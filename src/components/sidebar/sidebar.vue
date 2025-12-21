@@ -46,7 +46,7 @@
               ກວດຍອດເງິນຂ້າມທະນາຄານຜ່ານຕູ້ ATM
             </li>
             <li class="sidebar-subitem" @click.stop="goTo('/products_service/atm-cash-withdraw'); closeSidebar()">
-              ຖອນເງິນສົດຂ້າມທະນາຄາານຜ່ານຕູ້ ATM
+              ຖອນເງິນສົດຂ້າມທະນາຄານຜ່ານຕູ້ ATM
             </li>
             <li class="sidebar-subitem" @click.stop="goTo('/products_service/atm-transfer'); closeSidebar()">
               ໂອນເງິນຂ້າມທະນາຄານຜ່ານຕູ້ ATM
@@ -55,10 +55,10 @@
               ໂອນເງິນຂ້າມທະນາຄານເທິງມືຖື
             </li>
             <li class="sidebar-subitem" @click.stop="goTo('/products_service/qr-payment'); closeSidebar()">
-              ການຊຳລະເງິນຂ້າມທະນາຄານຜ່ານ QR
+              ຊຳລະຂ້າມທະນາຄານຜ່ານ LAPNet
             </li>
             <li class="sidebar-subitem" @click.stop="goTo('/products_service/crossborder'); closeSidebar()">
-              ຊຳລະຂ້າມແດນໃນຮູບແບບ QR CODE ລະຫວ່າງປະເທດ
+              ຊຳລະຂ້າມແດນຜ່ານ QR CODE 
             </li>
           </ul>
         </li>
@@ -79,7 +79,7 @@
               ສະມາຊິກລະບົບຊຳລະຂ້າມທະນາຄານເທິງມືຖື
             </li>
             <li class="sidebar-subitem" @click.stop="goTo('/member/crossborder'); closeSidebar()">
-              ສະມາຊິກລະບົບຊຳລະຂ້າມແດນໃນຮູບແບບ QR Code ລະຫວ່າງປະເທດ
+              ສະມາຊິກລະບົບຊຳລະຂ້າມແດນຜ່ານ QR Code
             </li>
           </ul>
         </li>
@@ -113,7 +113,7 @@
               ຄວາມເປັນມາ
             </li>
             <li class="sidebar-subitem" @click.stop="goTo('/aboutus/board_director'); closeSidebar()">
-              ສະພາຜູ້ບໍລິຫານ
+              ສະພາບໍລິຫານ
             </li>
             <li class="sidebar-subitem" @click.stop="goTo('/aboutus/companystructureimage'); closeSidebar()">
               ໂຄງຮ່າງການຈັດຕັ້ງ

@@ -538,7 +538,7 @@ onBeforeUnmount(() => {
 
     .mockup-card {
         width: 300px;
-        height: 420px;
+        height: 550px;
     }
 
     .mockup-frame {

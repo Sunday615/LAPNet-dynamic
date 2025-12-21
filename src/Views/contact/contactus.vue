@@ -29,7 +29,7 @@ const openMap = () => {
                     <div class="headercontact">
                         <h1>
                             Anywhere Anytime <br />
-                            Any Payment Chanel
+                            Any Payment Channels.
                         </h1>
                     </div>
 

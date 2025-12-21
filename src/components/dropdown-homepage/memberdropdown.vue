@@ -24,7 +24,7 @@
         <div class="dropdown-divider"></div>
         <div class="dropdown-item">
           <router-link to="/member/crossborder">
-            <span>ສະມາຊິກລະບົບຊຳລະຂ້າມແດນໃນຮູບແບບ QR Code ລະຫວ່າງປະເທດ</span></router-link>
+            <span>ສະມາຊິກລະບົບຊຳລະຂ້າມແດນຜ່ານ QR Code </span></router-link>
 
         </div>
 

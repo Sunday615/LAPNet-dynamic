@@ -76,7 +76,7 @@
                             <RouterLink to="/products_service/allproduct">ຜະລິດຕະພັນ ແລະ ການບໍລິການ ທັງໝົດ</RouterLink>
                         </li>
                         <li>
-                            <RouterLink to="/products_service/atm-inquiry">ກວດເງິນຂ້າມທະນາຄານຜ່ານຕູ້ ATM</RouterLink>
+                            <RouterLink to="/products_service/atm-inquiry">ກວດຍອດເງິນຂ້າມທະນາຄານຜ່ານຕູ້ ATM</RouterLink>
                         </li>
                         <li>
                             <RouterLink to="/products_service/atm-cash-withdraw">ຖອນເງິນສົດຂ້າມທະນາຄານຜ່ານຕູ້ ATM</RouterLink>
@@ -88,10 +88,10 @@
                             <RouterLink to="/products_service/mobile-transfer">ໂອນເງິນຂ້າມທະນາຄານເທິງມືຖື</RouterLink>
                         </li>
                         <li>
-                            <RouterLink to="/products_service/qr-payment">ການຊຳລະເງິນຂ້າມທະນາຄານຜ່ານ LAPNet</RouterLink>
+                            <RouterLink to="/products_service/qr-payment">ຊຳລະຂ້າມທະນາຄານຜ່ານ LAPNet</RouterLink>
                         </li>
                         <li>
-                            <RouterLink to="/products_service/crossborder">ຊຳລະເງິນຂ້າມແດນຜ່ານ QR</RouterLink>
+                            <RouterLink to="/products_service/crossborder">ຊຳລະຂ້າມແດນຜ່ານ QR CODE </RouterLink>
                         </li>
                     </ul>
                 </div>
@@ -118,8 +118,8 @@
                                     <RouterLink to="/member/mobile_banking">ສະມາຊິກລະບົບຊຳລະຂ້າມທະນາຄານເທິງມືຖື</RouterLink>
                                 </li>
                                 <li>
-                                    <RouterLink to="/member/crossborder">ສະມາຊິກລະບົບຊຳລະຂ້າມແດນໃນຮູບແບບ QR Code
-                                        ລະຫວ່າງປະເທດ</RouterLink>
+                                    <RouterLink to="/member/crossborder">ສະມາຊິກລະບົບຊຳລະຂ້າມແດນຜ່ານ QR Code
+                                       </RouterLink>
                                 </li>
                             </ul>
                         </li>
@@ -145,7 +145,7 @@
                                     <RouterLink to="/aboutus/history">ຄວາມເປັນມາ</RouterLink>
                                 </li>
                                 <li>
-                                    <RouterLink to="/aboutus/board_director">ສະພາຜູ້ບໍລິຫານ</RouterLink>
+                                    <RouterLink to="/aboutus/board_director">ສະພາບໍລິຫານ</RouterLink>
                                 </li>
                                 <li>
                                     <RouterLink to="/aboutus/companystructureimage">ໂຄ່ງຮ່າງການຈັດຕັ້ງ</RouterLink>

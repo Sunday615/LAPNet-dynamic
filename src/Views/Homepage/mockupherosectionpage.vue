@@ -57,7 +57,7 @@
           </button>
 
           <!-- Facebook -->
-          <a class="iconLink" href="https://facebook.com" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook">
+          <a class="iconLink" href="https://www.facebook.com/laonationalpaymentnetwork" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook">
            <i class="fa-brands fa-facebook-f"></i>
           </a>
 

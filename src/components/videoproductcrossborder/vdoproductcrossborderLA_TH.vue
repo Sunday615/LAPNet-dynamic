@@ -21,22 +21,26 @@
 
         <div class="centercontainer">
           <div class="headercondition">
-            <p>
-              ເບື້ອງລາວ (ສະແກນຊຳລະ) : 10 ທະນາຄານສະມາຊິກ.
-            </p>
+            <p>ເບື້ອງລາວ (ສະແກນຊຳລະ) : 10 ທະນາຄານສະມາຊິກ.</p>
           </div>
-          <div class="logomember">
-            <div class="logo-row">
+
+         
+          <div class="logomember logomember-top">
+            <div class="logo-row row-1">
               <img src="/logoallmember/retangle_scale/BCEL.png" alt="BCEL" />
               <img src="/logoallmember/retangle_scale/LDBnew.png" alt="LDB" />
               <img src="/Logomember/APB.png" alt="APB" />
               <img src="/logoallmember/retangle_scale/LVBnew.png" alt="LVB" />
               <img src="/logoallmember/retangle_scale/jdbnew.png" alt="JDB" />
-            </div>
-            <div class="logo-row" style="margin-top: 10px">
+         
               <img src="/logoallmember/retangle_scale/STB.jpg" alt="STB" />
-              <img src="/logoallmember/retangle_scale/ACL.jpg" alt="ACL" />
-              <img src="/logoallmember/retangle_scale/sacom.png" alt="Sacom" />
+               <img src="/logoallmember/retangle_scale/ACL.jpg" alt="ACL" />
+                  <img src="/logoallmember/retangle_scale/sacom.png" alt="Sacom" />
+            </div>
+
+            <div class="logo-row row-2">
+             
+           
               <img src="/Logomember/psvbre.PNG" alt="PSVBRE" />
               <img src="/logoallmember/retangle_scale/mjbl.jpeg" alt="MJBL" />
             </div>
@@ -46,7 +50,8 @@
         <div class="bottomcontainer">
           <div class="headercondition thai-header">
             <p class="thai-text">
-              ເບື້ອງໄທ (ຮັບການຊຳລະ) : 05 ທະນາຄານຫຼັກ "ທຸກຮ້ານຄ້າທີ່ຮັບ Thai QR Payment" :
+              ເບື້ອງໄທ (ຮັບການຊຳລະ) : 05 ທະນາຄານຫຼັກ
+              "ທຸກຮ້ານຄ້າທີ່ຮັບ Thai QR Payment" :
             </p>
             <img
               src="/logoallmember/retangle_scale/THAIQR.png"
@@ -54,12 +59,22 @@
               class="thaiqr-logo"
             />
           </div>
+
           <div class="logomember">
             <div class="logo-row">
               <img src="/logoallmember/retangle_scale/kbank.jpg" alt="KBank" />
-              <img src="/logoallmember/retangle_scale/krungsi.jpeg" alt="Krungsri" />
-              <img src="/logoallmember/retangle_scale/Kringthai.png" alt="Krungthai" />
-              <img src="/logoallmember/retangle_scale/BBL-Logo-TH.jpg" alt="BBL" />
+              <img
+                src="/logoallmember/retangle_scale/krungsi.jpeg"
+                alt="Krungsri"
+              />
+              <img
+                src="/logoallmember/retangle_scale/Kringthai.png"
+                alt="Krungthai"
+              />
+              <img
+                src="/logoallmember/retangle_scale/BBL-Logo-TH.jpg"
+                alt="BBL"
+              />
               <img src="/logoallmember/retangle_scale/SCB.png" alt="SCB" />
             </div>
           </div>
@@ -75,7 +90,7 @@
 .video-background-container {
   position: relative;
   width: 100%;
-  min-height: 100vh; /* full screen height instead of fixed 1000px */
+  min-height: 100vh;
   padding: 40px 0;
   box-sizing: border-box;
   overflow: hidden;
@@ -120,8 +135,7 @@
   -webkit-backdrop-filter: blur(5px);
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.1),
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.5),
     inset 0 -1px 0 rgba(255, 255, 255, 0.1),
     inset 0 0 0px 0px rgba(255, 255, 255, 0);
@@ -200,7 +214,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-wrap: wrap; /* allow Thai QR text + logo to wrap */
+  flex-wrap: wrap;
   text-align: center;
   gap: 12px;
   padding: 0 10px;
@@ -232,7 +246,7 @@
 
 .logo-row {
   display: flex;
-  flex-wrap: wrap; /* responsive wrapping */
+  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   gap: 12px;
@@ -245,6 +259,18 @@
   max-width: 20vw;
   height: auto;
   object-fit: contain;
+}
+
+/* ✅ เฉพาะด้านบน: แถว 2 มี 4 โลโก้แบบเป็นระเบียบ */
+.logomember-top .row-2 {
+  margin-top: 10px;
+}
+
+/* desktop/tablet ใหญ่: บังคับไม่ให้ตัดบรรทัด เพื่อให้ row-2 = 4 แน่นอน */
+@media (min-width: 769px) {
+  .logomember-top .logo-row {
+    flex-wrap: nowrap;
+  }
 }
 
 /* ===== Bottom section ===== */
@@ -317,6 +343,11 @@
     max-width: 30vw;
   }
 
+  /* มือถือปล่อยให้ wrap ได้ กันล้นจอ */
+  .logomember-top .logo-row {
+    flex-wrap: wrap;
+  }
+
   .headercondition {
     min-height: auto;
   }
@@ -362,14 +393,14 @@
 </style>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { gsap } from "gsap";
+import { ref, onMounted } from "vue"
+import { gsap } from "gsap"
 
-const videoSrc = "/videos/testcrossborder.mp4";
-const videoRef = ref(null);
-const titleRef = ref(null);
-const subtitleRef = ref(null); // for future subtitle
-const buttonRef = ref(null);   // for future button
+const videoSrc = "/videos/testcrossborder.mp4"
+const videoRef = ref(null)
+const titleRef = ref(null)
+const subtitleRef = ref(null) // for future subtitle
+const buttonRef = ref(null) // for future button
 
 onMounted(() => {
   if (titleRef.value) {
@@ -378,7 +409,7 @@ onMounted(() => {
       opacity: 0,
       duration: 1,
       ease: "power3.out",
-    });
+    })
   }
 
   if (subtitleRef.value) {
@@ -388,7 +419,7 @@ onMounted(() => {
       duration: 1,
       delay: 0.5,
       ease: "power3.out",
-    });
+    })
   }
 
   if (buttonRef.value) {
@@ -398,18 +429,18 @@ onMounted(() => {
       duration: 0.8,
       delay: 1,
       ease: "back.out(1.7)",
-    });
+    })
   }
-});
+})
 
 function playAnimation() {
-  if (!buttonRef.value) return;
+  if (!buttonRef.value) return
   gsap.to(buttonRef.value, {
     scale: 0.9,
     duration: 0.2,
     yoyo: true,
     repeat: 1,
     ease: "power1.inOut",
-  });
+  })
 }
 </script>

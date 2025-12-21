@@ -1,15 +1,21 @@
 <template>
   <div class="lang-container">
     <div class="lang-box">
-      <!-- BLOCK 1 -->
-      <div class="select-wrap" ref="leftBlock">
-        <div class="selected" @click="open1 = !open1">
+      <!-- LEFT -->
+      <div
+        class="select-wrap"
+        ref="leftBlock"
+        :class="{ open: open1 && !leftIsLa, 'is-la': leftIsLa }"
+      >
+        <div class="selected" :class="{ readonly: leftIsLa }" @click="toggleLeft">
           <img :src="getFlag(source)" class="flag" />
           <span>{{ getName(source) }}</span>
         </div>
-        <ul v-if="open1" class="dropdown-list">
+
+        <!-- dropdown (เฉพาะฝั่งที่ไม่ใช่ la) -->
+        <ul v-if="open1 && !leftIsLa" class="dropdown-list">
           <li
-            v-for="lang in filteredSource"
+            v-for="lang in nonLaLanguages"
             :key="lang.code"
             @click="selectSource(lang.code)"
           >
@@ -30,15 +36,25 @@
         <i class="fa-solid fa-repeat"></i>
       </button>
 
-      <!-- BLOCK 2 -->
-      <div class="select-wrap" ref="rightBlock">
-        <div class="selected" @click="open2 = !open2">
+      <!-- RIGHT -->
+      <div
+        class="select-wrap"
+        ref="rightBlock"
+        :class="{ open: open2 && !rightIsLa, 'is-la': rightIsLa }"
+      >
+        <div
+          class="selected"
+          :class="{ readonly: rightIsLa }"
+          @click="toggleRight"
+        >
           <img :src="getFlag(target)" class="flag" />
           <span>{{ getName(target) }}</span>
         </div>
-        <ul v-if="open2" class="dropdown-list">
+
+        <!-- dropdown (เฉพาะฝั่งที่ไม่ใช่ la) -->
+        <ul v-if="open2 && !rightIsLa" class="dropdown-list">
           <li
-            v-for="lang in filteredTarget"
+            v-for="lang in nonLaLanguages"
             :key="lang.code"
             @click="selectTarget(lang.code)"
           >
@@ -77,29 +93,14 @@ const leftBlock = ref(null)
 const rightBlock = ref(null)
 const swapBtn = ref(null)
 
-const isValidCode = (code) => languages.some(l => l.code === code)
-const getFlag = (code) => languages.find(l => l.code === code)?.flag || ""
-const getName = (code) => languages.find(l => l.code === code)?.name || ""
+const isValidCode = (code) => languages.some((l) => l.code === code)
+const getFlag = (code) => languages.find((l) => l.code === code)?.flag || ""
+const getName = (code) => languages.find((l) => l.code === code)?.name || ""
 
-// filter lists based on rules:
-// - One side must always be "la"
-// - If the other side is "la" → this side can select any country except "la"
-// - If the other side is NOT "la" → this side must be "la"
-const filteredSource = computed(() => {
-  if (target.value === "la") {
-    return languages.filter(l => l.code !== "la")
-  } else {
-    return languages.filter(l => l.code === "la")
-  }
-})
+const nonLaLanguages = computed(() => languages.filter((l) => l.code !== "la"))
 
-const filteredTarget = computed(() => {
-  if (source.value === "la") {
-    return languages.filter(l => l.code !== "la")
-  } else {
-    return languages.filter(l => l.code === "la")
-  }
-})
+const leftIsLa = computed(() => source.value === "la")
+const rightIsLa = computed(() => target.value === "la")
 
 // special case: vn-la and ch-la → swap is disabled
 const isSwapLocked = computed(() => {
@@ -109,63 +110,49 @@ const isSwapLocked = computed(() => {
   )
 })
 
-// select from BLOCK 1 (left)
+const toggleLeft = () => {
+  if (leftIsLa.value) return
+  open1.value = !open1.value
+  if (open1.value) open2.value = false
+}
+
+const toggleRight = () => {
+  if (rightIsLa.value) return
+  open2.value = !open2.value
+  if (open2.value) open1.value = false
+}
+
+// select from LEFT (non-la only)
 const selectSource = (code) => {
   if (!isValidCode(code)) return
+  if (code === "la") return
 
-  if (code === "la") {
-    // if selecting "la" on the left
-    source.value = "la"
-    // prevent la-la
-    if (target.value === "la") {
-      const firstNonLa = languages.find(l => l.code !== "la")
-      if (firstNonLa) target.value = firstNonLa.code
-    }
-  } else {
-    // if selecting non-"la" on the left → right side becomes "la" automatically
-    source.value = code
-    target.value = "la"
-  }
-
+  source.value = code
+  target.value = "la"
   open1.value = false
 }
 
-// select from BLOCK 2 (right)
+// select from RIGHT (non-la only)
 const selectTarget = (code) => {
   if (!isValidCode(code)) return
+  if (code === "la") return
 
-  if (code === "la") {
-    // if selecting "la" on the right
-    target.value = "la"
-    // prevent la-la
-    if (source.value === "la") {
-      const firstNonLa = languages.find(l => l.code !== "la")
-      if (firstNonLa) source.value = firstNonLa.code
-    }
-  } else {
-    // if selecting non-"la" on the right → left side becomes "la" automatically
-    target.value = code
-    source.value = "la"
-  }
-
+  target.value = code
+  source.value = "la"
   open2.value = false
 }
 
 // update route based on current pair
 const updateRoute = () => {
   const path = `/products_service/crossborder/${source.value}-${target.value}`
-
   if (router.currentRoute.value.path === path) return
 
   router.push(path).catch((err) => {
-    if (err && err.name !== "NavigationDuplicated") {
-      console.error(err)
-    }
+    if (err && err.name !== "NavigationDuplicated") console.error(err)
   })
 }
 
-// sync state from route path (enforce rules: must include "la", no la-la, etc.)
-// sync state from route path (enforce rules: must include "la", no la-la, etc.)
+// sync state from route path (enforce rules: must include la, no la-la, etc.)
 const syncStateFromRoute = (path) => {
   const match = path.match(/\/crossborder\/([a-z]+)-([a-z]+)/)
   if (!match) {
@@ -177,12 +164,12 @@ const syncStateFromRoute = (path) => {
   let src = match[1]
   let tgt = match[2]
 
-  // ✅ normalize special cases:
+  // normalize special cases:
   // la-vn  → vn-la
   // la-ch  → ch-la
   if (src === "la" && (tgt === "vn" || tgt === "ch")) {
-    src = tgt      // vn or ch
-    tgt = "la"     // la on the right
+    src = tgt
+    tgt = "la"
   }
 
   if (!isValidCode(src) || !isValidCode(tgt)) {
@@ -194,34 +181,31 @@ const syncStateFromRoute = (path) => {
   // la-la → force only one side to be "la"
   if (src === "la" && tgt === "la") {
     src = "la"
-    const firstNonLa = languages.find(l => l.code !== "la")?.code || "kh"
-    tgt = firstNonLa
+    tgt = languages.find((l) => l.code !== "la")?.code || "kh"
   }
   // both sides are not "la" → force right side to "la"
   else if (src !== "la" && tgt !== "la") {
-    // keep src, set tgt = "la"
     tgt = "la"
   }
 
-  // set state
   source.value = src
   target.value = tgt
 }
 
-// redirect special cases: la-vn → vn-la, la-ch → ch-la
+// redirect special cases: la-vn → vn-la, la-ch → ch-la (รองรับ path ที่มี prefix)
 const fixWrongOrder = (path) => {
-  const clean = path.replace("/crossborder/", "")
+  const match = path.match(/\/crossborder\/([a-z]+)-([a-z]+)/)
+  if (!match) return false
 
+  const clean = `${match[1]}-${match[2]}`
   if (clean === "la-vn") {
-    router.replace("/crossborder/vn-la")
+    router.replace("/products_service/crossborder/vn-la")
     return true
   }
-
   if (clean === "la-ch") {
-    router.replace("/crossborder/ch-la")
+    router.replace("/products_service/crossborder/ch-la")
     return true
   }
-
   return false
 }
 
@@ -231,11 +215,9 @@ watch(
   (newPath, oldPath) => {
     if (newPath === oldPath) return
 
-    // if la-vn or la-ch → redirect and skip sync
     const redirected = fixWrongOrder(newPath)
     if (redirected) return
 
-    // normal case → sync state from path
     syncStateFromRoute(newPath)
   },
   { immediate: true }
@@ -248,8 +230,10 @@ watch([source, target], () => {
 
 // GSAP animated swap
 const swap = () => {
-  // vn-la / ch-la → do not allow swap
   if (isSwapLocked.value) return
+
+  open1.value = false
+  open2.value = false
 
   const leftEl = leftBlock.value
   const rightEl = rightBlock.value
@@ -259,27 +243,18 @@ const swap = () => {
     let src = source.value
     let tgt = target.value
 
-    // swap values
-    const tmp = src
-    src = tgt
-    tgt = tmp
+    ;[src, tgt] = [tgt, src]
 
     // enforce rule: one side must be "la" and no la-la
-    if (src !== "la" && tgt !== "la") {
-      // if no "la" after swap → force right side to "la"
-      tgt = "la"
-    }
+    if (src !== "la" && tgt !== "la") tgt = "la"
     if (src === "la" && tgt === "la") {
-      // if la-la → set right side to first non-"la"
-      const firstNonLa = languages.find(l => l.code !== "la")?.code || "kh"
-      tgt = firstNonLa
+      tgt = languages.find((l) => l.code !== "la")?.code || "kh"
     }
 
     source.value = src
     target.value = tgt
   }
 
-  // if elements not ready → skip animation, just do logic
   if (!leftEl || !rightEl || !btnEl) {
     doSwapLogic()
     return
@@ -317,9 +292,7 @@ const swap = () => {
     "<"
   )
 
-  tl.add(() => {
-    doSwapLogic()
-  })
+  tl.add(() => doSwapLogic())
 
   tl.to(leftEl, {
     x: 0,
@@ -356,7 +329,7 @@ const swap = () => {
 
 /* ====== card ====== */
 .lang-box {
-  width: min(100%, 820px);       /* follow screen, limit max width */
+  width: min(100%, 820px);
   background: linear-gradient(135deg, #001072, #5ab3dd);
   padding: clamp(14px, 2.2vw, 26px) clamp(14px, 2.6vw, 34px);
   border-radius: 22px;
@@ -367,17 +340,27 @@ const swap = () => {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
   z-index: 3;
 
-  /* allow wrap on small screens */
   flex-wrap: wrap;
   box-sizing: border-box;
+
+  /* สำคัญ: ทำให้เป็น stacking context */
+  position: relative;
 }
 
 /* ====== Select blocks ====== */
 .select-wrap {
   position: relative;
-  flex: 1 1 260px;              /* grow/shrink */
-  min-width: 220px;             /* prevent too small on desktop */
+  flex: 1 1 260px;
+  min-width: 220px;
   max-width: 420px;
+
+  /* base layer */
+  z-index: 1;
+}
+
+/* ตอนเปิด dropdown ให้ลอยขึ้นเหนือทุกอย่าง */
+.select-wrap.open {
+  z-index: 200;
 }
 
 /* selected input */
@@ -389,24 +372,16 @@ const swap = () => {
   border-radius: 15px;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* name aligned */
+  justify-content: space-between;
   gap: 10px;
   cursor: pointer;
   backdrop-filter: blur(4px);
   box-sizing: border-box;
 }
 
-/* left side (flag + text) */
-.selected > img.flag {
-  flex: 0 0 auto;
-}
-.selected > span {
-  flex: 1 1 auto;
-  font-size: clamp(0.8rem, 1.2vw, 0.95rem);
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.selected.readonly {
+  cursor: default;
+  opacity: 0.85;
 }
 
 /* flag */
@@ -415,6 +390,15 @@ const swap = () => {
   height: clamp(14px, 1.7vw, 18px);
   border-radius: 4px;
   object-fit: cover;
+}
+
+.selected > span {
+  flex: 1 1 auto;
+  font-size: clamp(0.8rem, 1.2vw, 0.95rem);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* dropdown */
@@ -427,7 +411,9 @@ const swap = () => {
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
-  z-index: 50;
+
+  /* สำคัญ: ให้ทับทุกอย่างแน่นอน */
+  z-index: 9999;
 
   max-height: min(320px, 40vh);
   overflow-y: auto;
@@ -460,8 +446,12 @@ const swap = () => {
   align-items: center;
   justify-content: center;
   transform-origin: center;
-  flex: 0 0 auto;               /* keep size */
+  flex: 0 0 auto;
   touch-action: manipulation;
+
+  /* ให้ปุ่มไม่โดน dropdown ทับผิดๆ ตอนมือถือ */
+  position: relative;
+  z-index: 2;
 }
 
 .swap-btn i {
@@ -490,7 +480,6 @@ const swap = () => {
 /* ====== Mobile ====== */
 @media (max-width: 480px) {
   .lang-box {
-       /* stack vertically */
     align-items: stretch;
     gap: 10px;
     padding: 14px;
@@ -502,11 +491,22 @@ const swap = () => {
     max-width: none;
   }
 
+  /* ✅ ตามที่ขอ: ถ้าฝั่งนั้นเป็น "ลาว" ให้ z-index ติดลบ เพื่อไม่ไปซ้อน dropdown */
+  .select-wrap.is-la {
+    z-index: -999;
+  }
+
+  /* ถ้าฝั่งนั้นกำลังเปิด dropdown ให้ดึงขึ้นมาเหนือเสมอ */
+  .select-wrap.open {
+    z-index: 200;
+  }
+
   .swap-btn {
     width: 44px;
     height: 44px;
     border-radius: 12px;
-    align-self: center;          /* center between selects */
+    align-self: center;
+    z-index: 2;
   }
 
   .dropdown-list {

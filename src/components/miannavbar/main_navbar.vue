@@ -38,8 +38,8 @@ const menuItems = [
       { label: 'ຖອນເງິນສົດຂ້າມທະນາຄານຜ່ານຕູ້ ATM', to: '/products_service/atm-cash-withdraw' },
       { label: 'ໂອນເງິນຂ້າມທະນາຄານຜ່ານຕູ້ ATM', to: '/products_service/atm-transfer' },
       { label: 'ໂອນເງິນຂ້າມທະນາຄານເທິງມືຖື', to: '/products_service/mobile-transfer' },
-      { label: 'ການຊຳລະເງິນຂ້າມທະນາຄານຜ່ານ LAPNet', to: '/products_service/qr-payment' },
-      { label: 'ຊຳລະຂ້າມແດນໃນຮູບແບບ QR CODE ລະຫວ່າງປະເທດ', to: '/products_service/crossborder' }
+      { label: 'ຊຳລະຂ້າມທະນາຄານຜ່ານ LAPNet', to: '/products_service/qr-payment' },
+      { label: 'ຊຳລະຂ້າມແດນຜ່ານ QR CODE  ', to: '/products_service/crossborder' }
     ]
   },
   {
@@ -48,7 +48,7 @@ const menuItems = [
     children: [
       { label: 'ສະມາຊິກລະບົບບັດທະນາຄານຮ່ວມກັນ', to: '/member/membercardATM' },
       { label: 'ສະມາຊິກລະບົບຊຳລະຂ້າມທະນາຄານເທິງມືຖື', to: '/member/mobile_banking' },
-      { label: 'ສະມາຊິກລະບົບຊຳລະຂ້າມແດນໃນຮູບແບບ QR Code ລະຫວ່າງປະເທດ', to: '/member/crossborder' }
+      { label: 'ສະມາຊິກລະບົບຊຳລະຂ້າມແດນຜ່ານ QR Code', to: '/member/crossborder' }
     ]
   },
   { label: 'ຂ່າວ ແລະ ກິດຈະກຳ', to: '/bloggrid' },
@@ -60,7 +60,7 @@ const menuItems = [
       { label: 'ວິໄສທັດ ແລະ ພາລະກິດ', to: '/aboutus/vision' },
       { label: 'ພາລະບົດບາດ', to: '/aboutus/role' },
       { label: 'ຄວາມເປັນມາ', to: '/aboutus/history' },
-      { label: 'ສະພາຜູ້ບໍລິຫານ', to: '/aboutus/board_director' },
+      { label: 'ສະພາບໍລິຫານ', to: '/aboutus/board_director' },
       { label: 'ໂຄງຮ່າງການຈັດຕັ້ງ', to: '/aboutus/companystructureimage' }
     ]
   },

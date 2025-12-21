@@ -41,11 +41,11 @@
 
           <ul v-if="openKey === 'product'" class="sidebar-subnav">
             <li class="sidebar-subitem" @click.stop="goTo('/products_service/atm-inquiry')">ກວດຍອດເງິນຂ້າມທະນາຄານຜ່ານຕູ້ ATM</li>
-            <li class="sidebar-subitem" @click.stop="goTo('/products_service/atm-cash-withdraw')">ຖອນເງິນສົດຂ້າມທະນາຄາານຜ່ານຕູ້ ATM</li>
+            <li class="sidebar-subitem" @click.stop="goTo('/products_service/atm-cash-withdraw')">ຖອນເງິນສົດຂ້າມທະນາຄານຜ່ານຕູ້ ATM</li>
             <li class="sidebar-subitem" @click.stop="goTo('/products_service/atm-transfer')">ໂອນເງິນຂ້າມທະນາຄານຜ່ານຕູ້ ATM</li>
             <li class="sidebar-subitem" @click.stop="goTo('/products_service/mobile-transfer')">ໂອນເງິນຂ້າມທະນາຄານເທິງມືຖື</li>
-            <li class="sidebar-subitem" @click.stop="goTo('/products_service/qr-payment')">ການຊຳລະເງິນຂ້າມທະນາຄານຜ່ານ QR</li>
-            <li class="sidebar-subitem" @click.stop="goTo('/products_service/crossborder')">ຊຳລະຂ້າມແດນໃນຮູບແບບ QR CODE ລະຫວ່າງປະເທດ</li>
+            <li class="sidebar-subitem" @click.stop="goTo('/products_service/qr-payment')">ຊຳລະຂ້າມທະນາຄານຜ່ານ LAPNet</li>
+            <li class="sidebar-subitem" @click.stop="goTo('/products_service/crossborder')">ຊຳລະຂ້າມແດນຜ່ານ QR CODE </li>
           </ul>
         </li>
 
@@ -60,7 +60,7 @@
           <ul v-if="openKey === 'member'" class="sidebar-subnav">
             <li class="sidebar-subitem" @click.stop="goTo('/member/membercardATM')">ສະມາຊິກລະບົບບັດທະນາຄານຮ່ວມກັນ</li>
             <li class="sidebar-subitem" @click.stop="goTo('/member/mobile_banking')">ສະມາຊິກລະບົບຊຳລະຂ້າມທະນາຄານເທິງມືຖື</li>
-            <li class="sidebar-subitem" @click.stop="goTo('/member/crossborder')">ສະມາຊິກລະບົບຊຳລະຂ້າມແດນໃນຮູບແບບ QR Code ລະຫວ່າງປະເທດ</li>
+            <li class="sidebar-subitem" @click.stop="goTo('/member/crossborder')">ສະມາຊິກລະບົບຊຳລະຂ້າມແດນຜ່ານ QR Code </li>
           </ul>
         </li>
 
@@ -86,7 +86,7 @@
             <li class="sidebar-subitem" @click.stop="goTo('/aboutus/vision')">ວິໄສທັດ ແລະ ພາລະກິດ</li>
             <li class="sidebar-subitem" @click.stop="goTo('/aboutus/role')">ພາລະບົດບາດ</li>
             <li class="sidebar-subitem" @click.stop="goTo('/aboutus/history')">ຄວາມເປັນມາ</li>
-            <li class="sidebar-subitem" @click.stop="goTo('/aboutus/board_director')">ສະພາຜູ້ບໍລິຫານ</li>
+            <li class="sidebar-subitem" @click.stop="goTo('/aboutus/board_director')">ສະພາບໍລິຫານ</li>
             <li class="sidebar-subitem" @click.stop="goTo('/aboutus/companystructureimage')">ໂຄງຮ່າງການຈັດຕັ້ງ</li>
           </ul>
         </li>
@@ -100,10 +100,12 @@
       <footer class="sidebar-footer">
         <div class="status-pill" @click="goTo('/contactus')">
           <span class="status-dot"></span>
+          <router-link to="/contactus">
           <div class="status-text">
             <span>Help Center</span>
             <small>Contact us</small>
           </div>
+          </router-link>
         </div>
       </footer>
     </nav>

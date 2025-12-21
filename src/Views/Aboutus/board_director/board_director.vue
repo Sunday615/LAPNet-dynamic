@@ -10,12 +10,12 @@
 
   <div class="chart-page">
     <div class="chart-wrapper">
-      <h1 class="chart-title">ຄະນະສະພາຜູ້ບໍລິຫານ</h1>
+      <h1 class="chart-title">ຄະນະສະພາບໍລິຫານ</h1>
 
-      <p class="chart-subtitle" style="display:flex ; align-items: center;">
+      <p class="chart-subtitle" style="display: flex; align-items: center">
         <img
           src="/logolapnet/fullcircle.png"
-          style="width: 25px; height:25px ; margin-right: 5px;"
+          style="width: 25px; height: 25px; margin-right: 5px"
           alt=""
         />
         ຄະນະບໍລິຫານງານ Lao National Payment Network CO., LTD
@@ -51,34 +51,33 @@
               @mouseenter="onCardEnter"
               @mouseleave="onCardLeave"
             >
-              <!-- ✅ light sweep (hover only) -->
+              <!-- ✅ light sweep (hover only / immediate) -->
               <span class="shine" aria-hidden="true"></span>
 
-              <div class="avatar-wrapper">
-                <img class="avatar-image" :src="slot.image" :alt="slot.name" />
+              <!-- ✅ TOP: Bank logo + bank name (NO "bank" label) -->
+              <div v-if="slot.bankName || slot.bankLogo" class="bank-header">
+                <img
+                  v-if="slot.bankLogo"
+                  class="bank-header__logo"
+                  :src="slot.bankLogo"
+                  :alt="slot.bankName || 'bank'"
+                />
+                <div v-if="slot.bankName" class="bank-header__name">
+                  {{ slot.bankName }}
+                </div>
+                <span class="bank-header__line" aria-hidden="true"></span>
               </div>
 
-              <div class="member-info">
-                <div class="member-name">{{ slot.name }}</div>
-                <div class="member-role">{{ slot.role }}</div>
-
-                <!-- ✅ NEW: modern underline + bank mini logo (left) + bank name (right) -->
-                <div v-if="slot.bankName || slot.bankLogo" class="member-bank">
-                  <span class="bank-line" aria-hidden="true"></span>
-
-                  <div class="bank-row">
-                    <img
-                      v-if="slot.bankLogo"
-                      class="bank-logo"
-                      :src="slot.bankLogo"
-                      :alt="slot.bankName || 'bank'"
-                    />
-                    <span v-if="slot.bankName" class="bank-name">
-                      {{ slot.bankName }}
-                    </span>
-                  </div>
+              <!-- ✅ BODY: avatar left (same as before) + member name/role right -->
+              <div class="member-body">
+                <div class="avatar-wrapper">
+                  <img class="avatar-image" :src="slot.image" :alt="slot.name" />
                 </div>
-                <!-- ✅ END -->
+
+                <div class="member-info">
+                  <div class="member-name">{{ slot.name }}</div>
+                  <div class="member-role">{{ slot.role }}</div>
+                </div>
               </div>
             </div>
           </div>
@@ -101,31 +100,29 @@
             @mouseenter="onCardEnter"
             @mouseleave="onCardLeave"
           >
-            <!-- ✅ light sweep (hover only) -->
             <span class="shine" aria-hidden="true"></span>
 
-            <div class="avatar-wrapper">
-              <img class="avatar-image" :src="member.image" :alt="member.name" />
+            <div v-if="member.bankName || member.bankLogo" class="bank-header">
+              <img
+                v-if="member.bankLogo"
+                class="bank-header__logo"
+                :src="member.bankLogo"
+                :alt="member.bankName || 'bank'"
+              />
+              <div v-if="member.bankName" class="bank-header__name">
+                {{ member.bankName }}
+              </div>
+              <span class="bank-header__line" aria-hidden="true"></span>
             </div>
 
-            <div class="member-info">
-              <div class="member-name">{{ member.name }}</div>
-              <div class="member-role">{{ member.role }}</div>
+            <div class="member-body">
+              <div class="avatar-wrapper">
+                <img class="avatar-image" :src="member.image" :alt="member.name" />
+              </div>
 
-              <div v-if="member.bankName || member.bankLogo" class="member-bank">
-                <span class="bank-line" aria-hidden="true"></span>
-
-                <div class="bank-row">
-                  <img
-                    v-if="member.bankLogo"
-                    class="bank-logo"
-                    :src="member.bankLogo"
-                    :alt="member.bankName || 'bank'"
-                  />
-                  <span v-if="member.bankName" class="bank-name">
-                    {{ member.bankName }}
-                  </span>
-                </div>
+              <div class="member-info">
+                <div class="member-name">{{ member.name }}</div>
+                <div class="member-role">{{ member.role }}</div>
               </div>
             </div>
           </div>
@@ -146,8 +143,16 @@ import main_navbar from "../../../components/miannavbar/main_navbar.vue";
 import bod_navbar from "../companystructure/navbarcompany/bod_navbar.vue";
 import secondfooter from "../../../components/footer/mainfooter/secondfooter.vue";
 
+onMounted(() => {
+  window.scrollTo({
+    top: 500,
+    left: 0,
+    behavior: "smooth",
+  });
+});
+
 /* =========================
-   DATA (เพิ่ม bankName/bankLogo ได้ตามต้องการ)
+   DATA (เพิ่ม bankName/bankLogo)
    ========================= */
 const layout = [
   [
@@ -158,8 +163,8 @@ const layout = [
       role: "ປະທານສະພາບໍລິຫານ",
       roleTag: "president",
       image: "/board-director-profile/BOL.webp",
-      bankName: "ທະນາຄານແຫ່ງ ສປປ ລາວ (BOL)",
-      bankLogo: "/logoallmember/circle_scale/BOL.png", 
+      bankName: "ທະນາຄານແຫ່ງ ສປປ ລາວ",
+      bankLogo: "/logoallmember/circle_scale/BOL.png",
     },
     null,
     null,
@@ -172,7 +177,7 @@ const layout = [
       role: "ຮອງປະທານສະພາບໍລິຫານ",
       roleTag: "vp",
       image: "/board-director-profile/allbcel.png",
-      bankName: "ທະນາຄານ ການຄ້າຕ່າງປະເທດລາວ ມະຫາຊົນ ",
+      bankName: "ທະນາຄານ ການຄ້າຕ່າງປະເທດລາວ ມະຫາຊົນ",
       bankLogo: "/logoallmember/circle_scale/BCEL.png",
     },
     null,
@@ -185,17 +190,8 @@ const layout = [
       role: "ສະມາຊິກສະພາບໍລິຫານ",
       roleTag: "member",
       image: "/board-director-profile/upi.webp",
-      bankName: "ບໍລິສັດ ຢູນຽນເພ ສາກົນ ຈຳກັດ ",
+      bankName: "ບໍລິສັດ ຢູນຽນເພ ສາກົນ ຈຳກັດ",
       bankLogo: "/logoallmember/circle_scale/UPI.png",
-    },
-    {
-      type: "member",
-      name: "ທ່ານ ສອນຕາວັນ ໄກສອນເສນາ",
-      role: "ສະມາຊິກສະພາບໍລິຫານ",
-      roleTag: "member",
-      image: "/board-director-profile/ldb.webp",
-      bankName: "ທະນາຄານ ພັດທະນາລາວ ຈຳກັດ ",
-      bankLogo: "/logoallmember/circle_scale/LDB.PNG",
     },
     {
       type: "member",
@@ -203,10 +199,19 @@ const layout = [
       role: "ສະມາຊິກສະພາບໍລິຫານ",
       roleTag: "member",
       image: "/board-director-profile/apbcircle.png",
-      bankName: "ທະນາຄານ ສົ່ງເສີມກະສິກຳ ຈຳກັດ ",
+      bankName: "ທະນາຄານ ສົ່ງເສີມກະສິກຳ ຈຳກັດ",
       bankLogo: "/logoallmember/circle_scale/APBB.PNG",
     },
     null,
+    {
+      type: "member",
+      name: "ທ່ານ ສອນຕາວັນ ໄກສອນເສນາ",
+      role: "ສະມາຊິກສະພາບໍລິຫານ",
+      roleTag: "member",
+      image: "/board-director-profile/ldb.webp",
+      bankName: "ທະນາຄານ ພັດທະນາລາວ ຈຳກັດ",
+      bankLogo: "/logoallmember/circle_scale/LDB.PNG",
+    },
   ],
   [
     {
@@ -215,7 +220,7 @@ const layout = [
       role: "ສະມາຊິກສະພາບໍລິຫານ",
       roleTag: "member",
       image: "/board-director-profile/lvb.png",
-      bankName: "ທະນາຄານ ຮ່ວມທຸລະກິດລາວ-ຫວຽດ ",
+      bankName: "ທະນາຄານ ຮ່ວມທຸລະກິດລາວ-ຫວຽດ",
       bankLogo: "/logoallmember/circle_scale/lvb.PNG",
     },
     {
@@ -224,7 +229,7 @@ const layout = [
       role: "ສະມາຊິກສະພາບໍລິຫານ",
       roleTag: "member",
       image: "/board-director-profile/alljdb.png",
-      bankName: "ທະນາຄານ ຮ່ວມພັດທະນາ ມະຫາຊົນ ",
+      bankName: "ທະນາຄານ ຮ່ວມພັດທະນາ ມະຫາຊົນ",
       bankLogo: "/logoallmember/circle_scale/JDB.png",
     },
     {
@@ -233,7 +238,7 @@ const layout = [
       role: "ສະມາຊິກສະພາບໍລິຫານ",
       roleTag: "member",
       image: "/logoallmember/circle_scale/STB.png",
-      bankName: "ທະນາຄານ ເອັສທີ ຈຳກັດ ",
+      bankName: "ທະນາຄານ ເອັສທີ ຈຳກັດ",
       bankLogo: "/logoallmember/circle_scale/STB.png",
     },
     {
@@ -242,7 +247,7 @@ const layout = [
       role: "ສະມາຊິກສະພາບໍລິຫານ",
       roleTag: "member",
       image: "/board-director-profile/bic.png",
-      bankName: "ທະນາຄານ ບີໄອຊີ ລາວ ຈຳກັດ ",
+      bankName: "ທະນາຄານ ບີໄອຊີ ລາວ ຈຳກັດ",
       bankLogo: "/logoallmember/circle_scale/BIC.png",
     },
   ],
@@ -268,9 +273,10 @@ const mobileMembers = computed(() => {
 });
 
 /* =========================
-   HOVER LIGHT SWEEP (GSAP) — hover only
+   HOVER LIGHT SWEEP (GSAP) — hover only / immediate
    ========================= */
-const sweepMap = new WeakMap();
+const sweepMap = new Map(); // cardEl -> timeline
+const sweepSet = new Set(); // timelines for cleanup
 
 function prefersReducedMotion() {
   return (
@@ -290,30 +296,32 @@ function onCardEnter(e) {
   const shine = getShine(card);
   if (!shine) return;
 
-  // kill previous animation for this card
+  // kill previous
   const prev = sweepMap.get(card);
   if (prev) {
     prev.kill();
+    sweepSet.delete(prev);
     sweepMap.delete(card);
   }
 
-  // premium smooth sweep: fade in -> cross -> fade out
+  // start immediately (no wait)
   gsap.set(shine, { xPercent: -180, opacity: 0 });
 
-  const tl = gsap.timeline();
-  tl.to(shine, { opacity: 0.75, duration: 0.18, ease: "power2.out" }, 0);
+  const tl = gsap.timeline({ defaults: { overwrite: "auto" } });
+  tl.to(shine, { opacity: 0.85, duration: 0.08, ease: "power2.out" }, 0);
   tl.to(
     shine,
     {
       xPercent: 180,
-      duration: 1.25,
+      duration: 1.05,
       ease: "sine.inOut",
     },
     0
   );
-  tl.to(shine, { opacity: 0, duration: 0.38, ease: "power2.out" }, 0.92);
+  tl.to(shine, { opacity: 0, duration: 0.28, ease: "power2.out" }, 0.78);
 
   sweepMap.set(card, tl);
+  sweepSet.add(tl);
 }
 
 function onCardLeave(e) {
@@ -324,13 +332,13 @@ function onCardLeave(e) {
   const prev = sweepMap.get(card);
   if (prev) {
     prev.kill();
+    sweepSet.delete(prev);
     sweepMap.delete(card);
   }
 
-  // quick clean reset (no flashing)
   gsap.to(shine, {
     opacity: 0,
-    duration: 0.14,
+    duration: 0.12,
     ease: "power2.out",
     onComplete: () => gsap.set(shine, { xPercent: -180 }),
   });
@@ -338,13 +346,13 @@ function onCardLeave(e) {
 
 onMounted(async () => {
   await nextTick();
-  // กัน flash แรกเข้า (ตั้งค่าเริ่มต้นให้ทุก shine)
   gsap.set(".member-card .shine", { xPercent: -180, opacity: 0 });
 });
 
 onBeforeUnmount(() => {
-  // kill any remaining timelines
-  sweepMap.forEach?.((tl) => tl?.kill?.()); // safe (บาง env ไม่มี forEach บน WeakMap)
+  sweepSet.forEach((tl) => tl.kill());
+  sweepSet.clear();
+  sweepMap.clear();
 });
 </script>
 
@@ -452,10 +460,9 @@ onBeforeUnmount(() => {
   position: relative;
   width: 100%;
   display: flex;
-  
-  align-items: center;
-  gap: 18px;
-  padding: 20px 22px;
+  flex-direction: column; /* ✅ bank header top + body bottom */
+  gap: 14px;
+  padding: 18px 18px;
   border-radius: 24px;
   background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.16), transparent 55%),
     rgba(6, 12, 52, 0.98);
@@ -465,22 +472,10 @@ onBeforeUnmount(() => {
   transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
 }
 
-/* Bigger cards: row 1, row 2, row 4 */
+/* Bigger cards */
 .member-card--large {
-  padding: 26px 26px;
-}
-
-.member-card--large .avatar-wrapper {
-  width: 100px;
-  height: 100px;
-}
-
-.member-card--large .member-name {
-  font-size: 18px;
-}
-
-.member-card--large .member-role {
-  font-size: 1.05rem;
+  padding: 24px 24px;
+  gap: 16px;
 }
 
 /* Glow border effect */
@@ -513,12 +508,11 @@ onBeforeUnmount(() => {
   pointer-events: none;
   opacity: 0;
 
-  /* prettier highlight (soft edges + bright core) */
   background: linear-gradient(
     120deg,
     rgba(255, 255, 255, 0) 0%,
     rgba(255, 255, 255, 0.06) 28%,
-    rgba(255, 255, 255, 0.42) 50%,
+    rgba(255, 255, 255, 0.46) 50%,
     rgba(255, 255, 255, 0.06) 72%,
     rgba(255, 255, 255, 0) 100%
   );
@@ -531,7 +525,7 @@ onBeforeUnmount(() => {
 
 /* Hover interaction */
 .member-card:hover {
-  transform: translateY(-8px) scale(1.035);
+  transform: translateY(-8px) scale(1.03);
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.75);
 }
 
@@ -545,6 +539,67 @@ onBeforeUnmount(() => {
     rgba(6, 16, 70, 0.98);
 }
 
+/* ✅ TOP bank header (logo + name balanced) */
+.bank-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px 14px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.bank-header__logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: rgba(2, 6, 23, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.18), 0 0 22px rgba(37, 99, 235, 0.14);
+}
+
+.bank-header__name {
+  min-width: 0;
+  font-size: 1.02rem; /* ✅ balance with 34px logo */
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  color: rgba(226, 232, 240, 0.94);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bank-header__line {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 0;
+  height: 1px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(157, 214, 255, 0.65) 18%,
+    rgba(0, 120, 255, 0.85) 50%,
+    rgba(157, 214, 255, 0.55) 82%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  opacity: 0.95;
+}
+
+/* ✅ BODY (avatar left like before) */
+.member-body {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
 .avatar-wrapper {
   flex-shrink: 0;
   width: 100px;
@@ -555,6 +610,11 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.member-card--large .avatar-wrapper {
+  width: 104px;
+  height: 104px;
 }
 
 .avatar-image {
@@ -586,93 +646,35 @@ onBeforeUnmount(() => {
   line-height: 1.25;
 }
 
-/* ✅ NEW: Bank underline + row */
-.member-bank {
-  margin-top: 10px;
-  display: grid;
-  gap: 10px;
-}
-
-.bank-line {
-  height: 1px;
-  width: 100%;
-  border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(157, 214, 255, 0.65) 18%,
-    rgba(0, 120, 255, 0.85) 50%,
-    rgba(157, 214, 255, 0.55) 82%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  box-shadow: 0 0 14px rgba(56, 189, 248, 0.25), 0 0 26px rgba(37, 99, 235, 0.18);
-  opacity: 0.95;
-  position: relative;
-  overflow: hidden;
-}
-
-.bank-line::after {
-  content: "";
-  position: absolute;
-  top: -2px;
-  left: -30%;
-  width: 30%;
-  height: 5px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
-  filter: blur(2px);
-  opacity: 0.55;
-  animation: lineSweep 2.8s ease-in-out infinite;
-}
-
-@keyframes lineSweep {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(420%); }
-}
-
-.bank-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
-
-.bank-logo {
-  width: 30px;
-  height: 30px;
-  border-radius: 999px;
-  object-fit: cover;
-  flex-shrink: 0;
-  background: rgba(2, 6, 23, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 0 14px rgba(56, 189, 248, 0.22), 0 0 26px rgba(37, 99, 235, 0.16);
-}
-
-.bank-name {
-  font-size: 0.86rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: rgba(226, 232, 240, 0.92);
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 /* Animations */
 @keyframes rowIn {
-  0% { opacity: 0; transform: translateY(18px) scale(0.98); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .chart-row { animation: none; opacity: 1; transform: none; }
-  .member-card { transition: none; }
-  .bank-line::after { animation: none; }
+  .chart-row {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .member-card {
+    transition: none;
+  }
 }
 
-/* MEDIUM SCREENS – tablets, small laptops */
+/* MEDIUM SCREENS */
 @media (max-width: 1200px) {
-  .chart-wrapper { padding: 28px 22px 32px; }
+  .chart-wrapper {
+    padding: 28px 22px 32px;
+  }
 
   .chart-row--flex .chart-cell,
   .chart-row--flex .chart-cell--vp,
@@ -681,15 +683,16 @@ onBeforeUnmount(() => {
     max-width: 600px;
   }
 
-  .chart-row--grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-
-  .member-card--large { padding: 22px 22px; }
-  .member-card--large .avatar-wrapper { width: 100px; height: 100px; }
+  .chart-row--grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 /* RESPONSIVE – mobile (1 column) */
 @media (max-width: 900px) {
-  .chart-page { padding: 40px 12px; }
+  .chart-page {
+    padding: 40px 12px;
+  }
 
   .chart-wrapper {
     padding: 22px 14px 26px;
@@ -697,10 +700,20 @@ onBeforeUnmount(() => {
     border-radius: 26px;
   }
 
-  .chart-title { text-align: center; }
-  .chart-subtitle { text-align: center; justify-content: center; gap: 6px; }
+  .chart-title {
+    text-align: center;
+  }
 
-  .chart-grid-desktop { display: none; }
+  .chart-subtitle {
+    text-align: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .chart-grid-desktop {
+    display: none;
+  }
+
   .chart-grid-mobile {
     display: flex;
     flex-direction: column;
@@ -719,46 +732,67 @@ onBeforeUnmount(() => {
 
   .member-card {
     padding: 14px 14px;
-    gap: 12px;
     border-radius: 18px;
     box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
+    gap: 12px;
   }
 
-  .avatar-wrapper { width: 60px; height: 60px; padding: 3px; }
-  .member-info { gap: 4px; }
-  .member-name { font-size: 15px; }
-  .member-role { font-size: 0.88rem; }
+  .member-body {
+    gap: 12px;
+  }
+
+  .avatar-wrapper {
+    width: 60px;
+    height: 60px;
+    padding: 3px;
+  }
+
+  .member-name {
+    font-size: 15px;
+  }
+
+  .member-role {
+    font-size: 0.88rem;
+  }
+
+  .bank-header {
+    padding: 10px 10px 12px;
+    border-radius: 16px;
+  }
+  .bank-header__logo {
+    width: 26px;
+    height: 26px;
+  }
+  .bank-header__name {
+    font-size: 0.9rem;
+  }
 
   .member-card:hover {
     transform: translateY(-2px) scale(1.01);
     box-shadow: 0 18px 44px rgba(0, 0, 0, 0.65);
   }
-
-  .member-bank { gap: 8px; margin-top: 8px; }
-  .bank-logo { width: 20px; height: 20px; }
-  .bank-name { font-size: 0.82rem; }
 }
 
 @media (max-width: 600px) {
-  .chart-wrapper { padding: 18px 12px 22px; border-radius: 22px; }
+  .chart-wrapper {
+    padding: 18px 12px 22px;
+    border-radius: 22px;
+  }
 
-  .chart-title { font-size: clamp(1.55rem, 4.5vw + 0.9rem, 2.2rem); }
-  .chart-subtitle { font-size: 13px; margin-bottom: 18px; }
+  .chart-title {
+    font-size: clamp(1.55rem, 4.5vw + 0.9rem, 2.2rem);
+  }
 
-  .member-card { padding: 12px 12px; gap: 10px; border-radius: 16px; }
-  .avatar-wrapper { width: 54px; height: 54px; }
-  .member-name { font-size: 14px; }
-  .member-role { font-size: 0.82rem; }
+  .chart-subtitle {
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
 }
 
 @media (max-width: 420px) {
-  .member-card { padding: 11px 10px; gap: 9px; }
-  .avatar-wrapper { width: 50px; height: 50px; }
-  .member-name { font-size: 13.5px; }
-  .member-role { font-size: 0.78rem; }
-
-  .bank-logo { width: 18px; height: 18px; }
-  .bank-name { font-size: 0.78rem; }
+  .bank-header__name {
+    font-size: 0.82rem;
+  }
 }
 
 /* ถ้าเครื่องไม่มี hover จริงๆ ให้ไม่ต้องยกการ์ด */

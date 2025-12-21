@@ -169,14 +169,14 @@
           <router-link to="/products_service/qr-payment">
           <div class="chip-row">
             <span class="chip-dot"></span>
-            <span class="chip-label">ການຊໍາລະເງິນຂ້າມທະນາຄານຜ່ານ LAPNet</span>
+            <span class="chip-label">ຊໍາລະຂ້າມທະນາຄານຜ່ານ LAPNet</span>
             <span class="chip-value">05</span>
           </div>
           </router-link>
           <router-link to="/products_service/crossborder">
           <div class="chip-row">
             <span class="chip-dot"></span>
-            <span class="chip-label">ຊຳລະຂ້າມແດນໃນຮູບແບບ QR CODE ລະຫວ່າງປະເທດ</span>
+            <span class="chip-label">ຊຳລະຂ້າມແດນໃນຮູບແບບ QR CODE </span>
             <span class="chip-value">06</span>
           </div>
           </router-link>

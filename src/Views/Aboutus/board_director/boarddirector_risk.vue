@@ -10,7 +10,6 @@
     background-image="/aboutus/navigatormission-bg.png"
   />
 
-
   <div class="boardofdirector">
     <bod_navbar />
   </div>
@@ -20,13 +19,12 @@
       <header class="org-header">
         <h2>ຄະນະກຳມະການຄຸ້ມຄອງຄວາມສ່ຽງ</h2>
         <p style="display: flex; align-items: center;">
-            <img
+          <img
             src="/logolapnet/fullcircle.png"
             alt=""
             style="width: 25px; height: 25px; margin-right: 5px;"
           />
           Lao National Payment Network CO., LTD
-       
         </p>
       </header>
 
@@ -35,13 +33,25 @@
         <!-- Node 1 -->
         <div class="org-node">
           <div class="connector-dot"></div>
+
           <div class="person-card member-card">
             <div class="avatar-wrapper">
               <div class="avatar">
                 <img src="/board-director-profile/bic.png" alt="" />
               </div>
             </div>
+
             <div class="person-info">
+              <!-- ✅ Bank row (logo + bank name) -->
+              <div class="bank-meta">
+                <img
+                  class="bank-logo"
+                  src="/logoallmember/circle_scale/BIC.png"
+                  alt="BIC"
+                />
+                <span class="bank-name">ທະນາຄານ ບີໄອຊີ ລາວ ຈຳກັດ</span>
+              </div>
+
               <div class="name">ທ່ານ ຟີລິກ ດີຟຣານຊິສ</div>
               <div class="position">
                 ຫົວໜ້າຄະນະກຳມະການຄຸ້ມຄອງຄວາມສ່ຽງ
@@ -53,13 +63,25 @@
         <!-- Node 2 -->
         <div class="org-node">
           <div class="connector-dot"></div>
+
           <div class="person-card member-card">
             <div class="avatar-wrapper">
               <div class="avatar">
                 <img src="/board-director-profile/lvb.png" alt="" />
               </div>
             </div>
+
             <div class="person-info">
+              <!-- ✅ Bank row (logo + bank name) -->
+              <div class="bank-meta">
+                <img
+                  class="bank-logo"
+                  src="/logoallmember/circle_scale/lvb.PNG"
+                  alt="LVB"
+                />
+                <span class="bank-name">ທະນາຄານ ຮ່ວມທຸລະກິດລາວ-ຫວຽດ</span>
+              </div>
+
               <div class="name">ທ່ານ ວຽງວິໄລ ແສງຄຳຢອງ</div>
               <div class="position">
                 ຮອງຫົວໜ້າຄະນະກຳມະການຄຸ້ມຄອງຄວາມສ່ຽງ
@@ -77,37 +99,37 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import { gsap } from 'gsap';
+import { ref, onMounted, onUnmounted } from 'vue'
+import { gsap } from 'gsap'
 
-import bod_navbar from '../../../Views/Aboutus/companystructure/navbarcompany/bod_navbar.vue';
-import main_navbar from '../../../components/miannavbar/main_navbar.vue';
-import secondfooter from '../../../components/footer/mainfooter/secondfooter.vue';
+import bod_navbar from '../../../Views/Aboutus/companystructure/navbarcompany/bod_navbar.vue'
+import main_navbar from '../../../components/miannavbar/main_navbar.vue'
+import secondfooter from '../../../components/footer/mainfooter/secondfooter.vue'
 
-const orgShell = ref(null);
-let ctx = null;
+const orgShell = ref(null)
+let ctx = null
 
 onMounted(() => {
   ctx = gsap.context(() => {
-    const cards = gsap.utils.toArray('.person-card');
+    const cards = gsap.utils.toArray('.person-card')
 
     const tl = gsap.timeline({
       defaults: {
         ease: 'power3.out',
-        duration: 0.8
-      }
-    });
+        duration: 0.8,
+      },
+    })
 
     tl.from('.org-shell', {
       opacity: 0,
       y: 40,
-      scale: 0.97
+      scale: 0.97,
     })
       .from(
         '.org-header',
         {
           opacity: 0,
-          y: 20
+          y: 20,
         },
         '-=0.4'
       )
@@ -117,16 +139,16 @@ onMounted(() => {
           opacity: 0,
           y: 24,
           filter: 'blur(6px)',
-          stagger: 0.1
+          stagger: 0.1,
         },
         '-=0.3'
-      );
-  }, orgShell);
-});
+      )
+  }, orgShell)
+})
 
 onUnmounted(() => {
-  if (ctx) ctx.revert();
-});
+  if (ctx) ctx.revert()
+})
 </script>
 
 <style scoped>
@@ -155,15 +177,19 @@ onUnmounted(() => {
   box-sizing: border-box;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text',
     sans-serif;
-}
 
-/* gradient token */
-.org-layout {
   --blue-gradient: linear-gradient(
     95deg,
     rgba(0, 3, 41, 1) 0%,
     rgba(0, 51, 171, 1) 46%
   );
+  --chip-bg: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(241, 245, 249, 0.9)
+  );
+  --chip-border: rgba(37, 99, 235, 0.18);
+  --chip-glow: rgba(37, 99, 235, 0.18);
 }
 
 .org-shell {
@@ -317,6 +343,57 @@ onUnmounted(() => {
   min-width: 0;
 }
 
+/* ✅ BANK META (Modern chip) */
+.bank-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: var(--chip-bg);
+  border: 1px solid var(--chip-border);
+  box-shadow:
+    0 10px 22px rgba(15, 23, 42, 0.08),
+    0 0 0 3px var(--chip-glow);
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 0.75rem;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    border-color 0.16s ease;
+}
+
+.person-card:hover .bank-meta {
+  border-color: rgba(37, 99, 235, 0.35);
+  box-shadow:
+    0 14px 28px rgba(15, 23, 42, 0.12),
+    0 0 0 4px rgba(37, 99, 235, 0.18);
+  transform: translateY(-1px);
+}
+
+.bank-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: #ffffff;
+  padding: 4px;
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.14);
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.bank-name {
+  font-size: 0.95rem;
+  font-weight: 650;
+  color: #0f172a;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* name + position */
 .name {
   font-size: 1.3rem;
   font-weight: 600;
@@ -373,6 +450,15 @@ onUnmounted(() => {
   .position {
     font-size: 0.95rem;
   }
+
+  .bank-logo {
+    width: 26px;
+    height: 26px;
+  }
+
+  .bank-name {
+    font-size: 0.92rem;
+  }
 }
 
 @media (max-width: 600px) {
@@ -386,53 +472,107 @@ onUnmounted(() => {
   }
 
   .org-shell {
-    padding-inline: 1.4rem;
-    padding-block: 1.8rem 2rem;
-    border-radius: 2.1rem;
+    padding-inline: 1.25rem;
+    padding-block: 1.7rem 2rem;
+    border-radius: 2rem;
     box-shadow:
       0 20px 40px rgba(15, 23, 42, 0.16),
       0 0 0 1px rgba(148, 163, 184, 0.18);
   }
 
   .org-header {
-    margin-bottom: 1.6rem;
-    text-align: left;
+    margin-bottom: 1.4rem;
   }
 
   .org-vertical {
-    gap: 1.6rem;
+    gap: 1.35rem;
     padding-left: 1.9rem;
   }
 
+  /* ✅ Layout เหมือนกัน: bank-meta อยู่บน -> avatar -> name -> position */
   .person-card {
-    padding: 1.1rem 1.4rem;
-    gap: 1rem;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.1rem 1.1rem;
+    gap: 0.85rem;
+    border-radius: 1.6rem;
+  }
+
+  /* ✅ ให้ order ทำงาน (เอา children ของ person-info มาเรียงกับ avatar-wrapper ได้) */
+  .person-info {
+    display: contents;
+  }
+
+  .bank-meta {
+    order: 1;
+    width: 100%;
+    justify-content: center;
+    padding: 7px 10px;
+    margin-bottom: 0.65rem;
+  }
+
+  .avatar-wrapper {
+    order: 2;
+    flex: 0 0 auto;
+    margin-top: 0.15rem;
   }
 
   .name {
+    order: 3;
+    width: 100%;
+    text-align: center;
     white-space: normal;
+    overflow: visible;
+  }
+
+  .position {
+    order: 4;
+    width: 100%;
+    text-align: center;
+  }
+
+  /* ✅ bank-name wrap สวยบนมือถือ */
+  .bank-name {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .connector-dot {
+    margin-top: 1.15rem;
   }
 }
 
 @media (max-width: 480px) {
   .org-layout {
-    padding: 1.25rem 0.75rem;
+    padding: 1.15rem 0.75rem;
   }
 
   .org-shell {
-    border-radius: 1.6rem;
+    border-radius: 1.55rem;
+    padding-inline: 1rem;
+    padding-block: 1.45rem 1.7rem;
   }
 
   .org-node {
     gap: 0.75rem;
   }
 
-  .person-card {
-    padding: 0.9rem 1.1rem;
+  .org-vertical {
+    padding-left: 1.7rem;
   }
 
-  .avatar-wrapper {
-    flex-basis: 56px;
+  .org-vertical::before {
+    left: 1.02rem;
+  }
+
+  .person-card {
+    padding: 0.95rem 0.95rem;
+    border-radius: 1.35rem;
   }
 
   .avatar {
@@ -440,12 +580,23 @@ onUnmounted(() => {
     height: 56px;
   }
 
-  .org-header h2 {
-    font-size: 1.4rem;
+  .bank-logo {
+    width: 24px;
+    height: 24px;
+    padding: 3px;
   }
 
-  .org-header p {
+  .bank-name {
     font-size: 0.9rem;
+    -webkit-line-clamp: 3;
+  }
+
+  .name {
+    font-size: 1.05rem;
+  }
+
+  .position {
+    font-size: 0.92rem;
   }
 }
 </style>

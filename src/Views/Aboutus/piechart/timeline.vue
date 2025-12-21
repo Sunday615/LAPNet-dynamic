@@ -11,7 +11,7 @@
               alt=""
               style="width: 30px; height:30px; margin-right: 7px;"
             />
-            Lao Nationnal Payment Network CO., LTD
+            Lao National Payment Network CO., LTD
           </p>
         </div>
       </header>
@@ -651,9 +651,9 @@ onBeforeUnmount(() => {
 
 h1{
   margin:.35rem 0 0;
-  font-size:clamp(30px, 3.8vw, 38px);
+  font-size:clamp(30px, 3.8vw, 39px);
   line-height:1.08;
-  font-weight:850;
+  font-weight:700;
 }
 
 .sub{

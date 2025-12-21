@@ -105,7 +105,7 @@
                     <i class="fa-solid fa-building-columns"></i>
                   </div>
                   <div>
-                    <div class="panelLabel">Member Banks</div>
+                    <div class="panelLabel">Commercial Bank</div>
                     <div class="panelMeta">
                       {{ filteredMembers.length }}
                       <span class="muted">/ {{ totalMembers }}</span>
@@ -118,7 +118,7 @@
                 <div class="panelTools">
                   <div class="searchWrap" role="search">
                     <span class="searchIcon" aria-hidden="true">🔍</span>
-                    <input v-model="searchText" class="searchInput" type="text" placeholder="Search members..."
+                    <input v-model="searchText" class="searchInput" type="text" placeholder="Search Commercial Bank..."
                       autocomplete="off" />
                     <button v-if="searchText" class="searchClear" type="button" @click="searchText = ''"
                       aria-label="Clear search">
@@ -183,7 +183,7 @@
                 <div class="panelTools">
                   <div class="searchWrap" role="search">
                     <span class="searchIcon" aria-hidden="true">🔍</span>
-                    <input v-model="searchText" class="searchInput" type="text" placeholder="Search members..."
+                    <input v-model="searchText" class="searchInput" type="text" placeholder="Search Fintech..."
                       autocomplete="off" />
                     <button v-if="searchText" class="searchClear" type="button" @click="searchText = ''"
                       aria-label="Clear search">
@@ -278,14 +278,14 @@ const props = withDefaults(defineProps<Props>(), {
     "We deliver secure, scalable experiences with modern design, clear performance, and dedicated support — helping your network grow with confidence.",
 
   stat1Value: 19,
-  stat1Label: "Member Banks",
+  stat1Label: "Commercial Bank",
   stat1Suffix: "+",
-  stat1Sub: "19 ທະນາຄານສະມາຊິກທີ່ເຂົ້າຮ່ວມກັບ Lao National Payment Network.",
+  stat1Sub: "19 ທະນາຄານສະມາຊິກທີ່ເຂົ້າຮ່ວມກັບ Lao National Payment Network CO., LTD",
 
   stat2Value: 2,
   stat2Label: "Members",
   stat2Suffix: "+",
-  stat2Sub: "2 ສະມາຊິກທີ່ເຂົ້າຮ່ວມກັບ Lao National Payment Network.",
+  stat2Sub: "2 ສະມາຊິກທີ່ເຂົ້າຮ່ວມກັບ Lao National Payment Network CO., LTD",
 
   memberBanks: () => [
     {

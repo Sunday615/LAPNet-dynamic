@@ -10,7 +10,7 @@
       <div class="itemLeft item2"><img src="/logoallmember/circle_scale/LDB.PNG" alt="" /></div>
       <div class="itemLeft item3"><img src="/logoallmember/circle_scale/APBB.PNG" alt="" /></div>
       <div class="itemLeft item4"><img src="/logoallmember/retangle_scale/jdb.png" alt="" /></div>
-      <div class="itemLeft item5"><img src="/logoallmember/retangle_scale/MARU.jpg" alt="" /></div>
+      <div class="itemLeft item5"><img  src="/logoallmember/circle_scale/MJBL.png" alt="" /></div>
       <div class="itemLeft item6"><img src="/logoallmember/retangle_scale/LVB.png" alt="" /></div>
       <div class="itemLeft item7"><img src="/logoallmember/retangle_scale/ICBC.svg.png" alt="" /></div>
       <div class="itemLeft item8"><img src="/logoallmember/retangle_scale/bboc.png" alt="" /></div>
@@ -30,7 +30,7 @@
       <div class="itemRight item3-right"><img src="/logoallmember/retangle_scale/aceleda.png" alt="" /></div>
       <div class="itemRight item4-right"><img src="/logoallmember/retangle_scale/BIC.png" alt="" /></div>
       <div class="itemRight item5-right"><img src="/logoallmember/retangle_scale/sacombank.png" alt="" /></div>
-      <div class="itemRight item6-right"><img src="/logoallmember/retangle_scale/STB.jpg" alt="" /></div>
+      <div class="itemRight item6-right"><img src="/logoallmember/retangle_scale/Stbretangle.png" alt="" /></div>
       <div class="itemRight item7-right"><img src="/logoallmember/retangle_scale/kkbank.PNG" alt="" /></div>
       <div class="itemRight item8-right"><img src="/logoallmember/retangle_scale/publicbank.png" alt="" /></div>
       <div class="itemRight item9-right"><img src="/logoallmember/retangle_scale/BFL.png" alt="" /></div>
@@ -129,6 +129,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  
 
   position: absolute;
   box-sizing: border-box; /* ✅ กัน padding ทำให้กว้างเกิน */
@@ -147,6 +148,7 @@
 .itemLeft img,
 .itemRight img {
   width: 100%;
+
   height: 100%;
   object-fit: contain;
   padding: 10px; /* เว้นขอบให้โลโก้หายใจ */

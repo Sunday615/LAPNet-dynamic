@@ -37,7 +37,7 @@
 
         <div class="dropdown-item">
           <router-link to="/aboutus/board_director">
-          <span>ສະພາຜູ້ບໍລິຫານ</span></router-link>
+          <span>ສະພາບໍລິຫານ</span></router-link>
         
         </div>
          <div class="dropdown-divider"></div>

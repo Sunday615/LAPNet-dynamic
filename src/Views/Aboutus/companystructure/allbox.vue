@@ -1,4 +1,4 @@
-<!-- LaoStyleOrgChart_InternalAudit.vue -->
+<!-- LaoStyleOrgChart_CEO.vue -->
 
 <template>
   <main_navbar
@@ -7,7 +7,7 @@
       'ໜ້າຫຼັກ',
       'ກ່ຽວກັບພວກເຮົາ',
       'ໂຄງຮ່າງການຈັດຕັ້ງ',
-      'ພະແນກກວດສອບພາຍໃນ',
+      'ຄະນະອຳນວຍການ',
     ]"
     background-image="/aboutus/navigatormission-bg.png"
   />
@@ -20,7 +20,7 @@
       <!-- TOP HEADER BAR -->
       <header class="org-header">
         <div class="org-header-left">
-          <h1 class="org-title-lao">ພະແນກກວດສອບພາຍໃນ</h1>
+          <h1 class="org-title-lao">ຄະນະອຳນວຍການ</h1>
         </div>
         <div class="org-header-right">
           <div class="org-logo-circle">
@@ -35,9 +35,20 @@
 
       <!-- ORG CHART FRAME -->
       <section class="org-frame">
-        <!-- ✅ ONE ROW -->
-        <div class="org-row org-row--single">
-          <article v-for="person in people" :key="person.id" class="org-card">
+        <!-- ✅ 3 ROWS: CEO / COO / HEADS -->
+        <div
+          v-for="(row, rowIndex) in rows"
+          :key="rowIndex"
+          :class="['org-row', `org-row--${rowIndex}`]"
+        >
+          <article
+            v-for="person in row"
+            :key="person.id"
+            class="org-card"
+            :class="[
+              rowIndex === 2 && 'org-card--head'  // ✅ row3 solid color
+            ]"
+          >
             <!-- AVATAR -->
             <div class="org-avatar-wrapper">
               <div class="org-avatar-ring">
@@ -78,39 +89,78 @@ import secondfooter from "../../../components/footer/mainfooter/secondfooter.vue
 
 const root = ref(null);
 
-/* ✅ keep your data (เดิมเป็น 2 แถว) */
+/**
+ * ✅ โครงสร้างใหม่:
+ * Row 1: CEO
+ * Row 2: COO
+ * Row 3: Head of Administration, Head of Finance & Accounting, Head of IT, Head of Operations, Audit
+ *
+ * (แก้ชื่อ/รูปจริงได้เลย)
+ */
 const rows = [
+  // Row 1 – CEO
   [
     {
       id: 1,
-      name: "ທ່ານ ນາງ ດາລີວັນ ຈັນທະລັງສີ",
-      role: "ກວດສອບພາຍໃນ",
-         photo: "/aboutus/company/lapnet_employee_image/audit/1.webp",
+      name: "ທ່ານ ສີສະໝອນ ສຣິດທິຣາດ",
+      role: "ຜູ້ອຳນວຍການ (CEO)",
+      photo: "/aboutus/company/lapnet_employee_image/CEO/CEO.png",
     },
   ],
+
+  // Row 2 – COO (เดิม Deputy เปลี่ยนเป็น COO)
   [
     {
       id: 2,
-      name: "ທ່ານ ນາງ ນ້ຳທິບພະກອນ ວໍລະລາດ",
-      role: "ກວດສອບພາຍໃນ",
-      photo: "/aboutus/company/lapnet_employee_image/audit/2.webp",
+      name: "ທ່ານ ນາງ ນີວະສອນ ມາລາທິບ",
+      role: "ຮອງຜູ້ອຳນວຍການ (COO)",
+      photo: "/aboutus/company/lapnet_employee_image/CEO/CFO.png",
+    },
+  ],
+
+  // Row 3 – Heads (5 คน)
+  [
+    {
+      id: 3,
+      name: "ທ່ານ ສັນຕິພາບ ປານມະໄລທອງ ",
+      role: "ຫົວໜ້າພະແນກຫ້ອງການ",
+            photo: '/aboutus/company/lapnet_employee_image/aministration/1.png'  
+    },
+    {
+      id: 4,
+     name: "ທ່ານ ວັດທະນາ ວໍລະບຸດ",
+      role: "ຫົວໜ້າພະແນກບັນຊີ ແລະ ການເງິນ",
+      photo: "/aboutus/company/lapnet_employee_image/finance/1.png",
+    },
+    {
+      id: 5,
+      name: 'ທ່ານ ພູເຂົາທອງ ເມືອງວົງ',
+      role: 'ຫົວໜ້າພະແນກໄອທີ',
+      photo: '/aboutus/company/lapnet_employee_image/IT/1.png'
+    },
+    {
+      id: 6,
+      name: 'ທ່ານ ເດດມີໄຊ ວັນນະຈິດ',
+      role: 'ຫົວໜ້າພະແນກດໍາເນີນງານ',
+      photo: '/aboutus/company/lapnet_employee_image/operation/1.png'
+    },
+    {
+      id: 7,
+      name: "ກວດສອບພາຍໃນ",
+      role: "Internal Audit",
+      photo: "/aboutus/company/avarta.png",
     },
   ],
 ];
 
-/* ✅ flatten ให้เป็น 1 แถว */
-const people = rows.flat();
-
-// initials fallback
+// initials fallback (2 ตัวแรก)
 const getInitials = (name) => (name || "").trim().slice(0, 2) || "?";
 
 let gsapCtx;
 
 onMounted(() => {
   gsapCtx = gsap.context(() => {
-    const tl = gsap.timeline({
-      defaults: { ease: "power3.out" },
-    });
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
     tl.from(".org-container", {
       opacity: 0,
@@ -121,18 +171,18 @@ onMounted(() => {
       .from(".org-header-left", { x: -40, opacity: 0, duration: 0.6 }, "-=0.4")
       .from(".org-header-right", { x: 40, opacity: 0, duration: 0.6 }, "-=0.5")
       .from(".org-frame", { opacity: 0, y: 24, duration: 0.7 }, "-=0.25")
-      .from(".org-row", { opacity: 0, y: 40, duration: 0.7 }, "-=0.2")
+      .from(".org-row", { opacity: 0, y: 40, duration: 0.7, stagger: 0.16 }, "-=0.2")
       .from(
         ".org-card",
         {
           opacity: 0,
           y: 30,
-          rotateX: -14,
+          rotateX: -18,
           transformOrigin: "50% 100%",
-          duration: 0.8,
-          stagger: { each: 0.12, from: "center" },
+          duration: 0.9,
+          stagger: { each: 0.08, from: "center" },
         },
-        "-=0.45"
+        "-=0.55"
       )
       .from(
         ".org-avatar-ring",
@@ -140,19 +190,12 @@ onMounted(() => {
           scale: 0.5,
           opacity: 0,
           duration: 0.55,
-          stagger: { each: 0.12, from: "center" },
+          stagger: { each: 0.08, from: "center" },
         },
         "-=0.55"
       );
 
-    // glow pulse
-    gsap.to(".org-card", {
-      boxShadow: "0 22px 48px rgba(15, 23, 42, 0.45)",
-      duration: 3.2,
-      ease: "sine.inOut",
-      repeat: -1,
-      yoyo: true,
-    });
+    // ✅ ลบ floating animation ออก (ไม่มี gsap.to ให้ลอยแล้ว)
   }, root.value);
 });
 
@@ -162,6 +205,7 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+/* NAVBAR WRAPPER */
 .navbarcompany {
   width: 100%;
   height: 20vh;
@@ -172,6 +216,7 @@ onBeforeUnmount(() => {
   background-color: #f5f7fb;
 }
 
+/* PAGE BACKGROUND */
 .org-page {
   min-height: 100vh;
   padding: 56px 24px;
@@ -182,23 +227,24 @@ onBeforeUnmount(() => {
   box-sizing: border-box;
 }
 
+/* MAIN CONTAINER */
 .org-container {
   width: 100%;
-  max-width: 1380px;
+  max-width: 1680px;
   background: #ffffff;
   border-radius: 14px;
   box-shadow: 0 20px 60px rgba(15, 23, 42, 0.18);
   overflow: hidden;
 }
 
-/* HEADER */
+/* HEADER BAR */
 .org-header {
   display: flex;
   justify-content: space-between;
   align-items: stretch;
   background: linear-gradient(135deg, #0f2d55, #123765);
   color: #ffffff;
-  padding: 26px 44px;
+  padding: 26px 56px;
 }
 
 .org-header-left {
@@ -208,7 +254,7 @@ onBeforeUnmount(() => {
 
 .org-title-lao {
   margin: 0;
-  font-size: 1.8rem;
+  font-size: 1.9rem;
   font-weight: 600;
 }
 
@@ -219,8 +265,8 @@ onBeforeUnmount(() => {
 }
 
 .org-logo-circle {
-  width: 80px;
-  height: 80px;
+  width: 82px;
+  height: 82px;
   border-radius: 999px;
   border: 3px solid #ffffff;
   display: flex;
@@ -243,62 +289,107 @@ onBeforeUnmount(() => {
   text-transform: uppercase;
 }
 
-/* FRAME */
+/* FRAME AROUND NODES */
 .org-frame {
-  margin: 34px 44px 42px;
-  padding: 60px 32px 46px;
-  border-radius: 12px;
+  margin: 40px 56px 46px;
+  padding: 70px 40px 54px;
+  border-radius: 16px;
   border: 2px dashed rgba(148, 163, 184, 0.8);
   background: radial-gradient(circle at top, #f8fafc, #edf2ff 40%, #f9fafb);
-  perspective: 1200px;
+  perspective: 1600px;
 }
 
-/* ✅ ONE ROW */
+/* ROWS */
 .org-row {
   display: flex;
   justify-content: center;
   gap: 42px;
+  margin-bottom: 70px;
 }
 
-.org-row--single {
+/* last row no bottom gap */
+.org-row--2 {
   margin-bottom: 0;
-  flex-wrap: nowrap;
 }
 
-/* CARD */
+/* CARD (CEO/COO ใช้ style เดิม) */
 .org-card {
   position: relative;
-  width: 360px;
-  background: #123765;
-  border-radius: 16px;
-  padding: 54px 34px 24px;
+  width: 420px;
+  max-width: 90%;
+  background: radial-gradient(circle at top, #123765, #061429);
+  border-radius: 20px;
+  padding: 60px 40px 28px;
   color: #ffffff;
   text-align: center;
-  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.42);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.45);
   transform-style: preserve-3d;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  overflow: visible;
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.35s ease-out;
 }
 
+.org-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.35s ease-out;
+}
+
+/* hover (ยังคงไว้เหมือนเดิม) */
 .org-card:hover {
-  transform: translateY(-8px) rotateX(3deg);
-  box-shadow: 0 26px 60px rgba(15, 23, 42, 0.48);
+  transform: translateY(-12px) rotateX(6deg) rotateY(-3deg) scale(1.02);
+  box-shadow: 0 28px 70px rgba(15, 23, 42, 0.65);
+  background: radial-gradient(circle at top, #1a4174, #050c1a);
+}
+
+.org-card:hover::before {
+  opacity: 1;
+}
+
+/* ✅ Row3 card: สี #123765 ล้วน + ขนาดเล็กลงให้พอดี 5 ใบ */
+.org-card--head {
+  width: 300px;
+  padding: 56px 28px 22px;
+  background: #123765 !important;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.42);
+}
+
+.org-card--head:hover {
+  /* ยังให้ hover ได้ แต่คงสีล้วน */
+  background: #123765 !important;
+  transform: translateY(-10px) rotateX(5deg) rotateY(-2deg) scale(1.015);
+  box-shadow: 0 26px 60px rgba(15, 23, 42, 0.6);
 }
 
 /* AVATAR */
 .org-avatar-wrapper {
   position: absolute;
-  top: -50px;
+  top: -56px;
   left: 50%;
   transform: translateX(-50%);
 }
 
 .org-avatar-ring {
-  width: 122px;
-  height: 122px;
+  width: 132px;
+  height: 132px;
   border-radius: 999px;
-  padding: 9px;
+  padding: 10px;
   background: #123765;
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.55);
+}
+
+/* ลดวงแหวนใน row3 ให้ดูพอดีกับการ์ดเล็ก */
+.org-card--head .org-avatar-ring {
+  width: 112px;
+  height: 112px;
+  padding: 9px;
 }
 
 .org-avatar-inner {
@@ -326,29 +417,51 @@ onBeforeUnmount(() => {
 
 /* TEXT */
 .org-card-name {
-  margin: 12px 0 6px;
-  font-size: var(--fs-base);
+  margin: 18px 0 6px;
+  font-size: var(--fs-md);
   font-weight: 600;
-  padding-top: 20px;
 }
 
 .org-card-role {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   opacity: 0.94;
 }
 
+/* row3 text slightly smaller */
+.org-card--head .org-card-name {
+  font-size: 1.02rem;
+}
+.org-card--head .org-card-role {
+  font-size: 0.88rem;
+}
+
 /* RESPONSIVE */
+@media (max-width: 1200px) {
+  .org-row--2 {
+    flex-wrap: wrap; /* row3 5 ใบ ให้ wrap */
+    gap: 28px;
+  }
+}
+
 @media (max-width: 900px) {
   .org-frame {
-    margin: 26px 24px 32px;
-    padding: 52px 20px 38px;
+    margin: 28px 24px 32px;
+    padding: 56px 20px 42px;
   }
 
-  /* ✅ บนจอเล็กให้ wrap เป็น 1 คอลัมน์อัตโนมัติ (ยังถือว่าเป็น row เดียว) */
-  .org-row--single {
+  .org-row {
     flex-wrap: wrap;
-    gap: 34px;
+    margin-bottom: 50px;
+  }
+
+  .org-card {
+     margin-top: 40px;
+    width: 360px;
+  }
+
+  .org-card--head {
+    width: 320px;
   }
 }
 
@@ -371,13 +484,20 @@ onBeforeUnmount(() => {
 
   .org-card {
     width: 100%;
-    margin-top: 50px;
-    max-width: 320px;
+    max-width: 340px;
+    padding-inline: 24px;
+
+    margin-top: 40px;
+  }
+
+  .org-card--head {
+    max-width: 340px;
+    
   }
 
   .org-frame {
     margin: 22px 16px 30px;
-    padding: 48px 16px 34px;
+    padding: 50px 16px 34px;
   }
 }
 </style>

@@ -47,7 +47,7 @@
 
         <div class="dropdown-item">
           <router-link to="/products_service/qr-payment">
-            <span>ການຊຳລະເງິນຂ້າມທະນາຄານຜ່ານ LAPNet</span>
+            <span>ຊຳລະຂ້າມທະນາຄານຜ່ານ LAPNet</span>
           </router-link>
 
 
@@ -55,9 +55,7 @@
         <div class="dropdown-divider"></div>
 
         <div class="dropdown-item">
-          <router-link to="/products_service/crossborder"> <span>ຊຳລະຂ້າມແດນໃນຮູບແບບ QR CODE ລະຫວ່າງປະເທດ</span></router-link>
-
-
+          <router-link to="/products_service/crossborder"> <span>ຊຳລະຂ້າມແດນຜ່ານ QR CODE  </span></router-link>
         </div>
       </div>
     </div>

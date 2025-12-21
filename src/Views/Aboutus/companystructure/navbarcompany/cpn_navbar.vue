@@ -23,9 +23,10 @@ const route = useRoute()
 
 const tabs = [
   { key: 'lapnetchart', label: 'ໂຄ່ງຮ່າງການຈັດຕັ້ງ' },
+  { key: 'allbox', label: 'ຄະນະບໍລິຫານ ພາຍໃນບໍລິສັດ' },
   { key: 'ceo-cfo', label: 'ຄະນະອຳນວຍການ' },
   { key: 'office', label: 'ພະແນກຫ້ອງການ' },
-  { key: 'finance', label: 'ພະແນກບັນຊີ - ການເງິນ' },
+  { key: 'finance', label: 'ພະແນກບັນຊີ ແລະ ການເງິນ' },
   { key: 'it', label: 'ພະແນກໄອທີ' },
   { key: 'operation', label: 'ພະແນກດໍາເນີນງານ' },
   { key: 'audit', label: 'ພະແນກກວດສອບພາຍໃນ' }
@@ -39,7 +40,8 @@ const tabRouteMap = {
   finance: '/company/finance',
   it: '/company/it',
   operation: '/company/operation',
-  audit: '/company/audit'
+  audit: '/company/audit',
+  allbox: '/company/lapnet'
 }
 
 
@@ -84,7 +86,7 @@ watch(
 
 .tabs-list {
   width: 100%;
-  max-width: 1300px;
+  max-width: 1380px;
   display: flex;
   align-items: center;
   justify-content: space-between;

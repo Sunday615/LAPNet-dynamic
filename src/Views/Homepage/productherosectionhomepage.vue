@@ -160,19 +160,19 @@ const description = props.description;
 // ✅ example products (edit as you want)
 const leftProducts = ref<Product[]>([
   {
-    title: "ກວດຍອດເງິນຂ້າມທະນາຄານຜ່ານຕູ້",
+    title: "ກວດຍອດເງິນຂ້າມທະນາຄານຜ່ານຕູ້ ATM",
     desc: "ການກວດຍອດເງິນຂ້າມທະນາຄານຜ່ານຕູ້ ATM ແມ່ນນຳໃຊ້ລະບົບ ແລັບໃນການເຊື່ອມໂຍງຕູ້ເອທີເອັມຂອງແຕ່ລະທະນາຄານທີ່ເປັນສະມາຊິກ ຂອງບໍລິສັດລາວ ເນເຊີນນໍເພເມັ້ນ ເນັດເວີກ.",
     tag: "ATM",
     to: "/products_service/atm-inquiry",
   },
   {
-    title: "ຖອນເງິນສົດ ຂ້າມ ທະນາຄານຜ່ານຕູ້ ATM",
+    title: "ຖອນເງິນສົດຂ້າມທະນາຄານຜ່ານຕູ້ ATM",
     desc: "ການຖອນເງິນສົດຜ່ານຕູ້ເອທີເອັມ ແມ່ນນຳໃຊ້ລະບົບແລັບໃນການ ເຊື່ອມໂຍງຕູ້ເອທີເອັມຂອງແຕ່ລະທະນາຄານທີ່ເປັນສະມາຊິກຂອງ ບໍລິສັດລາວ ເນເຊີນນໍເພເມັ້ນ ເນັດເວີກ.",
     tag: "ATM",
     to: "/products_service/atm-cash-withdraw",
   },
   {
-    title: "ໂອນເງິນ ຂ້າມທະນາຄານຜ່ານຕູ້ ATM",
+    title: "ໂອນເງິນຂ້າມທະນາຄານຜ່ານຕູ້ ATM",
     desc: "ການໂອນເງິນຂ້າມທະນາຄານຜ່ານຕູ້ ATM ແມ່ນນຳໃຊ້ລະບົບແລັບ ໃນການເຊື່ອມໂຍງຕູ້ເອທີເອັມຂອງແຕ່ລະທະນາຄານທີ່ເປັນສະມາຊິກຂອງ ບໍລິສັດລາວ ເນເຊີນນໍເພເມັ້ນ ເນັດເວີກ.",
     tag: "ATM",
     to: "/products_service/atm-transfer",
@@ -181,7 +181,7 @@ const leftProducts = ref<Product[]>([
 
 const rightProducts = ref<Product[]>([
   {
-    title: "ໂອນເງິນ ຂ້າມທະນາຄານເທິງມືຖື",
+    title: "ໂອນເງິນຂ້າມທະນາຄານເທິງມືຖື",
     desc: "ການໂອນເງິນຂ້າມທະນາຄານເທິງມືຖື (Fund Transfer via Mobile Application) ໂດຍນຳໃຊ້ລະບົບ LMPS ໃນການເຊື່ອມໂຍງຜ່ານ Applications ຂອງແຕ່ລະທະນາຄານທີ່ເປັນສະມາຊິກຂອງບໍລິສັດລາວ ເນເຊີນນໍເພເມັ້ນ ເນັດເວີກ.",
     tag: "Mobile Banking",
     to: "/products_service/mobile-transfer",
@@ -193,7 +193,7 @@ const rightProducts = ref<Product[]>([
     to: "/products_service/qr-payment",
   },
   {
-    title: "ຊຳລະຂ້າມແດນໃນຮູບແບບQR CODE ລະຫວ່າງປະເທດ",
+    title: "ຊຳລະຂ້າມແດນຜ່ານ QR CODE",
     desc: "ບໍລິສັດ LAPNet ໄດ້ຕໍ່ຍອດການພັດທະນາລະບົບຊຳລະຂ້າມທະນາຄານເທິງມືຖື (LMPS) ເພື່ອຂະຫຍາຍຜະລິດຕະພັນ ຊຳລະຂ້າມທະນາຄານ ໃຫ້ສາມາດຮອງຮັບການ ຊຳລະ ຄ່າສິນຄ້າ - ບໍລິການ ລະຫວ່າງປະເທດ.",
     tag: "Mobile Banking",
     to: "/products_service/crossborder",

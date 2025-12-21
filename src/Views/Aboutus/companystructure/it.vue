@@ -126,12 +126,7 @@ const rows = [
       role: 'ຄຸ້ມຄອງ ແລະ ພັດທະນາຊັອບແວຣ໌',
          photo: '/aboutus/company/lapnet_employee_image/IT/7.webp'
     },
-    {
-      id: 8,
-      name: 'ທ່ານ ...... .....',
-      role: 'ຄຸ້ມຄອງ ແລະ ພັດທະນາຊັອບແວຣ໌',
-      photo: '/aboutus/company/avarta.png'
-    }
+   
   ]
 ]
 

@@ -20,7 +20,6 @@
       <!-- TOP HEADER BAR -->
       <header class="org-header">
         <div class="org-header-left">
-   
           <h1 class="org-title-lao">ພະແນກບັນຊີ ແລະ ການເງິນ</h1>
         </div>
         <div class="org-header-right">
@@ -36,17 +35,13 @@
 
       <!-- ORG CHART FRAME -->
       <section class="org-frame">
-        <!-- ROWS -->
+        <!-- ✅ NOW: 2 ROWS ONLY -->
         <div
           v-for="(row, rowIndex) in rows"
           :key="rowIndex"
           :class="['org-row', `org-row--${rowIndex}`]"
         >
-          <article
-            v-for="person in row"
-            :key="person.id"
-            class="org-card"
-          >
+          <article v-for="person in row" :key="person.id" class="org-card">
             <!-- AVATAR -->
             <div class="org-avatar-wrapper">
               <div class="org-avatar-ring">
@@ -66,12 +61,8 @@
 
             <!-- TEXT -->
             <div class="org-card-body">
-              <h2 class="org-card-name">
-                {{ person.name }}
-              </h2>
-              <p class="org-card-role">
-                {{ person.role }}
-              </p>
+              <h2 class="org-card-name">{{ person.name }}</h2>
+              <p class="org-card-role">{{ person.role }}</p>
             </div>
           </article>
         </div>
@@ -83,130 +74,109 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { gsap } from 'gsap'
-import main_navbar from '../../../components/miannavbar/main_navbar.vue'
-import cpn_navbar from './navbarcompany/cpn_navbar.vue'
-import secondfooter from '../../../components/footer/mainfooter/secondfooter.vue'
-const root = ref(null)
+import { ref, onMounted, onBeforeUnmount } from "vue";
+import { gsap } from "gsap";
+import main_navbar from "../../../components/miannavbar/main_navbar.vue";
+import cpn_navbar from "./navbarcompany/cpn_navbar.vue";
+import secondfooter from "../../../components/footer/mainfooter/secondfooter.vue";
+
+const root = ref(null);
 
 /**
- * โครงสร้างตามภาพ Finance:
- *  row 0: 1 คน (หัวหน้าพะแນก)
- *  row 1: 2 คน
- *  row 2: 1 คน
- *  👇 เปลี่ยนชื่อ / role / รูปตามจริงได้เลย
+ * ✅ ปรับเหลือ 2 row:
+ * row 0: 1 คน (หัวหน้าแผนก)
+ * row 1: 3 คน (เอา row 2 เดิมขึ้นมาต่อท้าย row 1)
  */
 const rows = [
-  // row 0 – หัวหน้าแผนก
+  // row 0
   [
     {
       id: 1,
-      name: 'ທ່ານ ວັດດະນາ ວໍລະບຸດ',
-      role: 'ຫົວໜ້າພະແນກບັນຊີ ແລະ ການເງິນ',
-       photo: '/aboutus/company/lapnet_employee_image/finance/1.png'  
-    }
+      name: "ທ່ານ ວັດທະນາ ວໍລະບຸດ",
+      role: "ຫົວໜ້າພະແນກບັນຊີ ແລະ ການເງິນ",
+      photo: "/aboutus/company/lapnet_employee_image/finance/1.png",
+    },
   ],
-  // row 1 – 2 คน
+  // row 1 (รวม 3 คน)
   [
     {
       id: 2,
-      name: 'ທ່ານ ຄູນມີ ລັດຕະນະເຮືອງສີ',
-      role: 'ບັນຊີ',
-    photo: '/aboutus/company/lapnet_employee_image/finance/2.png'  
+      name: "ທ່ານ ຄູນມີ ລັດຕະນະເຮືອງສີ",
+      role: "ບັນຊີ",
+      photo: "/aboutus/company/lapnet_employee_image/finance/2.png",
     },
     {
       id: 3,
-      name: 'ທ່ານ ນາງ ປ່າເອ້ຍເຮີ່ ຈົ່ງລື',
-      role: 'ການເງິນວິເຄາະ',
-      photo: '/aboutus/company/lapnet_employee_image/finance/3.png'  
-    }
-  ],
-  // row 2 – 1 คน
-  [
+      name: "ທ່ານ ນາງ ປາເອ້ຍເຮີ່ ຈົ່ງລື",
+      role: "ການເງິນວິເຄາະ",
+      photo: "/aboutus/company/lapnet_employee_image/finance/3.png",
+    },
     {
       id: 4,
-      name: 'ທ່ານ ນາງ ດອນສະຫວັນ ລຳລະໄມ້',
-      role: 'ການເງິນ',
-     photo: '/aboutus/company/avarta.png'  
-    }
-  ]
-]
+      name: "ທ່ານ ນາງ ຄູນສະຫວັນ ລຳລະໄມ",
+      role: "ການເງິນທົ່ວໄປ",
+      photo: "/aboutus/company/lapnet_employee_image/finance/4.webp",
+    },
+     
+
+  ],
+];
 
 // initials fallback
-const getInitials = (name) => (name || '').trim().slice(0, 2) || '?'
+const getInitials = (name) => (name || "").trim().slice(0, 2) || "?";
 
-let gsapCtx
+let gsapCtx;
 
 onMounted(() => {
   gsapCtx = gsap.context(() => {
-    const tl = gsap.timeline({
-      defaults: { ease: 'power3.out' }
-    })
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
-    tl.from('.org-container', {
+    tl.from(".org-container", {
       opacity: 0,
       y: 48,
       scale: 0.97,
-      duration: 0.8
+      duration: 0.8,
     })
+      .from(".org-header-left", { x: -40, opacity: 0, duration: 0.6 }, "-=0.4")
+      .from(".org-header-right", { x: 40, opacity: 0, duration: 0.6 }, "-=0.5")
+      .from(".org-frame", { opacity: 0, y: 24, duration: 0.7 }, "-=0.25")
+      .from(".org-row", { opacity: 0, y: 40, duration: 0.7, stagger: 0.12 }, "-=0.2")
       .from(
-        '.org-header-left',
-        { x: -40, opacity: 0, duration: 0.6 },
-        '-=0.4'
-      )
-      .from(
-        '.org-header-right',
-        { x: 40, opacity: 0, duration: 0.6 },
-        '-=0.5'
-      )
-      .from(
-        '.org-frame',
-        { opacity: 0, y: 24, duration: 0.7 },
-        '-=0.25'
-      )
-      .from(
-        '.org-row',
-        { opacity: 0, y: 40, duration: 0.7, stagger: 0.12 },
-        '-=0.2'
-      )
-      .from(
-        '.org-card',
+        ".org-card",
         {
           opacity: 0,
           y: 30,
           rotateX: -14,
-          transformOrigin: '50% 100%',
+          transformOrigin: "50% 100%",
           duration: 0.8,
-          stagger: { each: 0.08, from: 'center' }
+          stagger: { each: 0.08, from: "center" },
         },
-        '-=0.6'
+        "-=0.6"
       )
       .from(
-        '.org-avatar-ring',
+        ".org-avatar-ring",
         {
           scale: 0.5,
           opacity: 0,
           duration: 0.55,
-          stagger: { each: 0.08, from: 'center' }
+          stagger: { each: 0.08, from: "center" },
         },
-        '-=0.55'
-      )
+        "-=0.55"
+      );
 
-    // glow pulse
-    gsap.to('.org-card', {
-      boxShadow: '0 22px 48px rgba(15, 23, 42, 0.45)',
+    gsap.to(".org-card", {
+      boxShadow: "0 22px 48px rgba(15, 23, 42, 0.45)",
       duration: 3.2,
-      ease: 'sine.inOut',
+      ease: "sine.inOut",
       repeat: -1,
-      yoyo: true
-    })
-  }, root.value)
-})
+      yoyo: true,
+    });
+  }, root.value);
+});
 
 onBeforeUnmount(() => {
-  if (gsapCtx) gsapCtx.revert()
-})
+  if (gsapCtx) gsapCtx.revert();
+});
 </script>
 
 <style scoped>
@@ -301,19 +271,20 @@ onBeforeUnmount(() => {
   perspective: 1200px;
 }
 
-/* ROWS */
+/* ROWS (2 rows) */
 .org-row {
   display: flex;
   justify-content: center;
   gap: 42px;
-   margin-bottom: 76px;
+  margin-bottom: 76px;
 }
 
 .org-row--0 {
-     margin-bottom: 76px;
+  margin-bottom: 76px;
 }
 
-.org-row--2 {
+/* ✅ last row (row 1) no bottom gap */
+.org-row--1 {
   margin-bottom: 0;
 }
 
@@ -328,8 +299,7 @@ onBeforeUnmount(() => {
   text-align: center;
   box-shadow: 0 16px 36px rgba(15, 23, 42, 0.42);
   transform-style: preserve-3d;
-  transition:
-    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
     box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -398,14 +368,15 @@ onBeforeUnmount(() => {
     padding: 52px 20px 38px;
   }
 
+  /* ✅ row 1 มี 3 ใบ ให้ wrap ได้ */
   .org-row {
     flex-wrap: wrap;
+    gap: 34px;
+    margin-bottom: 64px;
   }
-   .org-row {
-    flex-direction: column;
-    align-items: center;
-    gap: 120px;        /* ระยะห่างแนวตั้งระหว่างการ์ดใน row เดียวกัน */
-    margin-bottom: 76px;
+
+  .org-row--1 {
+    margin-bottom: 0;
   }
 }
 
@@ -416,10 +387,12 @@ onBeforeUnmount(() => {
     gap: 16px;
     padding: 22px 24px;
   }
-   .org-header-en{
+
+  .org-header-en {
     font-size: 13px;
   }
-  .org-logo-circle{
+
+  .org-logo-circle {
     width: 60px;
     height: 60px;
   }
@@ -434,11 +407,16 @@ onBeforeUnmount(() => {
     padding: 48px 16px 34px;
   }
 
+  /* ✅ บนมือถือให้เป็นคอลัมน์ */
   .org-row {
     flex-direction: column;
     align-items: center;
-    gap: 120px;      
-    margin-bottom: 76px;
+    gap: 120px;
+    margin-bottom: 64px;
+  }
+
+  .org-row--1 {
+    margin-bottom: 0;
   }
 }
 </style>

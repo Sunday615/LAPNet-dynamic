@@ -38,7 +38,7 @@ import Adminlogin from '../login/adminlogin.vue'
 import allproduct from '../Views/products/allproduct.vue'
 import atmmockup from '../components/mockup/atmmockup.vue'
 import testhome from '../Views/Homepage/testhome.vue'
-import modernorg from '../Views/Aboutus/board_director/modernorg.vue'
+import allbox from '../Views/Aboutus/companystructure/allbox.vue'
 
 const routes = [
   {
@@ -46,12 +46,9 @@ const routes = [
     name: 'home',
     component: testhome,
   },
-  
-  {
-    path: '/modern',
-    name: 'modern',
-    component: modernorg,
-  },
+
+
+
   
 
   {
@@ -149,7 +146,7 @@ const routes = [
     
   // ######################### About us  ##########################
 
-  // Companystructure
+  
   {
     path: '/aboutus/companystructure',
     name: 'companystructure',
@@ -158,6 +155,8 @@ const routes = [
 
 
   //CompanyStructure by image 
+  // Companystructure
+   
    {
     path: '/aboutus/companystructureimage',
     name: 'companystructure',
@@ -166,6 +165,13 @@ const routes = [
 
 
 
+
+
+   {
+    path: '/company/lapnet',
+    name: 'lapnet',
+    component: allbox,
+  },
   {
     path: '/company/operation',
     name: 'operation',
