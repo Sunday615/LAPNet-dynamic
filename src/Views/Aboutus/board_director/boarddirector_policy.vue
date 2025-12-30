@@ -14,8 +14,8 @@
     <bod_navbar />
   </div>
 
-  <div class="org-layout">
-    <div ref="orgShell" class="org-shell">
+  <div ref="orgLayout" class="org-layout">
+    <div class="org-shell">
       <header class="org-header">
         <h2>ຄະນະກຳມະການຄົ້ນຄວ້ານະໂຍບາຍ</h2>
         <p class="org-subline">
@@ -64,8 +64,6 @@
               <div class="avatar">
                 <img src="/board-director-profile/stb.webp" alt="" />
               </div>
-
-           
             </div>
 
             <div class="person-info">
@@ -95,51 +93,57 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { onBeforeRouteLeave } from 'vue-router'
 import { gsap } from 'gsap'
 
 import bod_navbar from '../../../Views/Aboutus/companystructure/navbarcompany/bod_navbar.vue'
 import main_navbar from '../../../components/miannavbar/main_navbar.vue'
 import secondfooter from '../../../components/footer/mainfooter/secondfooter.vue'
 
-const orgShell = ref(null)
+const orgLayout = ref(null)
 let ctx = null
 
-onMounted(() => {
+const PAN_DISTANCE = 90
+
+onMounted(async () => {
+  await nextTick()
+
   ctx = gsap.context(() => {
     const cards = gsap.utils.toArray('.person-card')
 
     const tl = gsap.timeline({
-      defaults: {
-        ease: 'power3.out',
-        duration: 0.8,
-      },
+      defaults: { ease: 'power3.out', duration: 0.8 },
     })
 
-    tl.from('.org-shell', {
-      opacity: 0,
-      y: 40,
-      scale: 0.97,
-    })
-      .from(
-        '.org-header',
-        {
-          opacity: 0,
-          y: 20,
-        },
-        '-=0.4'
-      )
+    // ✅ Pan เฉพาะ org-layout (เข้าจากขวา)
+    tl.fromTo(
+      orgLayout.value,
+      { opacity: 0, x: PAN_DISTANCE },
+      { opacity: 1, x: 0, duration: 0.55, ease: 'power2.out' }
+    )
+      .from('.org-shell', { opacity: 0, y: 40, scale: 0.97 }, '-=0.25')
+      .from('.org-header', { opacity: 0, y: 20 }, '-=0.45')
       .from(
         cards,
-        {
-          opacity: 0,
-          y: 24,
-          filter: 'blur(6px)',
-          stagger: 0.1,
-        },
-        '-=0.3'
+        { opacity: 0, y: 24, filter: 'blur(6px)', stagger: 0.1 },
+        '-=0.35'
       )
-  }, orgShell)
+  }, orgLayout.value)
+})
+
+// ✅ ออกเพจ: pan-out เฉพาะ org-layout (ออกซ้ายก่อนเปลี่ยน route)
+onBeforeRouteLeave((to, from, next) => {
+  if (!orgLayout.value) return next()
+
+  gsap.killTweensOf(orgLayout.value)
+  gsap.to(orgLayout.value, {
+    x: -PAN_DISTANCE,
+    opacity: 0,
+    duration: 0.45,
+    ease: 'power2.inOut',
+    onComplete: next,
+  })
 })
 
 onUnmounted(() => {
@@ -173,15 +177,14 @@ onUnmounted(() => {
   box-sizing: border-box;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text',
     sans-serif;
+
+  /* ✅ improve pan performance */
+  will-change: transform, opacity;
 }
 
 /* gradient token */
 .org-layout {
-  --blue-gradient: linear-gradient(
-    95deg,
-    rgba(0, 3, 41, 1) 0%,
-    rgba(0, 51, 171, 1) 46%
-  );
+
 
   --chip-bg: linear-gradient(
     180deg,
@@ -480,25 +483,23 @@ onUnmounted(() => {
   }
 
   .org-shell {
-    padding-inline: 1.4rem;
-    padding-block: 1.8rem 2rem;
-    border-radius: 2.1rem;
-    box-shadow:
-      0 20px 40px rgba(15, 23, 42, 0.16),
+    padding-inline: 1.25rem;
+    padding-block: 1.7rem 2.8rem;
+    
+    border-radius: 2rem;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.16),
       0 0 0 1px rgba(148, 163, 184, 0.18);
   }
 
   .org-header {
-    margin-bottom: 1.6rem;
-    text-align: left;
+    margin-bottom: 1.4rem;
   }
 
   .org-vertical {
-    gap: 1.6rem;
+    gap: 1.35rem;
     padding-left: 1.9rem;
   }
 
-  /* ✅ ทำเหมือนกัน: bank-meta อยู่บน แล้วค่อย avatar */
   .person-card {
     flex-direction: column;
     align-items: center;
@@ -508,17 +509,15 @@ onUnmounted(() => {
     border-radius: 1.6rem;
   }
 
-  /* ✅ แบน .person-info เพื่อให้จัด order ได้ */
   .person-info {
     display: contents;
   }
 
-  /* ✅ เรียงใหม่: bank-meta -> avatar -> name -> position */
   .bank-meta {
     order: 1;
     width: 100%;
     justify-content: center;
-    padding: 6px 10px;
+    padding: 7px 10px;
     margin-bottom: 0.65rem;
   }
 
@@ -542,7 +541,6 @@ onUnmounted(() => {
     text-align: center;
   }
 
-  /* ✅ ให้ bank-name wrap สวยในมือถือ */
   .bank-name {
     white-space: normal;
     display: -webkit-box;
@@ -557,21 +555,33 @@ onUnmounted(() => {
   }
 }
 
+/* ---------- Extra small phones ---------- */
 @media (max-width: 480px) {
   .org-layout {
-    padding: 1.25rem 0.75rem;
+    padding: 1.15rem 0.75rem;
   }
 
   .org-shell {
-    border-radius: 1.6rem;
+    border-radius: 1.55rem;
+    padding-inline: 1rem;
+    padding-block: 1.45rem 2.5rem;
   }
 
   .org-node {
     gap: 0.75rem;
   }
 
+  .org-vertical {
+    padding-left: 1.7rem;
+  }
+
+  .org-vertical::before {
+    left: 1.02rem;
+  }
+
   .person-card {
-    padding: 0.9rem 1.1rem;
+    padding: 0.95rem 0.95rem;
+    border-radius: 1.35rem;
   }
 
   .avatar {
@@ -579,17 +589,23 @@ onUnmounted(() => {
     height: 56px;
   }
 
-  .org-header h2 {
-    font-size: 1.4rem;
-  }
-
-  .org-header p {
-    font-size: 0.9rem;
+  .bank-logo {
+    width: 24px;
+    height: 24px;
+    padding: 3px;
   }
 
   .bank-name {
-    max-width: 200px;
+    font-size: 0.9rem;
     -webkit-line-clamp: 3;
+  }
+
+  .name {
+    font-size: 1.05rem;
+  }
+
+  .position {
+    font-size: 0.92rem;
   }
 }
 </style>

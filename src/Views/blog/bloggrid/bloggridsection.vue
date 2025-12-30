@@ -17,7 +17,7 @@
       <div class="control search-control">
         <span class="control-label">Search</span>
         <div class="search-input-wrap">
-          <span class="search-icon">🔍</span>
+          <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
           <input
             v-model="searchQuery"
             type="text"

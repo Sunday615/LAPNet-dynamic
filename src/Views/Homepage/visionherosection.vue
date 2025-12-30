@@ -1,394 +1,778 @@
 <template>
-  <section ref="heroSection" class="hero-wrapper">
-    <div class="hero-inner">
-      <!-- Left: Text -->
-      <div ref="content" class="hero-content">
-
-        <h1 class="headline">
-          ວິໄສທັດ <span class="accent">&amp;</span> ພາລະກິດ
-
-        </h1>
-
-
-
-        <div class="hero-tags">
-
-
-
-        </div>
-
-        <div class="cards-grid">
-          <article class="info-card vision-card">
-            <h2>Our Vision</h2>
-            <p>
-              ພັດທະນາລະບົບການຊໍາລະທຸລະກຳຍ່ອຍໃຫ້ເປັນສູນກາງການຊໍາລະຂອງບັນດາຜູ້ໃຫ້ບໍລິການຊໍາລະ ທັງພາຍໃນ ແລະ ສາກົນ,
-              ແນໃສ່ໃຫ້ປະຊາຊົນລາງໄດ້ໃຊ້ບໍລິການຊໍາລະທີ່ສະດວກວ່ອງໄວ, ທັນສະໄໝ, ປອດໄພ, ຕົ້ນທືນຕໍາ ແລະ
-              ເພື່ອໃຫ້ບໍລິສັດການເປັນໂຄງຮ່າງພື້ນຖານໃຫ້ແກ່ການຊໍາລະໃນ ສປປ ລາວ.
-            </p>
-          </article>
-          <article class="info-card vision-card">
-            <h2>Our Mission</h2>
-            <p>
-              ພັດທະນາລະບົບການຊໍາລະໃຫ້ມີຄວາມຫຼາກຫຼາຍ, ທັນສະໄໝ, ຕອບຮັບໄດ້ທຸກຊ່ອງທາງການຊໍາລະທີ່ເກີດຂື້ນ,
-              ເຕົ້າໂຮມເອົາບັນດາທະນາຄານທຸລະກິດ, ສະຖາບັນການເງິນ ແລະ ບໍລິສັດ Fintech ທີ່ເປັນຜູ້ໃຫ້ບໍລິການຊໍາລະ
-              ໃຫ້ເຂົ້າມາເປັນສະມາຊີກຂອງບໍລິສັດ ເພື່ອພ້ອມກັນໃຫ້ບໍລິການລະບົບການຊໍາລະແກ່ສັງຄົມ,
-              ຫັນເອົາການເຊື່ອມຕໍ່ສາກົນທີ່ມີລັກສະນະກະແຈກກະຈາຍລວມສູນເຂົ້າມາເຊື່ອມຕໍ່ເປັນຮູບແບບລະບົບປະຕູດຽວເພື່ອຫຼຸດຜ່ອນຕົ້ນທືນລວມຂອງທົ່ວລະບົບ,
-              ເສີມຂະຫຍາຍຄວາມຮູ້-ເຂົ້າໃຈໃຫ້ແກ່ມວນຊົນໄດ້ຮັບຮູ້ເຖິງຄວາມສຳຄັນ ແລະ
-              ປະໂຫຍກຂອງການນຳໃຊ້ລະບົບການຊໍາລະເອເລັກໂຕຣນິກຢ່າງຖ່ອງແທ້ ເພື່ອເຮັດໃຫ້ມວນຊົນໄດ້ນຳໃຊ້ລະບົບການຊໍາລະຢ່າງຖືກຕ້ອງ
-              ແລະ ປອດໄພ ເປັນການເສີມສ້າງຄວາມໝັ້ນໃຈໃຫ້ແກ່ມວນຊົນ.
-            </p>
-
-
-          </article>
-          
-          <router-link to="/aboutus/vision">
-            <div class="hero-badge-row" style="margin-top: 50px;">
-             <span class="badge-pill">ອ່ານເພີ່ມເຕີ່ມ<i class="fa-solid fa-arrow-right"></i> </span>
-
-
+  <section class="page">
+    <div ref="cardEl" class="card">
+      <!-- CONTENT PANEL -->
+      <div ref="contentEl" class="panel content">
+        <div class="contentInner">
+          <!-- Brand INSIDE content -->
+          <div class="brandBar" aria-label="Company brand">
+            <div class="brandLeft">
+              <img
+                v-if="logoSrc"
+                :src="logoSrc"
+                class="brandLogo"
+                alt="Company logo"
+              />
+              <div class="brandText">
+                <div class="brandName">{{ companyName }}</div>
+                <div class="brandSub">LAO NATIONAL PAYMENT NETWORK CO., LTD</div>
+              </div>
             </div>
-            </router-link>
-     
 
+            <div class="brandRight">
+              <span class="brandChip">
+                {{ current === 0 ? labelA : labelB }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Title area (modern) -->
+          <div class="titleArea">
+            <div class="kickerRow">
+              <span class="kickerDot" aria-hidden="true"></span>
+              <div class="kicker">ABOUT US</div>
+              <span class="kickerLine" aria-hidden="true"></span>
+            </div>
+
+            <h1 class="headline">
+              {{ current === 0 ? "Our Vision" : "Our Mission" }}
+            </h1>
+
+            <p class="desc">
+              {{ current === 0 ? visionHint : missionHint }}
+            </p>
+          </div>
+
+          <!-- Content swap panes -->
+          <div ref="stackEl" class="contentStack">
+            <div ref="contentA" class="contentPane">
+              <slot name="content1" />
+            </div>
+            <div ref="contentB" class="contentPane">
+              <slot name="content2" />
+            </div>
+          </div>
+
+          <!-- Button bottom of content -->
+          <div class="contentFooter">
+            <button
+              ref="btnEl"
+              class="switchBtn"
+              :disabled="animating"
+              @click="toggle"
+              @mouseenter="onBtnEnter"
+              @mouseleave="onBtnLeave"
+            >
+              <span class="btnText">
+                {{ current === 0 ? switchLabel : backLabel }}
+              </span>
+
+              <!-- Arrow icon (FontAwesome) -->
+              <span class="btnIcon" aria-hidden="true">
+                <!-- ✅ base icon is RIGHT, then flip to LEFT by scaleX(-1) -->
+                <i class="fa-solid fa-arrow-right"></i>
+              </span>
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- Right: Your Image -->
-      <div class="hero-image-wrapper">
-        <div class="hero-image-card">
-          <!-- Replace src with your own image path/url -->
-          <img ref="heroImage" class="hero-image" src="/homepage/vision&mission.png" alt="Founder / Team" />
-
+      <!-- IMAGE PANEL -->
+      <div ref="imageEl" class="panel image" aria-label="Image panel">
+        <div class="imageStack">
+          <img ref="imgA" class="bgImg" :src="image1" alt="Image 1" />
+          <img ref="imgB" class="bgImg" :src="image2" alt="Image 2" />
+          <div class="imgOverlay" aria-hidden="true"></div>
         </div>
       </div>
     </div>
-
-    <!-- Background floating shapes -->
-    <div class="blur-circle blur-circle-1"></div>
-    <div class="blur-circle blur-circle-2"></div>
   </section>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { gsap } from 'gsap'
+import { ref, onMounted, onBeforeUnmount, nextTick } from "vue";
+import { gsap } from "gsap";
 
-const heroSection = ref(null)
-const heroImage = ref(null)
+const props = defineProps({
+  companyName: { type: String, default: "YOUR COMPANY" },
+  logoSrc: { type: String, default: "" },
+
+  image1: { type: String, required: true },
+  image2: { type: String, required: true },
+
+  labelA: { type: String, default: "VISION" },
+  labelB: { type: String, default: "MISSION" },
+  switchLabel: { type: String, default: "OUR MISSION" },
+  backLabel: { type: String, default: "OUR VISION" },
+
+  visionHint: { type: String, default: "" },
+  missionHint: { type: String, default: "" },
+});
+
+const cardEl = ref(null);
+const contentEl = ref(null);
+const imageEl = ref(null);
+
+const stackEl = ref(null);
+const contentA = ref(null);
+const contentB = ref(null);
+const imgA = ref(null);
+const imgB = ref(null);
+
+const btnEl = ref(null);
+
+const current = ref(0);
+const animating = ref(false);
+
+/** responsive mode */
+const stacked = ref(false);
+let mql;
+let ro; // ResizeObserver (fix content cut on responsive)
+let lastStackH = 0;
+
+function setArrowDirection(dir, immediate = false) {
+  // dir: 1 = right, -1 = left
+  if (!btnEl.value) return;
+  const icon = btnEl.value.querySelector(".btnIcon");
+  if (!icon) return;
+
+  if (immediate) {
+    gsap.set(icon, { scaleX: dir });
+    return;
+  }
+  gsap.to(icon, { scaleX: dir, duration: 0.25, ease: "power2.out" });
+}
+
+function arrowNudge(dir = 1) {
+  if (!btnEl.value) return;
+  const icon = btnEl.value.querySelector(".btnIcon");
+  if (!icon) return;
+
+  gsap.fromTo(
+    icon,
+    { x: 0 },
+    {
+      x: 6 * dir, // ✅ nudge follows arrow direction
+      duration: 0.22,
+      ease: "power2.out",
+      yoyo: true,
+      repeat: 1,
+    }
+  );
+}
+
+function onBtnEnter() {
+  if (!btnEl.value) return;
+  gsap.to(btnEl.value, { y: -1, duration: 0.18, ease: "power2.out" });
+}
+function onBtnLeave() {
+  if (!btnEl.value) return;
+  gsap.to(btnEl.value, { y: 0, duration: 0.18, ease: "power2.out" });
+}
+
+/** ✅ IMPORTANT FIX:
+ *  - On responsive, panes are absolute -> getBoundingClientRect() = parent height (wrong)
+ *  - Use scrollHeight to get real content height so it won't be cut/hidden
+ */
+function getPaneHeight(el) {
+  if (!el) return 0;
+  const h = el.scrollHeight; // real content height
+  return Math.max(1, Math.ceil(h));
+}
+
+function setStackHeight(idx = current.value, immediate = true) {
+  if (!stackEl.value) return;
+
+  // desktop uses original flex behavior
+  if (!stacked.value) {
+    stackEl.value.style.height = "";
+    lastStackH = 0;
+    return;
+  }
+
+  const pane = idx === 0 ? contentA.value : contentB.value;
+  if (!pane) return;
+
+  const h = getPaneHeight(pane);
+
+  // guard to avoid endless resize loops
+  if (Math.abs(h - lastStackH) < 2) return;
+  lastStackH = h;
+
+  if (immediate) gsap.set(stackEl.value, { height: h });
+  else gsap.to(stackEl.value, { height: h, duration: 0.35, ease: "power2.out" });
+}
+
+function applyState(immediate = true) {
+  const goingToB = current.value === 1;
+
+  // panel placement
+  if (stacked.value) {
+    gsap.set(contentEl.value, { xPercent: 0, borderRadius: "24px 24px 0 0" });
+    gsap.set(imageEl.value, { xPercent: 0, borderRadius: "0 0 24px 24px" });
+  } else {
+    gsap.set(contentEl.value, {
+      xPercent: goingToB ? 100 : 0,
+      borderRadius: goingToB ? "0 24px 24px 0" : "24px 0 0 24px",
+    });
+    gsap.set(imageEl.value, {
+      xPercent: goingToB ? -100 : 0,
+      borderRadius: goingToB ? "24px 0 0 24px" : "0 24px 24px 0",
+    });
+  }
+
+  // panes
+  gsap.set(contentA.value, {
+    autoAlpha: goingToB ? 0 : 1,
+    y: goingToB ? -10 : 0,
+    filter: goingToB ? "blur(10px)" : "blur(0px)",
+    pointerEvents: goingToB ? "none" : "auto",
+  });
+  gsap.set(contentB.value, {
+    autoAlpha: goingToB ? 1 : 0,
+    y: goingToB ? 0 : 10,
+    filter: goingToB ? "blur(0px)" : "blur(10px)",
+    pointerEvents: goingToB ? "auto" : "none",
+  });
+
+  // images
+  gsap.set(imgA.value, { autoAlpha: goingToB ? 0 : 1, scale: goingToB ? 1.08 : 1.03 });
+  gsap.set(imgB.value, { autoAlpha: goingToB ? 1 : 0, scale: goingToB ? 1.03 : 1.08 });
+
+  // ✅ arrow: Vision (0) => right, Mission (1) => left
+  setArrowDirection(current.value === 0 ? 1 : -1, immediate);
+
+  nextTick(() => setStackHeight(current.value, true));
+}
+
+function setInitial() {
+  applyState(true);
+}
+
+function animateTo(next) {
+  animating.value = true;
+  const goingToB = next === 1;
+
+  // ✅ direction for the state we're moving TO
+  const dirTo = goingToB ? -1 : 1; // Mission => left, Vision => right
+  setArrowDirection(dirTo);
+
+  const tl = gsap.timeline({
+    defaults: { duration: 0.9, ease: "expo.inOut" },
+    onComplete: () => {
+      current.value = next;
+      animating.value = false;
+      nextTick(() => setStackHeight(current.value, false));
+      arrowNudge(dirTo);
+    },
+  });
+
+  // ✅ mobile stacked: do NOT swap panel positions, but ensure content height always fits
+  if (stacked.value) {
+    const hNext = getPaneHeight(goingToB ? contentB.value : contentA.value);
+    lastStackH = hNext;
+
+    tl.to(stackEl.value, { height: hNext, duration: 0.35, ease: "power2.out" }, 0);
+
+    // content crossfade
+    tl.to(
+      contentA.value,
+      {
+        autoAlpha: goingToB ? 0 : 1,
+        y: goingToB ? -10 : 0,
+        filter: goingToB ? "blur(10px)" : "blur(0px)",
+        pointerEvents: goingToB ? "none" : "auto",
+        duration: 0.5,
+        ease: "power2.out",
+      },
+      0
+    ).to(
+      contentB.value,
+      {
+        autoAlpha: goingToB ? 1 : 0,
+        y: goingToB ? 0 : 10,
+        filter: goingToB ? "blur(0px)" : "blur(10px)",
+        pointerEvents: goingToB ? "auto" : "none",
+        duration: 0.6,
+        ease: "power2.out",
+      },
+      0.12
+    );
+
+    // image crossfade + subtle zoom
+    tl.to(
+      imgA.value,
+      { autoAlpha: goingToB ? 0 : 1, scale: goingToB ? 1.08 : 1.03, duration: 0.75 },
+      0
+    );
+    tl.to(
+      imgB.value,
+      { autoAlpha: goingToB ? 1 : 0, scale: goingToB ? 1.03 : 1.08, duration: 0.8 },
+      0.06
+    );
+
+    // title micro motion + card pop
+    const titleArea = cardEl.value?.querySelector(".titleArea");
+    if (titleArea) {
+      tl.fromTo(
+        titleArea,
+        { y: 0 },
+        { y: -6, duration: 0.18, yoyo: true, repeat: 1, ease: "power2.out" },
+        0.08
+      );
+    }
+    tl.fromTo(
+      cardEl.value,
+      { scale: 1 },
+      { scale: 1.01, duration: 0.18, yoyo: true, repeat: 1, ease: "power2.out" },
+      0.1
+    );
+
+    return;
+  }
+
+  // ✅ desktop/tablet: original swap panels animation
+  tl.to(
+    contentEl.value,
+    {
+      xPercent: goingToB ? 100 : 0,
+      borderRadius: goingToB ? "0 24px 24px 0" : "24px 0 0 24px",
+    },
+    0
+  ).to(
+    imageEl.value,
+    {
+      xPercent: goingToB ? -100 : 0,
+      borderRadius: goingToB ? "24px 0 0 24px" : "0 24px 24px 0",
+    },
+    0
+  );
+
+  // content crossfade
+  tl.to(
+    contentA.value,
+    {
+      autoAlpha: goingToB ? 0 : 1,
+      y: goingToB ? -10 : 0,
+      filter: goingToB ? "blur(10px)" : "blur(0px)",
+      pointerEvents: goingToB ? "none" : "auto",
+      duration: 0.5,
+      ease: "power2.out",
+    },
+    0
+  );
+
+  tl.to(
+    contentB.value,
+    {
+      autoAlpha: goingToB ? 1 : 0,
+      y: goingToB ? 0 : 10,
+      filter: goingToB ? "blur(0px)" : "blur(10px)",
+      pointerEvents: goingToB ? "auto" : "none",
+      duration: 0.6,
+      ease: "power2.out",
+    },
+    0.12
+  );
+
+  // image crossfade + subtle zoom
+  tl.to(
+    imgA.value,
+    { autoAlpha: goingToB ? 0 : 1, scale: goingToB ? 1.08 : 1.03, duration: 0.75 },
+    0
+  );
+
+  tl.to(
+    imgB.value,
+    { autoAlpha: goingToB ? 1 : 0, scale: goingToB ? 1.03 : 1.08, duration: 0.8 },
+    0.06
+  );
+
+  // title micro motion
+  const titleArea = cardEl.value?.querySelector(".titleArea");
+  if (titleArea) {
+    tl.fromTo(
+      titleArea,
+      { y: 0 },
+      { y: -6, duration: 0.18, yoyo: true, repeat: 1, ease: "power2.out" },
+      0.08
+    );
+  }
+
+  // tiny card pop
+  tl.fromTo(
+    cardEl.value,
+    { scale: 1 },
+    { scale: 1.01, duration: 0.18, yoyo: true, repeat: 1, ease: "power2.out" },
+    0.1
+  );
+}
+
+function toggle() {
+  if (animating.value) return;
+  animateTo(current.value === 0 ? 1 : 0);
+}
+
+function updateLayoutMode() {
+  if (!mql) return;
+  const next = !!mql.matches;
+  if (stacked.value === next) return;
+  stacked.value = next;
+  nextTick(() => applyState(true));
+}
 
 onMounted(() => {
-  const sectionEl = heroSection.value
-  if (!sectionEl) return
+  mql = window.matchMedia("(max-width: 860px)");
+  stacked.value = !!mql.matches;
 
-  const timeline = gsap.timeline({
-    defaults: {
-      duration: 0.5,
-      ease: 'power3.out',
-    },
-  })
+  if (mql.addEventListener) mql.addEventListener("change", updateLayoutMode);
+  else mql.addListener(updateLayoutMode);
 
-  const headline = sectionEl.querySelector('.headline')
-  const description = sectionEl.querySelector('.description')
-  const badges = sectionEl.querySelectorAll('.badge-pill')
-  const tags = sectionEl.querySelectorAll('.tag-pill')
-  const cards = sectionEl.querySelectorAll('.info-card')
+  // ✅ ResizeObserver: if slot content changes height (wrap/image load), auto-fix stack height
+  if (window.ResizeObserver) {
+    ro = new ResizeObserver(() => {
+      if (!stacked.value) return;
+      // wait layout settle
+      requestAnimationFrame(() => setStackHeight(current.value, true));
+    });
 
-  // Intro animation
-  timeline
-    .from(sectionEl, {
-      opacity: 0,
-      y: 40,
-    })
-    .from(
-      badges,
-      {
-        opacity: 0,
-        y: 20,
-        stagger: 0.1,
-      },
-      '-=0.4'
-    )
-    .from(
-      headline,
-      {
-        opacity: 0,
-        y: 30,
-      },
-      '-=0.3'
-    )
-    .from(
-      description,
-      {
-        opacity: 0,
-        y: 20,
-      },
-      '-=0.3'
-    )
-    .from(
-      tags,
-      {
-        opacity: 0,
-        y: 16,
-        stagger: 0.08,
-      },
-      '-=0.3'
-    )
-    .from(
-      cards,
-      {
-        opacity: 0,
-        y: 40,
-        stagger: 0.12,
-      },
-      '-=0.2'
-    )
-    .from(
-      heroImage.value,
-      {
-        opacity: 0,
-        x: 40,
-        scale: 0.95,
-      },
-      '-=0.5'
-    )
-
-  // Soft floating animation for the image
-  if (heroImage.value) {
-    gsap.to(heroImage.value, {
-      y: 12,
-      duration: 2,
-      repeat: -1,
-      yoyo: true,
-      ease: 'sine.inOut',
-    })
+    // observe both panes
+    nextTick(() => {
+      if (contentA.value) ro.observe(contentA.value);
+      if (contentB.value) ro.observe(contentB.value);
+    });
   }
-})
+
+  nextTick(() => setInitial());
+});
+
+onBeforeUnmount(() => {
+  if (ro) ro.disconnect();
+  if (!mql) return;
+  if (mql.removeEventListener) mql.removeEventListener("change", updateLayoutMode);
+  else mql.removeListener(updateLayoutMode);
+});
 </script>
 
 <style scoped>
-.hero-wrapper {
+.page{
+  min-height: 80vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding: 24px;
+}
+
+.card{
   position: relative;
-  padding: 4rem 1.5rem 5rem;
-  background: #ffffff;
-  /* WHITE BACKGROUND */
-  color: #0f172a;
+  width: min(1380px, 96vw);
+  height: 560px;
+  border-radius: 24px;
   overflow: hidden;
+  box-shadow: 0 30px 70px rgba(0,0,0,.35);
+  background: rgba(255,255,255,.12);
 }
 
-.hero-inner {
-  max-width: 1380px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-  gap: 3rem;
-  align-items: center;
+.panel{
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  will-change: transform;
 }
 
-.hero-content {
-  position: relative;
-  z-index: 1;
+/* Content left */
+.content{
+  left: 0;
+  background: #ffffff;
+}
+.contentInner{
+  height: 100%;
+  display:flex;
+  flex-direction: column;
+  padding: 22px 30px 28px;
 }
 
-.hero-badge-row {
-  display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
+/* Brand bar INSIDE content (modern) */
+.brandBar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 12px 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(15, 25, 40, .08);
+  background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(248,250,255,.92));
+  box-shadow: 0 10px 24px rgba(10, 18, 35, .06);
+  margin-bottom: 16px;
 }
 
-.badge-pill {
-  padding: 0.35rem 0.9rem;
+.brandLeft{
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  color: #0b1220;
+  min-width: 0;
+}
+
+.brandLogo{
+  width: 42px;
+  height: 42px;
   border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.5);
-  font-size: 0.75rem;
+  object-fit: cover;
+  border: 1px solid rgba(0,0,0,.10);
+  background: #fff;
+}
+
+.brandText{
+  display:flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.brandName{
+  font-weight: 900;
+  letter-spacing: .1px;
+  font-size: 14px;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.brandSub{
+  font-size: 11px;
+  color: rgba(11, 18, 32, .55);
+  letter-spacing: .7px;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.brandChip{
+  color: rgba(10, 18, 35, .9);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 90, 255, .22);
+  background: rgba(0, 90, 255, .08);
+}
+
+/* Title area (bigger + modern) */
+.titleArea{
+  padding: 8px 2px 10px;
+  margin-bottom: 6px;
+}
+
+.kickerRow{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.kickerDot{
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 30%, rgba(25,178,255,1), rgba(31,76,255,1));
+  box-shadow: 0 8px 18px rgba(0, 90, 255, .18);
+}
+.kicker{
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 1.4px;
+  color: rgba(0, 90, 255, .85);
+  text-transform: uppercase;
+}
+.kickerLine{
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(90deg, rgba(0,90,255,.35), rgba(0,90,255,0));
+}
+
+.headline{
+  margin: 0 0 10px;
+  font-size: 34px;
+  line-height: 1.1;
+  letter-spacing: -0.8px;
+  color: #0b1220;
+}
+
+.desc{
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.75;
+  color: rgba(11, 18, 32, .62);
+  max-width: 58ch;
+}
+
+/* Content swap panes */
+.contentStack{
+  position: relative;
+  flex: 1;
+  overflow: auto;
+  padding-top: 12px;
+}
+.contentPane{
+  position: absolute;
+  inset: 0;
+}
+
+/* make slot text look better */
+.contentStack :deep(h1){
+  margin: 0 0 10px;
+  font-size: 22px;
+  letter-spacing: -.2px;
+  color: #0b1220;
+}
+.contentStack :deep(p){
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.9;
+  color: rgba(11, 18, 32, .74);
+}
+
+/* Footer button */
+.contentFooter{
+  margin-top: 18px;
+  display:flex;
+  justify-content:flex-start;
+}
+
+.switchBtn{
+  height: 48px;
+  padding: 0 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 90, 255, .22);
+  cursor: pointer;
+  font-weight: 900;
+  letter-spacing: .2px;
+  color: #fff;
+  background: linear-gradient(90deg, #1f4cff, #19b2ff);
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.8);
-  color: #64748b;
+  gap: 12px;
+  box-shadow: 0 16px 30px rgba(0, 90, 255, .18);
+  transform: translateZ(0);
 }
 
-.badge-secondary {
-  border-style: dashed;
-  border-color: rgba(59, 130, 246, 0.7);
+.switchBtn:hover{ filter: brightness(1.03); }
+.switchBtn:active{ transform: translateY(1px); }
+.switchBtn:disabled{
+  opacity: .6;
+  cursor: not-allowed;
 }
 
-.headline {
-  font-size: clamp(2rem, 2.9vw, 3rem);
-  line-height: 1.1;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  color: #020617;
+.btnText{ white-space: nowrap; }
+
+/* FontAwesome arrow */
+.btnIcon{
+  width: 18px;
+  height: 18px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  transform-origin: center;
+}
+.btnIcon i{
+  font-size: 16px;
+  line-height: 1;
 }
 
-.headline .accent {
-  background: linear-gradient(120deg, #22c55e, #38bdf8, #a855f7);
-  -webkit-background-clip: text;
-  color: transparent;
+/* Image right (full cover) */
+.image{
+  left: 50%;
+  background: #040a18;
 }
-
-.description {
-  max-width: 32rem;
-  color: #4b5563;
-  font-size: 0.98rem;
-  line-height: 1.6;
-  margin-bottom: 1.25rem;
-}
-
-.hero-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1.75rem;
-}
-
-.tag-pill {
-  padding: 0.35rem 0.85rem;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  border: 1px solid rgba(148, 163, 184, 0.6);
-  background: #f9fafb;
-  color: #0f172a;
-}
-
-.cards-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.1fr);
-  gap: 1.25rem;
-}
-
-.info-card {
-  padding: 1.1rem 1.1rem 1rem;
-  border-radius: 1.1rem;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-}
-
-.info-card h2 {
-  font-size: 0.95rem;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  margin-bottom: 0.45rem;
-  color: #111827;
-}
-
-.info-card p {
-  font-size: 0.88rem;
-  color: #4b5563;
-  line-height: 1.6;
-}
-
-.info-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
-  border-color: rgba(59, 130, 246, 0.7);
-}
-
-.hero-image-wrapper {
+.imageStack{
   position: relative;
-  z-index: 1;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.hero-image-card {
-  position: relative;
-  border-radius: 1.5rem;
-  padding: 0.6rem;
-  background: linear-gradient(145deg, rgba(59, 130, 246, 0.08), rgba(56, 189, 248, 0.04));
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 18px 60px rgba(15, 23, 42, 0.12);
+  width: 100%;
+  height: 100%;
   overflow: hidden;
-  max-width: 440px;
-  width: 100%;
 }
-
-.hero-image {
+.bgImg{
+  position: absolute;
+  inset: 0;
   width: 100%;
-  display: block;
-  border-radius: 1.25rem;
+  height: 100%;
   object-fit: cover;
-  aspect-ratio: 3 / 4;
+  transform-origin: center;
 }
-
-.image-overlay {
+.imgOverlay{
   position: absolute;
-  left: 1rem;
-  bottom: 1rem;
-  padding: 0.6rem 0.9rem;
-  border-radius: 0.9rem;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(209, 213, 219, 0.9);
-  backdrop-filter: blur(10px);
-}
-
-.image-label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #111827;
-}
-
-.image-subtitle {
-  margin-top: 0.15rem;
-  font-size: 0.72rem;
-  color: #6b7280;
-}
-
-/* Background blur shapes */
-.blur-circle {
-  position: absolute;
-  filter: blur(52px);
-  opacity: 0.8;
+  inset: 0;
   pointer-events: none;
 }
 
-.blur-circle-1 {
-  width: 320px;
-  height: 320px;
-  background: radial-gradient(circle, rgba(64, 179, 255, 0.55), transparent);
-  top: -60px;
-  left: -80px;
+/* =========================
+   Responsive (ไม่เปลี่ยนสไตล์)
+   ========================= */
+@media (max-width: 1200px){
+  .card{ height: 520px; }
+  .contentInner{ padding: 20px 24px 24px; }
+  .headline{ font-size: 32px; }
+}
+@media (max-width: 1024px){
+  .card{ height: 500px; }
+  .headline{ font-size: 30px; }
+}
+@media (max-width: 860px){
+  .page{ padding: 16px; }
+
+  .card{
+    height: auto;
+    width: min(720px, 100%);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .panel{
+    position: relative;
+    width: 100%;
+    height: auto;
+  }
+
+  .content{ left: 0; }
+  .image{
+    left: 0;
+    height: 260px;
+  }
+
+  .contentInner{
+    height: auto;
+    padding: 18px 18px 20px;
+  }
+
+  /* ✅ FIX: do not hide content on mobile */
+  .contentStack{
+    flex: none;
+    overflow: visible; /* was hidden -> content got cut */
+    padding-top: 10px;
+  }
+
+  .headline{ font-size: 28px; }
+  .desc{ max-width: 68ch; }
+}
+@media (max-width: 480px){
+  .brandBar{ padding: 10px 12px; border-radius: 16px; }
+  .brandLogo{ width: 38px; height: 38px; }
+  .headline{ font-size: 24px; }
+
+  .contentFooter{ justify-content: stretch; }
+  .switchBtn{
+    width: 100%;
+    justify-content: center;
+  }
+}
+@media (max-width: 495px){
+ .brandChip{
+  display: none;
+ }
 }
 
-.blur-circle-2 {
-  width: 260px;
-  height: 260px;
-  background: radial-gradient(circle, rgba(1, 132, 255, 0.4), transparent);
-  bottom: -80px;
-  right: -40px;
-}
-
-/* Responsive */
-@media (max-width: 900px) {
-  .hero-inner {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 2.5rem;
-  }
-
-  .hero-image-wrapper {
-    justify-content: flex-start;
-  }
-
-  .hero-wrapper {
-    padding-top: 3.25rem;
-  }
-}
-
-@media (max-width: 640px) {
-  .hero-wrapper {
-    padding: 2.75rem 1.25rem 3.5rem;
-  }
-
-  .cards-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .headline {
-    font-size: 1.9rem;
-  }
+/* optional: user prefers reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .panel{ will-change: auto; }
 }
 </style>

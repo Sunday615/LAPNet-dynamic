@@ -14,16 +14,15 @@
     <bod_navbar />
   </div>
 
-  <div class="org-layout">
-    <div ref="orgShell" class="org-shell">
+  <!-- ✅ pan เฉพาะ org-layout -->
+  <div ref="orgLayout" class="org-layout">
+    <div class="org-shell">
       <header class="org-header">
         <h2>ຄະນະກຳມະການຄຸ້ມຄອງຄວາມສ່ຽງ</h2>
-        <p style="display: flex; align-items: center;">
-          <img
-            src="/logolapnet/fullcircle.png"
-            alt=""
-            style="width: 25px; height: 25px; margin-right: 5px;"
-          />
+
+        <!-- ✅ ทำให้เหมือนหน้าอื่น -->
+        <p class="org-subline">
+          <img src="/logolapnet/fullcircle.png" alt="" class="lapnet-logo" />
           Lao National Payment Network CO., LTD
         </p>
       </header>
@@ -42,7 +41,6 @@
             </div>
 
             <div class="person-info">
-              <!-- ✅ Bank row (logo + bank name) -->
               <div class="bank-meta">
                 <img
                   class="bank-logo"
@@ -72,7 +70,6 @@
             </div>
 
             <div class="person-info">
-              <!-- ✅ Bank row (logo + bank name) -->
               <div class="bank-meta">
                 <img
                   class="bank-logo"
@@ -99,51 +96,57 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { onBeforeRouteLeave } from 'vue-router'
 import { gsap } from 'gsap'
 
 import bod_navbar from '../../../Views/Aboutus/companystructure/navbarcompany/bod_navbar.vue'
 import main_navbar from '../../../components/miannavbar/main_navbar.vue'
 import secondfooter from '../../../components/footer/mainfooter/secondfooter.vue'
 
-const orgShell = ref(null)
+const orgLayout = ref(null)
 let ctx = null
 
-onMounted(() => {
+const PAN_DISTANCE = 90
+
+onMounted(async () => {
+  await nextTick()
+
   ctx = gsap.context(() => {
     const cards = gsap.utils.toArray('.person-card')
 
     const tl = gsap.timeline({
-      defaults: {
-        ease: 'power3.out',
-        duration: 0.8,
-      },
+      defaults: { ease: 'power3.out', duration: 0.8 },
     })
 
-    tl.from('.org-shell', {
-      opacity: 0,
-      y: 40,
-      scale: 0.97,
-    })
-      .from(
-        '.org-header',
-        {
-          opacity: 0,
-          y: 20,
-        },
-        '-=0.4'
-      )
+    // ✅ Pan-in เฉพาะ org-layout (เข้าจากขวา)
+    tl.fromTo(
+      orgLayout.value,
+      { opacity: 0, x: PAN_DISTANCE },
+      { opacity: 1, x: 0, duration: 0.55, ease: 'power2.out' }
+    )
+      .from('.org-shell', { opacity: 0, y: 40, scale: 0.97 }, '-=0.25')
+      .from('.org-header', { opacity: 0, y: 20 }, '-=0.45')
       .from(
         cards,
-        {
-          opacity: 0,
-          y: 24,
-          filter: 'blur(6px)',
-          stagger: 0.1,
-        },
-        '-=0.3'
+        { opacity: 0, y: 24, filter: 'blur(6px)', stagger: 0.1 },
+        '-=0.35'
       )
-  }, orgShell)
+  }, orgLayout.value)
+})
+
+// ✅ Pan-out เฉพาะ org-layout ก่อนเปลี่ยนหน้า
+onBeforeRouteLeave((to, from, next) => {
+  if (!orgLayout.value) return next()
+
+  gsap.killTweensOf(orgLayout.value)
+  gsap.to(orgLayout.value, {
+    x: -PAN_DISTANCE,
+    opacity: 0,
+    duration: 0.45,
+    ease: 'power2.inOut',
+    onComplete: next,
+  })
 })
 
 onUnmounted(() => {
@@ -178,11 +181,9 @@ onUnmounted(() => {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text',
     sans-serif;
 
-  --blue-gradient: linear-gradient(
-    95deg,
-    rgba(0, 3, 41, 1) 0%,
-    rgba(0, 51, 171, 1) 46%
-  );
+  /* ✅ improve pan performance */
+  will-change: transform, opacity;
+
   --chip-bg: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.9),
@@ -201,8 +202,7 @@ onUnmounted(() => {
   position: relative;
   overflow: hidden;
   margin-inline: auto;
-  box-shadow:
-    0 32px 90px rgba(15, 23, 42, 0.22),
+  box-shadow: 0 32px 90px rgba(15, 23, 42, 0.22),
     0 0 0 1px rgba(148, 163, 184, 0.28);
 }
 
@@ -230,10 +230,18 @@ onUnmounted(() => {
   letter-spacing: 0.03em;
 }
 
-.org-header p {
+.org-subline {
   margin: 0.5rem 0 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: clamp(0.95rem, 1.1vw, 1.05rem);
   color: #6b7280;
+}
+
+.lapnet-logo {
+  width: 25px;
+  height: 25px;
 }
 
 /* VERTICAL SIDE STRUCTURE --------------------------------------- */
@@ -274,8 +282,7 @@ onUnmounted(() => {
   border-radius: 999px;
   background: #ffffff;
   border: 3px solid #1d4ed8;
-  box-shadow:
-    0 0 0 4px rgba(191, 219, 254, 0.7),
+  box-shadow: 0 0 0 4px rgba(191, 219, 254, 0.7),
     0 10px 20px rgba(15, 23, 42, 0.25);
   margin-top: 1.3rem;
   flex-shrink: 0;
@@ -291,21 +298,16 @@ onUnmounted(() => {
   background: #ffffff;
   border-radius: 1.9rem;
   border: 1px solid #e5e7eb;
-  box-shadow:
-    0 24px 50px rgba(15, 23, 42, 0.14),
+  box-shadow: 0 24px 50px rgba(15, 23, 42, 0.14),
     0 0 0 1px rgba(148, 163, 184, 0.16);
   box-sizing: border-box;
-  transition:
-    transform 0.16s ease-out,
-    box-shadow 0.16s ease-out,
-    border-color 0.16s ease-out,
-    background 0.16s ease-out;
+  transition: transform 0.16s ease-out, box-shadow 0.16s ease-out,
+    border-color 0.16s ease-out, background 0.16s ease-out;
 }
 
 .person-card:hover {
   transform: translateY(-4px);
-  box-shadow:
-    0 30px 60px rgba(15, 23, 42, 0.26),
+  box-shadow: 0 30px 60px rgba(15, 23, 42, 0.26),
     0 0 0 1px rgba(37, 99, 235, 0.6);
   border-color: rgba(37, 99, 235, 0.7);
 }
@@ -323,8 +325,7 @@ onUnmounted(() => {
   height: 82px;
   border-radius: 999px;
   background: var(--blue-gradient);
-  box-shadow:
-    0 22px 40px rgba(15, 23, 42, 0.45),
+  box-shadow: 0 22px 40px rgba(15, 23, 42, 0.45),
     0 0 0 4px rgba(255, 255, 255, 0.96);
   overflow: hidden;
 }
@@ -343,7 +344,7 @@ onUnmounted(() => {
   min-width: 0;
 }
 
-/* ✅ BANK META (Modern chip) */
+/* BANK META */
 .bank-meta {
   display: inline-flex;
   align-items: center;
@@ -352,22 +353,18 @@ onUnmounted(() => {
   border-radius: 999px;
   background: var(--chip-bg);
   border: 1px solid var(--chip-border);
-  box-shadow:
-    0 10px 22px rgba(15, 23, 42, 0.08),
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08),
     0 0 0 3px var(--chip-glow);
   width: fit-content;
   max-width: 100%;
   margin-bottom: 0.75rem;
-  transition:
-    transform 0.16s ease,
-    box-shadow 0.16s ease,
+  transition: transform 0.16s ease, box-shadow 0.16s ease,
     border-color 0.16s ease;
 }
 
 .person-card:hover .bank-meta {
   border-color: rgba(37, 99, 235, 0.35);
-  box-shadow:
-    0 14px 28px rgba(15, 23, 42, 0.12),
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12),
     0 0 0 4px rgba(37, 99, 235, 0.18);
   transform: translateY(-1px);
 }
@@ -473,10 +470,10 @@ onUnmounted(() => {
 
   .org-shell {
     padding-inline: 1.25rem;
-    padding-block: 1.7rem 2rem;
+    padding-block: 1.7rem 2.8rem;
+    
     border-radius: 2rem;
-    box-shadow:
-      0 20px 40px rgba(15, 23, 42, 0.16),
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.16),
       0 0 0 1px rgba(148, 163, 184, 0.18);
   }
 
@@ -489,7 +486,6 @@ onUnmounted(() => {
     padding-left: 1.9rem;
   }
 
-  /* ✅ Layout เหมือนกัน: bank-meta อยู่บน -> avatar -> name -> position */
   .person-card {
     flex-direction: column;
     align-items: center;
@@ -499,7 +495,6 @@ onUnmounted(() => {
     border-radius: 1.6rem;
   }
 
-  /* ✅ ให้ order ทำงาน (เอา children ของ person-info มาเรียงกับ avatar-wrapper ได้) */
   .person-info {
     display: contents;
   }
@@ -532,7 +527,6 @@ onUnmounted(() => {
     text-align: center;
   }
 
-  /* ✅ bank-name wrap สวยบนมือถือ */
   .bank-name {
     white-space: normal;
     display: -webkit-box;
@@ -547,6 +541,7 @@ onUnmounted(() => {
   }
 }
 
+/* ---------- Extra small phones ---------- */
 @media (max-width: 480px) {
   .org-layout {
     padding: 1.15rem 0.75rem;
@@ -555,7 +550,7 @@ onUnmounted(() => {
   .org-shell {
     border-radius: 1.55rem;
     padding-inline: 1rem;
-    padding-block: 1.45rem 1.7rem;
+    padding-block: 1.45rem 2.5rem;
   }
 
   .org-node {

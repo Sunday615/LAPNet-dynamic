@@ -559,7 +559,7 @@ watch(filteredMembers, async () => {
 
         <!-- Search box -->
         <div class="searchBox">
-          <span class="searchIcon">🔍</span>
+          <span class="searchIcon"><img src="/icon/search2.png" alt="" style="width: 30px; height: 30px;"></span>
           <input
             v-model="searchQuery"
             type="text"

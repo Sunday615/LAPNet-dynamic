@@ -33,7 +33,35 @@
     <mockupherosectionpage />
   </div>
   <div class="vision">
-    <visionherosection />
+    <SwitchSplit
+    
+    company-name="LAPNet"
+    logo-src="/logolapnet/fullcircle.png"
+    image1="/homepage/Vision.png"
+    image2="/homepage/missionhome.png"
+    label-a="VISION"
+    label-b="MISSION"
+  
+
+  >
+    <template #content1>
+      
+      <p style="margin:0;opacity:.7;">   ພັດທະນາລະບົບການຊໍາລະທຸລະກຳຍ່ອຍໃຫ້ເປັນສູນກາງການຊໍາລະຂອງບັນດາຜູ້ໃຫ້ບໍລິການຊໍາລະ ທັງພາຍໃນ ແລະ ສາກົນ,
+              ແນໃສ່ໃຫ້ປະຊາຊົນລາງໄດ້ໃຊ້ບໍລິການຊໍາລະທີ່ສະດວກວ່ອງໄວ, ທັນສະໄໝ, ປອດໄພ, ຕົ້ນທືນຕໍາ ແລະ
+              ເພື່ອໃຫ້ບໍລິສັດການເປັນໂຄງຮ່າງພື້ນຖານໃຫ້ແກ່ການຊໍາລະໃນ ສປປ ລາວ.</p>
+    </template>
+
+    <template #content2>
+  
+      <p style="margin:0;opacity:.7;">          ພັດທະນາລະບົບການຊໍາລະໃຫ້ມີຄວາມຫຼາກຫຼາຍ, ທັນສະໄໝ, ຕອບຮັບໄດ້ທຸກຊ່ອງທາງການຊໍາລະທີ່ເກີດຂື້ນ,
+              ເຕົ້າໂຮມເອົາບັນດາທະນາຄານທຸລະກິດ, ສະຖາບັນການເງິນ ແລະ ບໍລິສັດ Fintech ທີ່ເປັນຜູ້ໃຫ້ບໍລິການຊໍາລະ
+              ໃຫ້ເຂົ້າມາເປັນສະມາຊີກຂອງບໍລິສັດ ເພື່ອພ້ອມກັນໃຫ້ບໍລິການລະບົບການຊໍາລະແກ່ສັງຄົມ,
+              ຫັນເອົາການເຊື່ອມຕໍ່ສາກົນທີ່ມີລັກສະນະກະແຈກກະຈາຍລວມສູນເຂົ້າມາເຊື່ອມຕໍ່ເປັນຮູບແບບລະບົບປະຕູດຽວເພື່ອຫຼຸດຜ່ອນຕົ້ນທືນລວມຂອງທົ່ວລະບົບ,
+              ເສີມຂະຫຍາຍຄວາມຮູ້-ເຂົ້າໃຈໃຫ້ແກ່ມວນຊົນໄດ້ຮັບຮູ້ເຖິງຄວາມສຳຄັນ ແລະ
+              ປະໂຫຍກຂອງການນຳໃຊ້ລະບົບການຊໍາລະເອເລັກໂຕຣນິກຢ່າງຖ່ອງແທ້ ເພື່ອເຮັດໃຫ້ມວນຊົນໄດ້ນຳໃຊ້ລະບົບການຊໍາລະຢ່າງຖືກຕ້ອງ
+              ແລະ ປອດໄພ ເປັນການເສີມສ້າງຄວາມໝັ້ນໃຈໃຫ້ແກ່ມວນຊົນ.</p>
+    </template>
+  </SwitchSplit>
   </div>
   <div class="whytus">
     <whychooseus title="Why choose LAPNET"
@@ -106,7 +134,7 @@ import mockupherosectionpage from './mockupherosectionpage.vue';
 import atmmockup from '../../components/mockup/atmmockup.vue';
 import bloghomepage from '../../components/blog/hompage/bloghomepage.vue';
 import main_navbar from '../../components/miannavbar/main_navbar.vue';
-import visionherosection from './visionherosection.vue';
+import SwitchSplit from './visionherosection.vue';
 import whychooseus from './whychooseus.vue';
 import allmemberscrolling from '../../components/swiper/memberscrolling/allmemberscrolling.vue';
 import productherosectionhomepage from './productherosectionhomepage.vue';

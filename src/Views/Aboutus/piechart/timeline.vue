@@ -109,32 +109,6 @@
           ✕
         </button>
 
-        <!-- ✅ Prev / Next floating buttons -->
-        <button
-          class="nav-btn nav-prev"
-          :class="{ disabled: !hasPrev }"
-          :disabled="!hasPrev"
-          @click="goPrev"
-          aria-label="Previous"
-          title="Previous"
-        >
-          <span class="nav-ico">←</span>
-          <span class="nav-txt">Prev</span>
-        </button>
-
-        <button
-          class="nav-btn nav-next"
-          :class="{ disabled: !hasNext }"
-          :disabled="!hasNext"
-          @click="goNext"
-          aria-label="Next"
-          title="Next"
-        >
-          <span class="nav-txt">Next</span>
-          <span class="nav-ico">→</span>
-        </button>
-
-        <!-- ✅ Swipe here (left/right) -->
         <div
           class="overlay-card"
           ref="overlayCardRef"
@@ -166,6 +140,70 @@
             <p class="overlay-desc">
               {{ activeItem.desc }}
             </p>
+          </div>
+
+          <!-- ✅ Bottom actions (theme-matching) -->
+          <!-- ⭐ สำคัญ: stop pointer events ไม่ให้ไปชน overlay-card swipe -->
+          <div
+            class="overlay-actions"
+            role="group"
+            aria-label="Overlay navigation"
+            @pointerdown.stop
+            @pointerup.stop
+            @pointercancel.stop
+          >
+            <button
+              class="ov-btn ov-prev"
+              :disabled="!hasPrev"
+              :class="{ disabled: !hasPrev }"
+              @click="goPrev"
+              @pointerdown.stop
+              @pointerup.stop
+              @pointercancel.stop
+              aria-label="Previous"
+              title="Previous"
+              type="button"
+            >
+              <span class="ov-ico">←</span>
+              <span class="ov-txt">Prev</span>
+            </button>
+
+            <!-- ✅ Dots indicator -->
+            <div class="overlay-dots" role="tablist" aria-label="Pages">
+              <button
+                v-for="(it, idx) in items"
+                :key="it.id"
+                class="dot"
+                :class="{ active: idx === activeIndex }"
+                type="button"
+                role="tab"
+                :aria-selected="idx === activeIndex"
+                :aria-current="idx === activeIndex ? 'true' : undefined"
+                :title="`Page ${idx + 1} / ${items.length}`"
+                @click="goTo(idx)"
+                @pointerdown.stop
+                @pointerup.stop
+                @pointercancel.stop
+              >
+                <span class="sr-only">Go to page {{ idx + 1 }}</span>
+              </button>
+            </div>
+
+            <button
+              class="ov-btn ov-next"
+              :disabled="!hasNext"
+              :class="{ disabled: !hasNext }"
+              @click="goNext"
+              @pointerdown.stop
+              @pointerup.stop
+              @pointercancel.stop
+              aria-label="Next"
+              title="Next"
+              type="button"
+            >
+              <span class="ov-txt">Next</span>
+              <span class="ov-ico">→</span>
+            </button>
           </div>
         </div>
       </div>
@@ -205,7 +243,6 @@ const items = ref([
     title: "ການບຳລຸງຮັກສາລະບົບ",
     desc: "ການບໍາລຸງຮັກສາທາງດ້ານເຕັກນິກດ້ວຍຮູບແບບຊ່ວຍເຫຼືອລ້າ ເປັນໄລຍະເວລາ 03 ປີ ແມ່ນຄວາມຮັບຜິດຊອບໃນຂອງ ບໍລິສັດ ຢູນຽນເພ ສປ ຈີນ (China UnionPay). ",
   },
-
   {
     id: "p4",
     side: "right",
@@ -223,8 +260,6 @@ const items = ref([
     desc: "ດໍາເນີນທຸລະກິດພາຍໃຕ້ການຮ່ວມທຶນຂອງ 09 ຜູ້ຖືຮຸ້ນຄື: ທະນາຄານແຫ່ງ ສປປ ລາວ, ທະນາຄານ ການຄ້າຕ່າງປະເທດລາວ ມະຫາຊົນ, ບໍລິສັດ ຢູນຽນເພ ສາກົນ, ທະນາຄານ ພັດທະນາລາວ ຈຳກັດ, ທະນາຄານ ສົ່ງເສີມກະສິກຳ ຈຳກັດ, ທະນາຄານ ຮ່ວມທຸລະກິດລາວ-ຫວຽດ ຈໍາກັດ, ທະນາຄານ ຮ່ວມພັດທະນາ ມະຫາຊົນ, ທະນາຄານ ເອັສທີ ຈຳກັດ ແລະ ທະນາຄານ ບີໄອຊີ ລາວ ຈຳກັດ.",
   },
 ]);
-
-
 
 const timelineRef = ref(null);
 const lineFillRef = ref(null);
@@ -265,6 +300,17 @@ const swipeCooldown = ref(false);
 function onSwipeDown(e) {
   if (!isOverlayOpen.value) return;
   if (e.pointerType === "mouse" && e.button !== 0) return;
+
+  // ✅ IMPORTANT: ถ้ากดบนปุ่ม/แถบ actions/dots ไม่เริ่ม swipe
+  const target = e.target;
+  if (
+    target?.closest?.(".overlay-actions") ||
+    target?.closest?.("button") ||
+    target?.closest?.("a") ||
+    target?.closest?.("input, textarea, select")
+  ) {
+    return;
+  }
 
   swipe.value.active = true;
   swipe.value.pointerId = e.pointerId;
@@ -365,6 +411,12 @@ function goNext() {
   swapToIndex(activeIndex.value + 1, 1);
 }
 
+function goTo(idx) {
+  if (idx === activeIndex.value) return;
+  const dir = idx > activeIndex.value ? 1 : -1;
+  swapToIndex(idx, dir);
+}
+
 function onCardEnter(i) {
   const eventEl = eventRefs.value[i];
   if (!eventEl) return;
@@ -450,12 +502,14 @@ function openOverlay(item, i) {
     gsap.set(ov, { autoAlpha: 0 });
     gsap.set(card, { autoAlpha: 0, y: 18, x: 0, scale: 0.985 });
 
-    const tl = gsap.timeline();
-    tl.to(ov, { autoAlpha: 1, duration: 0.18, ease: "power2.out" }).to(
-      card,
-      { autoAlpha: 1, y: 0, x: 0, scale: 1, duration: 0.34, ease: "power3.out" },
-      "-=0.05"
-    );
+    gsap
+      .timeline()
+      .to(ov, { autoAlpha: 1, duration: 0.18, ease: "power2.out" })
+      .to(
+        card,
+        { autoAlpha: 1, y: 0, x: 0, scale: 1, duration: 0.34, ease: "power3.out" },
+        "-=0.05"
+      );
   });
 }
 
@@ -481,14 +535,21 @@ function closeOverlay() {
     return;
   }
 
-  const tl = gsap.timeline({ onComplete: done });
-  tl.to(card, { autoAlpha: 0, y: 10, x: 0, scale: 0.985, duration: 0.18, ease: "power2.inOut" })
+  gsap
+    .timeline({ onComplete: done })
+    .to(card, {
+      autoAlpha: 0,
+      y: 10,
+      x: 0,
+      scale: 0.985,
+      duration: 0.18,
+      ease: "power2.inOut",
+    })
     .to(ov, { autoAlpha: 0, duration: 0.2, ease: "power2.inOut" }, "-=0.06");
 }
 
 function onKeydown(e) {
   if (!isOverlayOpen.value) return;
-
   if (e.key === "Escape") closeOverlay();
   if (e.key === "ArrowLeft") goPrev();
   if (e.key === "ArrowRight") goNext();
@@ -579,6 +640,15 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+/* screen-reader only */
+.sr-only{
+  position:absolute;
+  width:1px;height:1px;
+  padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0,0,0,0);
+  white-space:nowrap;border:0;
+}
+
 .page{
   --bg0:#03081a;
   --bg1:#01030f;
@@ -769,7 +839,7 @@ h1{
   min-height:120px;
 }
 
-/* node centered ALWAYS */
+/* node centered ALWAYS (desktop) */
 .node{
   position:absolute;
   top:50%;
@@ -891,60 +961,12 @@ h1{
   background:rgba(30,64,175,.92);
 }
 
-/* ✅ Prev/Next buttons */
-.nav-btn{
-  position:fixed;
-  top:50%;
-  transform:translateY(-50%);
-  z-index:10000;
-  border:none;
-  cursor:pointer;
-  padding:10px 14px;
-  border-radius:999px;
-  color:#eaf2ff;
-  background: linear-gradient(95deg, rgba(0,3,41,.85) 0%, rgba(0,51,171,.85) 46%);
-  box-shadow:
-    0 18px 44px rgba(0,0,0,.55),
-    0 0 0 1px rgba(255,255,255,.18);
-  backdrop-filter: blur(10px);
-  display:flex;
-  align-items:center;
-  gap:10px;
-  transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease;
-}
-
-.nav-btn:hover{
-  transform:translateY(-50%) translateY(-2px);
-  box-shadow:
-    0 26px 56px rgba(0,0,0,.65),
-    0 0 0 1px rgba(219,234,254,.85);
-}
-
-.nav-prev{ left:18px; }
-.nav-next{ right:18px; }
-
-.nav-ico{
-  font-size:16px;
-  opacity:.95;
-}
-.nav-txt{
-  font-size:12px;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-  opacity:.9;
-}
-
-.nav-btn.disabled{
-  opacity:.35;
-  pointer-events:none;
-}
-
 .overlay-card{
   width:min(920px, 100%);
   max-height: 86vh;
   overflow:auto;
   border-radius:22px;
-  padding:18px 18px 16px;
+  padding:18px 18px 0; /* bottom handled by sticky actions */
   background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
   border:1px solid rgba(255,255,255,.16);
   box-shadow:
@@ -1017,7 +1039,7 @@ h1{
 }
 
 .overlay-body{
-  padding:14px 6px 6px;
+  padding:14px 6px 16px;
 }
 
 .overlay-desc{
@@ -1028,21 +1050,137 @@ h1{
   white-space:pre-wrap;
 }
 
-/* ✅ Mobile: dot always centered on card height */
+/* ✅ Bottom nav inside overlay card */
+.overlay-actions{
+  position: sticky;
+  bottom: 0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px 12px;
+  margin-top: 8px;
+
+  background:
+    linear-gradient(180deg, rgba(2,6,23,0) 0%, rgba(2,6,23,.62) 30%, rgba(2,6,23,.78) 100%);
+  border-top: 1px solid rgba(255,255,255,.12);
+  backdrop-filter: blur(10px);
+}
+
+.ov-btn{
+  border:none;
+  cursor:pointer;
+  padding:10px 14px;
+  border-radius:999px;
+  color:#eaf2ff;
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  background: linear-gradient(
+    95deg,
+    rgba(0, 72, 255, .35) 0%,
+    rgba(96,165,250, .30) 40%,
+    rgba(167,139,250, .28) 100%
+  );
+  box-shadow:
+    0 18px 44px rgba(0,0,0,.45),
+    0 0 0 1px rgba(255,255,255,.16);
+  transition: transform .16s ease, box-shadow .16s ease, filter .16s ease, opacity .16s ease;
+}
+
+.ov-btn:hover{
+  transform: translateY(-1px);
+  box-shadow:
+    0 26px 56px rgba(0,0,0,.58),
+    0 0 0 1px rgba(219,234,254,.85);
+}
+
+.ov-btn:focus-visible{
+  outline:none;
+  box-shadow:
+    0 26px 56px rgba(0,0,0,.58),
+    0 0 0 2px rgba(96,165,250,.40);
+}
+
+.ov-btn.disabled,
+.ov-btn:disabled{
+  opacity:.35;
+  pointer-events:none;
+}
+
+.ov-ico{ font-size:16px; opacity:.95; }
+.ov-txt{
+  font-size:12px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  opacity:.92;
+}
+
+.overlay-dots{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:6px 10px;
+  border-radius:999px;
+  background: rgba(2,6,23,.38);
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 12px 30px rgba(0,0,0,.35);
+}
+
+.dot{
+  width:10px;
+  height:10px;
+  border-radius:999px;
+  border:none;
+  cursor:pointer;
+  background: rgba(234,241,255,.22);
+  box-shadow: 0 0 0 0 rgba(96,165,250,.0);
+  transition: transform .16s ease, background .16s ease, box-shadow .16s ease, width .16s ease;
+}
+
+.dot:hover{
+  background: rgba(234,241,255,.35);
+  transform: translateY(-1px);
+}
+
+.dot.active{
+  width:22px;
+  background: linear-gradient(90deg, rgba(94,234,212,.95), rgba(96,165,250,.95), rgba(167,139,250,.95));
+  box-shadow:
+    0 0 0 6px rgba(96,165,250,.10),
+    0 10px 28px rgba(96,165,250,.18);
+}
+
+.dot:focus-visible{
+  outline:none;
+  box-shadow:
+    0 0 0 2px rgba(219,234,254,.90),
+    0 0 0 7px rgba(96,165,250,.18);
+}
+
+/* ✅ Mobile layout (1 column) — DOT อยู่ระดับเดียวกับเส้น + เส้นขีดไปหา card */
 @media (max-width: 820px){
   .hero{flex-direction:column;align-items:flex-start}
 
+  /* ✅ เส้น timeline อยู่ซ้าย 22px */
   .line{
     left:22px;
     transform:none;
   }
 
   .event{
-    grid-template-columns:44px 1fr;
+    grid-template-columns:44px 1fr; /* ✅ 44px => กึ่งกลาง = 22px ตรงกับเส้น */
     align-items:stretch;
     padding:14px 0;
     min-height:auto;
+    position:relative;
   }
+
+  /* ✅ ซ่อน side ที่ไม่ได้ใช้ เพื่อไม่ให้ช่องว่างทำให้ dot เพี้ยน */
+  .event[data-side="left"]  .side.right{ display:none; }
+  .event[data-side="right"] .side.left { display:none; }
 
   .side{
     grid-column:2;
@@ -1051,19 +1189,33 @@ h1{
     display:flex;
   }
 
+  /* ✅ MID ให้สูงเท่ากับ card แล้วจัดกลางแนวตั้งจริง */
   .mid{
     grid-column:1;
-    min-height:auto;
     align-self:stretch;
+    position:relative;
+    min-height:0;
+    height:auto;
+    overflow:visible;
+
+    display:flex;
+    align-items:center;      /* ✅ dot อยู่กึ่งกลาง card แนวตั้ง */
+    justify-content:center;  /* ✅ dot อยู่ x=22px ตรงเส้น */
   }
 
+  /* ✅ เปลี่ยน node เป็น relative (ไม่ใช้ absolute) เพื่อให้อยู่กลาง row เป๊ะ */
   .node{
-    left:22px;
+    position:relative;
+    top:auto;
+    left:auto;
+    transform:none;
   }
 
-  .connector{
-    display:none;
-  }
+  /* ✅ เส้นที่ “ขีดไปหา events” ในโหมด 1 column (จากเส้นไปหาการ์ด) */
+ 
+
+  /* ✅ บนมือถือไม่ต้องใช้ connector เดิม (ของ desktop) */
+  .connector{ display:none; }
 
   .card{
     display:block;
@@ -1073,32 +1225,32 @@ h1{
 
   .event[data-side="left"] .card{margin-left:0;}
 
-  /* ✅ overlay nav buttons on mobile: move to bottom center (ไม่บัง content) */
-  .overlay{
-    padding:14px 14px 96px;
+  /* overlay */
+  .overlay{ padding:14px; }
+  .overlay-card{ max-height: 88vh; }
+
+  .overlay-actions{
+    padding:10px 10px;
+    gap:10px;
   }
 
-  .nav-btn{
-    top:auto;
-    bottom:16px;
-    transform:none;
-    padding:10px 12px;
+  .ov-txt{ display:none; }
+  .ov-btn{ padding:10px 12px; }
+
+  .overlay-dots{
+    gap:7px;
+    padding:6px 8px;
+  }
+}
+
+/* Extra small phones */
+@media (max-width: 420px){
+  .overlay-actions{
+    flex-wrap: nowrap;
     gap:8px;
   }
-
-  .nav-txt{ display:none; }
-
-  .nav-prev{
-    left: calc(50% - 64px);
-  }
-
-  .nav-next{
-    left: calc(50% + 18px);
-    right: auto;
-  }
-
-  .overlay-card{
-    max-height: calc(86vh - 56px);
-  }
+  .overlay-dots{ gap:6px; }
+  .dot{ width:9px; height:9px; }
+  .dot.active{ width:18px; }
 }
 </style>

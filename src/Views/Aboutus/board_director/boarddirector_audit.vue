@@ -14,8 +14,8 @@
     <bod_navbar />
   </div>
 
-  <div class="org-layout">
-    <div ref="orgShell" class="org-shell">
+  <div ref="orgLayout" class="org-layout">
+    <div class="org-shell">
       <header class="org-header">
         <h2>ຄະນະກຳມະການກວດກາ</h2>
         <p class="org-subline">
@@ -54,7 +54,7 @@
         </div>
 
         <!-- Node 2 -->
-      
+        <!-- (ไม่มีข้อมูลในโค้ดเดิม) -->
 
         <!-- Node 3 -->
         <div class="org-node">
@@ -82,7 +82,8 @@
             </div>
           </div>
         </div>
-          <div class="org-node">
+
+        <div class="org-node">
           <div class="connector-dot"></div>
 
           <div class="person-card member-card">
@@ -117,17 +118,22 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { onBeforeRouteLeave } from 'vue-router'
 import { gsap } from 'gsap'
 
 import bod_navbar from '../../../Views/Aboutus/companystructure/navbarcompany/bod_navbar.vue'
 import main_navbar from '../../../components/miannavbar/main_navbar.vue'
 import secondfooter from '../../../components/footer/mainfooter/secondfooter.vue'
 
-const orgShell = ref(null)
+const orgLayout = ref(null)
 let ctx = null
 
-onMounted(() => {
+const PAN_DISTANCE = 90
+
+onMounted(async () => {
+  await nextTick()
+
   ctx = gsap.context(() => {
     const cards = gsap.utils.toArray('.person-card')
 
@@ -135,14 +141,34 @@ onMounted(() => {
       defaults: { ease: 'power3.out', duration: 0.8 },
     })
 
-    tl.from('.org-shell', { opacity: 0, y: 40, scale: 0.97 })
-      .from('.org-header', { opacity: 0, y: 20 }, '-=0.4')
+    // ✅ Pan เฉพาะ org-layout (เข้าจากขวา)
+    tl.fromTo(
+      orgLayout.value,
+      { opacity: 0, x: PAN_DISTANCE },
+      { opacity: 1, x: 0, duration: 0.55, ease: 'power2.out' }
+    )
+      .from('.org-shell', { opacity: 0, y: 40, scale: 0.97 }, '-=0.25')
+      .from('.org-header', { opacity: 0, y: 20 }, '-=0.45')
       .from(
         cards,
         { opacity: 0, y: 24, filter: 'blur(6px)', stagger: 0.08 },
-        '-=0.3'
+        '-=0.35'
       )
-  }, orgShell)
+  }, orgLayout.value)
+})
+
+// ✅ ออกเพจ: pan-out เฉพาะ org-layout (ออกซ้ายก่อนเปลี่ยน route)
+onBeforeRouteLeave((to, from, next) => {
+  if (!orgLayout.value) return next()
+
+  gsap.killTweensOf(orgLayout.value)
+  gsap.to(orgLayout.value, {
+    x: -PAN_DISTANCE,
+    opacity: 0,
+    duration: 0.45,
+    ease: 'power2.inOut',
+    onComplete: next,
+  })
 })
 
 onUnmounted(() => {
@@ -174,13 +200,13 @@ onUnmounted(() => {
   padding: clamp(2rem, 4vw, 3.5rem) clamp(1.25rem, 4vw, 2.5rem);
   background: #f6f6f6;
   box-sizing: border-box;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text',
+    sans-serif;
 
-  --blue-gradient: linear-gradient(
-    95deg,
-    rgba(0, 3, 41, 1) 0%,
-    rgba(0, 51, 171, 1) 46%
-  );
+  /* ✅ improve pan performance */
+  will-change: transform, opacity;
+
+ 
   --chip-bg: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.9),
@@ -384,7 +410,6 @@ onUnmounted(() => {
   letter-spacing: 0.02em;
   white-space: nowrap;
   overflow: hidden;
-
   text-overflow: ellipsis;
 }
 
@@ -469,7 +494,8 @@ onUnmounted(() => {
 
   .org-shell {
     padding-inline: 1.25rem;
-    padding-block: 1.7rem 2rem;
+    padding-block: 1.7rem 2.8rem;
+    
     border-radius: 2rem;
     box-shadow: 0 20px 40px rgba(15, 23, 42, 0.16),
       0 0 0 1px rgba(148, 163, 184, 0.18);
@@ -484,7 +510,6 @@ onUnmounted(() => {
     padding-left: 1.9rem;
   }
 
-  /* make the card stack (better for small screens) */
   .person-card {
     flex-direction: column;
     align-items: center;
@@ -494,14 +519,10 @@ onUnmounted(() => {
     border-radius: 1.6rem;
   }
 
-  /* ✅ IMPORTANT: Flatten .person-info so its children can be ordered
-     directly under .person-card in mobile */
   .person-info {
     display: contents;
   }
 
-  /* ✅ New order on mobile:
-     bank-meta -> avatar -> name -> position */
   .bank-meta {
     order: 1;
     width: 100%;
@@ -530,7 +551,6 @@ onUnmounted(() => {
     text-align: center;
   }
 
-  /* allow bank name to wrap nicely on mobile */
   .bank-name {
     white-space: normal;
     display: -webkit-box;
@@ -540,7 +560,6 @@ onUnmounted(() => {
     text-overflow: ellipsis;
   }
 
-  /* keep dot visually aligned a bit nicer when cards become taller */
   .connector-dot {
     margin-top: 1.15rem;
   }
@@ -555,7 +574,7 @@ onUnmounted(() => {
   .org-shell {
     border-radius: 1.55rem;
     padding-inline: 1rem;
-    padding-block: 1.45rem 1.7rem;
+    padding-block: 1.45rem 2.5rem;
   }
 
   .org-node {
