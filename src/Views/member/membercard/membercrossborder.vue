@@ -382,33 +382,33 @@ const isAllChecked = computed({
 });
 
 // --- Filtered list (search + flags -> pagination) ---
+// --- Filtered list (search + flags -> pagination) ---
 const filteredMembers = computed(() => {
-    const q = searchQuery.value.trim().toLowerCase();
-    const activeFilters = selectedFilters.value;
+  const q = searchQuery.value.trim().toLowerCase();
+  const activeFilters = selectedFilters.value;
 
-    return members.value.filter((m) => {
-        const title = (m.title || '').toLowerCase();
-        const subtitle = (m.subtitle || '').toLowerCase();
+  return members.value.filter((m) => {
+    const title = (m.title || '').toLowerCase();
+    const subtitle = (m.subtitle || '').toLowerCase();
 
-        // search by text
-        const matchesSearch =
-            !q || title.includes(q) || subtitle.includes(q);
+    // search by text
+    const matchesSearch = !q || title.includes(q) || subtitle.includes(q);
+    if (!matchesSearch) return false;
 
-        if (!matchesSearch) return false;
+    // no cross-border filter selected => show everything that matches search
+    if (!activeFilters.length) return true;
 
-        // no cross-border filter selected => show everything that matches search
-        if (!activeFilters.length) return true;
+    const memberFilters = m.filters || [];
 
-        const memberFilters = m.filters || [];
+    // ✅ AND: ทุกตัวที่เลือกต้องอยู่ใน memberFilters
+    const matchesFilter = activeFilters.every(f =>
+      memberFilters.includes(f)
+    );
 
-        // at least one selected filter must match member.filters
-        const matchesFilter = activeFilters.some(f =>
-            memberFilters.includes(f)
-        );
-
-        return matchesFilter;
-    });
+    return matchesFilter;
+  });
 });
+
 
 const totalPages = computed(() =>
     Math.max(1, Math.ceil(filteredMembers.value.length / itemsPerPage))

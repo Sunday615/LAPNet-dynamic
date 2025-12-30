@@ -422,32 +422,31 @@ const isAllChecked = computed({
 
 // --- Filtered list (search + filters -> pagination) ---
 const filteredMembers = computed(() => {
-    const q = searchQuery.value.trim().toLowerCase();
-    const activeFilters = selectedFilters.value;
+  const q = searchQuery.value.trim().toLowerCase();
+  const activeFilters = selectedFilters.value;
 
-    return members.value.filter((m) => {
-        const title = (m.title || '').toLowerCase();
-        const subtitle = (m.subtitle || '').toLowerCase();
+  return members.value.filter((m) => {
+    const title = (m.title || '').toLowerCase();
+    const subtitle = (m.subtitle || '').toLowerCase();
 
-        // search text
-        const matchesSearch =
-            !q || title.includes(q) || subtitle.includes(q);
+    // search text
+    const matchesSearch = !q || title.includes(q) || subtitle.includes(q);
+    if (!matchesSearch) return false;
 
-        if (!matchesSearch) return false;
+    // no filters selected → show all that match search
+    if (!activeFilters.length) return true;
 
-        // no filters selected → show all that match search
-        if (!activeFilters.length) return true;
+    const memberFilters = m.filters || [];
 
-        const memberFilters = m.filters || [];
+  
+    const matchesFilter = activeFilters.every(f =>
+      memberFilters.includes(f)
+    );
 
-        // at least one selected filter must match member.filters
-        const matchesFilter = activeFilters.some(f =>
-            memberFilters.includes(f)
-        );
-
-        return matchesFilter;
-    });
+    return matchesFilter;
+  });
 });
+
 
 const totalPages = computed(() =>
     Math.max(1, Math.ceil(filteredMembers.value.length / itemsPerPage))

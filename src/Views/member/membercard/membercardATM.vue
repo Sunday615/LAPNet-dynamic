@@ -6,6 +6,7 @@ import membercard from '../../../components/membercard/membercard.vue';
 import logofootermembercardatm from '../../../components/footer/logomemberfooter/logofootermembercardatm.vue';
 import secondfooter from '../../../components/footer/mainfooter/secondfooter.vue';
 import main_navbar from '../../../components/miannavbar/main_navbar.vue';
+
 onMounted(() => {
   window.scrollTo({
     top: 0,
@@ -377,7 +378,6 @@ const members = ref([
   
 ]);
 
-// --- Filtered list (search -> filters -> pagination) ---
 const filteredMembers = computed(() => {
   const q = searchQuery.value.trim().toLowerCase();
   const activeFilters = selectedFilters.value;
@@ -387,9 +387,7 @@ const filteredMembers = computed(() => {
     const subtitle = (m.subtitle || '').toLowerCase();
 
     // Search
-    const matchesSearch =
-      !q || title.includes(q) || subtitle.includes(q);
-
+    const matchesSearch = !q || title.includes(q) || subtitle.includes(q);
     if (!matchesSearch) return false;
 
     // No checkbox selected => show all (only filtered by search)
@@ -399,10 +397,9 @@ const filteredMembers = computed(() => {
     if (activeFilters.includes('all')) return true;
 
     const memberFilters = m.filters || [];
-    // at least one selected filter must match member's filters
-    const matchesFilter = activeFilters.some((f) =>
-      memberFilters.includes(f)
-    );
+
+  
+    const matchesFilter = activeFilters.every((f) => memberFilters.includes(f));
 
     return matchesFilter;
   });

@@ -1,13 +1,9 @@
 <template>
-  <main_navbar
-    title="ໂຄງຮ່າງການຈັດຕັ້ງ"
-    :breadcrumb="[
-      'ໜ້າຫຼັກ',
-      'ກ່ຽວກັບພວກເຮົາ',
-      'ໂຄງຮ່າງການຈັດຕັ້ງ'
-    ]"
-    background-image="/aboutus/navigatormission-bg.png"
-  />
+  <main_navbar title="ໂຄງຮ່າງການຈັດຕັ້ງ" :breadcrumb="[
+    'ໜ້າຫຼັກ',
+    'ກ່ຽວກັບພວກເຮົາ',
+    'ໂຄງຮ່າງການຈັດຕັ້ງ'
+  ]" background-image="/aboutus/navigatormission-bg.png" />
 
   <section class="hero">
     <!-- background layers -->
@@ -15,14 +11,7 @@
       <div class="hero-gradient"></div>
 
       <!-- 🎥 Video background overlay -->
-      <video
-        class="hero-video-overlay"
-        autoplay
-        muted
-        loop
-        playsinline
-      >
-        <!-- 🔁 change src to your real video path -->
+      <video class="hero-video-overlay" autoplay muted loop playsinline>
         <source src="/videos/Rolebackground.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
@@ -49,23 +38,24 @@
         </h1>
 
         <p class="hero-subtitle">
-          ບໍລິສັດ ລາວເນ ເຊີນນໍ ເພເມັ້ນ ເນັດເວີກ ຈຳກັດ (LAPNet) ເຊິ່ງບໍລິສັດ LAPNet ເປັນຜູ້ໃຫ້ບໍລິການລະບົບ ການຊໍາລະທຸລະກໍາຍ່ອຍ ຕາມທີ່ໄດ້ກໍານົດໄວ້ໃນກົດໝາຍວ່າດ້ວຍລະບົບ ການຊໍາລະ. ຊຶ່ງເຮັດໜ້າທີ່ເປັນໂຕກາງໃນການ ເຊື່ອມໂຍງກັບທຸກຂະແໜງການຊຳລະທີ່ເປັນທະນາຄານ, ສະຖາບັນການເງິນ ແລະ ຜູ້ໃຫ້ບໍລິການ ການຊຳລະແຫ່ງດຽວໃນ ສປປ ລາວ;
-          <br />
-          ເພື່ອອໍານວຍຄວາມສະດວກໃຫ້ລູກຄ້າຂອງບັນດາທະນາຄານທີ່ເຂົ້າມາເປັນສະມາຊິກສາມາດນໍາໃຊ້ບັດສິນເຊື່ອ, ບັດເງິນຝາກ ແລະ ບັດ ATM ໃນ
-          ການເຮັດທຸລະກໍາດ້ານການເງິນຜ່ານຕູ້ ATM ແລະ ເຄື່ອງ (POS)
-          ຮ່ວມກັນລະຫວ່າງທະນາຄານ, ໄດ້ຢ່າງສະດວກ ທຸກທີ່ ທຸກເວລາ.
+          ບໍລິສັດ ລາວເນ ເຊີນນໍ ເພເມັ້ນ ເນັດເວີກ ຈຳກັດ (LAPNet) ມີພາລະບົດບາດ ເປັນຜູ້ຄວບຄຸມລະບົບຊໍາລະ
+          ທົ່ວໄປຕາມການອະນຸຍາດຂອງ ທະນາຄານແຫ່ງ ສປປ ລາວ. LAPNet ໃຫ້ບໍລິການ ຄື: ລະບົບບັດທະນາຄານຮ່ວມກັນ (Lao ATM Pool
+          Switching: LAPS) ແລະ ລະບົບຊໍາລະຂ້າມທະນາຄານເທິງມືຖື (Lao Mobile Payment System: LMPS)
+          ໂດຍເຮັດໜ້າທີ່ເປັນຕົວກາງໃນການເຊື່ອມໂຍງກັບທຸກຂະແໜງການຊຳລະ ບໍ່ວ່າຈະເປັນທະນາຄານ, ສະຖາບັນການເງິນ ຫຼື ບໍລິສັດ
+          FinTech ຫຼື ຜູ້ໃຫ້ບໍລິການ ການຊໍາລະອື່ນໆ ໃນ ສປປ ລາວ ພ້ອມທັງເປັນຜູ້ໄລ່ລຽງບັນດາທຸລະກໍາທາງການເງິນເລົ່ານັ້ນ
+          ແລ້ວສົ່ງໄປສູນຊໍາລະສຸດທ້າຍ ທີ່ LaPASS ທະນາຄານແຫ່ງ ສປປ ລາວ.
         </p>
 
         <div class="hero-actions">
-            <router-link to="/">
-          <button class="btn-primary">
-            ໜ້າຫຼັກ
-          </button>
+          <router-link to="/">
+            <button class="btn-primary">
+              ໜ້າຫຼັກ
+            </button>
           </router-link>
           <router-link to="/products_service/allproduct">
-          <button class="btn-ghost">
-            ຜະລິດຕະພັນ ແລະ ການບໍລິການ
-          </button>
+            <button class="btn-ghost">
+              ຜະລິດຕະພັນ ແລະ ການບໍລິການ
+            </button>
           </router-link>
         </div>
 
@@ -87,47 +77,28 @@
 
       <!-- Right: network / mesh visual -->
       <div class="hero-visual">
-        <svg
-          class="network-svg"
-          viewBox="0 0 420 420"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <!-- outer glowing ring -->
-          <circle
-            class="net-ring"
-            cx="210"
-            cy="210"
-            r="150"
-          />
+        <svg class="network-svg" viewBox="0 0 420 420" xmlns="http://www.w3.org/2000/svg">
+          <circle class="net-ring" cx="210" cy="210" r="150" />
+          <circle class="net-ring net-ring-inner" cx="210" cy="210" r="90" />
 
-          <!-- inner ring -->
-          <circle
-            class="net-ring net-ring-inner"
-            cx="210"
-            cy="210"
-            r="90"
-          />
-
-          <!-- lines (edges) -->
           <g class="net-lines">
-            <line x1="210" y1="60" x2="90"  y2="150" />
-            <line x1="90"  y1="150" x2="110" y2="290" />
+            <line x1="210" y1="60" x2="90" y2="150" />
+            <line x1="90" y1="150" x2="110" y2="290" />
             <line x1="110" y1="290" x2="210" y2="360" />
             <line x1="210" y1="360" x2="310" y2="290" />
             <line x1="310" y1="290" x2="330" y2="150" />
             <line x1="330" y1="150" x2="210" y2="60" />
 
-            <line x1="210" y1="60"  x2="210" y2="210" />
-            <line x1="90"  y1="150" x2="210" y2="210" />
+            <line x1="210" y1="60" x2="210" y2="210" />
+            <line x1="90" y1="150" x2="210" y2="210" />
             <line x1="110" y1="290" x2="210" y2="210" />
             <line x1="310" y1="290" x2="210" y2="210" />
             <line x1="330" y1="150" x2="210" y2="210" />
           </g>
 
-          <!-- nodes -->
           <g class="net-nodes">
-            <circle cx="210" cy="60"  r="6" />
-            <circle cx="90"  cy="150" r="6" />
+            <circle cx="210" cy="60" r="6" />
+            <circle cx="90" cy="150" r="6" />
             <circle cx="110" cy="290" r="6" />
             <circle cx="210" cy="360" r="6" />
             <circle cx="310" cy="290" r="6" />
@@ -138,47 +109,52 @@
 
         <!-- Glass chip stack -->
         <div ref="chipStack" class="chip-stack">
-          <router-link to="/products_service/atm-inquiry">
-          <div class="chip-row">
-            <span class="chip-dot"></span>
-            <span class="chip-label">ກວດຍອດເງິນຂ້າມທະນາຄານຜ່ານຕູ້ ATM</span>
-            <span class="chip-value">01</span>
-          </div>
+          <router-link class="chip-link" to="/products_service/atm-inquiry">
+            <div class="chip-row">
+              <span class="chip-dot"></span>
+              <span class="chip-label">ກວດຍອດເງິນຂ້າມທະນາຄານຜ່ານຕູ້ ATM</span>
+              <span class="chip-value">01</span>
+            </div>
           </router-link>
-          <router-link to="/products_service/atm-cash-withdraw">
-          <div class="chip-row">
-            <span class="chip-dot"></span>
-            <span class="chip-label">ຖອນເງິນສົດຂ້າມທະນາຄານຜ່ານຕູ້ ATM</span>
-            <span class="chip-value">02</span>
-          </div>
+
+          <router-link class="chip-link" to="/products_service/atm-cash-withdraw">
+            <div class="chip-row">
+              <span class="chip-dot"></span>
+              <span class="chip-label">ຖອນເງິນສົດຂ້າມທະນາຄານຜ່ານຕູ້ ATM</span>
+              <span class="chip-value">02</span>
+            </div>
           </router-link>
-          <router-link to="/products_service/atm-transfer">
-          <div class="chip-row">
-            <span class="chip-dot"></span>
-            <span class="chip-label">ໂອນເງິນຂ້າມທະນາຄານຜ່ານຕູ້ ATM</span>
-            <span class="chip-value">03</span>
-          </div>
+
+          <router-link class="chip-link" to="/products_service/atm-transfer">
+            <div class="chip-row">
+              <span class="chip-dot"></span>
+              <span class="chip-label">ໂອນເງິນຂ້າມທະນາຄານຜ່ານຕູ້ ATM</span>
+              <span class="chip-value">03</span>
+            </div>
           </router-link>
-          <router-link to="/products_service/mobile-transfer">
-          <div class="chip-row">
-            <span class="chip-dot"></span>
-            <span class="chip-label">ໂອນເງິນຂ້າມທະນາຄານເທິງມືຖື</span>
-            <span class="chip-value">04</span>
-          </div>
+
+          <router-link class="chip-link" to="/products_service/mobile-transfer">
+            <div class="chip-row">
+              <span class="chip-dot"></span>
+              <span class="chip-label">ໂອນເງິນຂ້າມທະນາຄານເທິງມືຖື</span>
+              <span class="chip-value">04</span>
+            </div>
           </router-link>
-          <router-link to="/products_service/qr-payment">
-          <div class="chip-row">
-            <span class="chip-dot"></span>
-            <span class="chip-label">ຊໍາລະຂ້າມທະນາຄານຜ່ານ LAPNet</span>
-            <span class="chip-value">05</span>
-          </div>
+
+          <router-link class="chip-link" to="/products_service/qr-payment">
+            <div class="chip-row">
+              <span class="chip-dot"></span>
+              <span class="chip-label">ຊໍາລະຂ້າມທະນາຄານຜ່ານ LAPNet</span>
+              <span class="chip-value">05</span>
+            </div>
           </router-link>
-          <router-link to="/products_service/crossborder">
-          <div class="chip-row">
-            <span class="chip-dot"></span>
-            <span class="chip-label">ຊຳລະຂ້າມແດນໃນຮູບແບບ QR CODE </span>
-            <span class="chip-value">06</span>
-          </div>
+
+          <router-link class="chip-link" to="/products_service/crossborder">
+            <div class="chip-row">
+              <span class="chip-dot"></span>
+              <span class="chip-label">ຊຳລະຂ້າມແດນໃນຮູບແບບ QR CODE </span>
+              <span class="chip-value">06</span>
+            </div>
           </router-link>
         </div>
       </div>
@@ -247,7 +223,7 @@ onMounted(() => {
 .hero {
   position: relative;
   width: 100%;
-  min-height: 100vh;
+  min-height: 70vh;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -269,9 +245,7 @@ onMounted(() => {
 .hero-gradient {
   position: absolute;
   inset: 0;
-  /* you can switch this to your blue gradient if you want:
-     background: linear-gradient(to right, #5BBDFF 0%, #1500CF 100%); */
-  background: linear-gradient(to right, #031239 0%,#093584 100%);
+  background: linear-gradient(to right, #031239 0%, #093584 100%);
 }
 
 /* 🎥 Video background overlay */
@@ -291,8 +265,8 @@ onMounted(() => {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
   background-size: 80px 80px;
   opacity: 0.4;
 }
@@ -346,8 +320,8 @@ onMounted(() => {
   position: relative;
   padding: 28px 30px;
   border-radius: 26px;
-  background: radial-gradient(circle at top left, rgba(255,255,255,0.18), rgba(12,18,44,0.8));
-  border: 1px solid rgba(255,255,255,0.16);
+  background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.18), rgba(12, 18, 44, 0.8));
+  border: 1px solid rgba(255, 255, 255, 0.16);
   box-shadow:
     0 24px 60px rgba(15, 23, 42, 0.9),
     0 0 0 1px rgba(148, 163, 184, 0.35);
@@ -523,50 +497,234 @@ onMounted(() => {
   box-shadow: 0 0 16px rgba(56, 189, 248, 0.9);
 }
 
-/* Glass chip stack */
+/* =========================
+   ✨ MODERN CHIP-STACK HOVER
+   ========================= */
+
+/* router-link style reset */
+.chip-stack :deep(a),
+.chip-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
 .chip-stack {
+  --stack-x: 18%;
   position: absolute;
   right: 0;
   bottom: 16px;
-  transform: translateX(18%);
-  padding: 12px 14px;
-  border-radius: 18px;
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid rgba(148, 163, 184, 0.6);
+  transform: translateX(var(--stack-x));
+  padding: 12px;
+  border-radius: 20px;
+  background: rgba(15, 23, 42, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.55);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  min-width: 210px;
+  min-width: 240px;
+
+  box-shadow:
+    0 22px 60px rgba(2, 6, 23, 0.65),
+    0 0 0 1px rgba(148, 163, 184, 0.18);
+  transition:
+    transform 320ms cubic-bezier(0.2, 0.9, 0.2, 1),
+    box-shadow 320ms cubic-bezier(0.2, 0.9, 0.2, 1),
+    border-color 320ms ease,
+    background 320ms ease;
+  will-change: transform;
 }
 
+/* gradient “border” ring (nice premium look) */
+.chip-stack::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 22px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.75), rgba(99, 102, 241, 0.55), rgba(168, 85, 247, 0.45));
+  opacity: 0.35;
+  pointer-events: none;
+
+  /* mask to show only border area */
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.chip-stack::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  pointer-events: none;
+  background: radial-gradient(circle at 20% 10%, rgba(255, 255, 255, 0.18), transparent 35%),
+              radial-gradient(circle at 80% 90%, rgba(56, 189, 248, 0.14), transparent 45%);
+  opacity: 0.55;
+  transition: opacity 320ms ease;
+}
+
+/* stack hover (lift + glow) */
+.chip-stack:hover {
+  transform: translateX(var(--stack-x)) translateY(-10px) scale(1.015);
+  border-color: rgba(191, 219, 254, 0.75);
+  background: rgba(15, 23, 42, 0.72);
+  box-shadow:
+    0 30px 80px rgba(2, 6, 23, 0.75),
+    0 0 0 1px rgba(148, 163, 184, 0.22),
+    0 0 40px rgba(56, 189, 248, 0.18);
+}
+
+.chip-stack:hover::after {
+  opacity: 0.8;
+}
+
+/* rows */
 .chip-row {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  font-size: 1rem;
-  padding: 6px 0;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  overflow: hidden;
+
+  background: rgba(2, 6, 23, 0.18);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+
+  transition:
+    transform 240ms cubic-bezier(0.2, 0.9, 0.2, 1),
+    border-color 240ms ease,
+    background 240ms ease,
+    box-shadow 240ms ease;
 }
 
-.chip-row + .chip-row {
-  border-top: 1px solid rgba(148, 163, 184, 0.4);
+/* spacing between rows */
+.chip-link + .chip-link {
+  margin-top: 8px;
 }
 
+/* hover overlay gradient + left accent bar */
+.chip-row::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+    rgba(34, 211, 238, 0.18) 0%,
+    rgba(99, 102, 241, 0.12) 40%,
+    rgba(168, 85, 247, 0.08) 100%);
+  opacity: 0;
+  transition: opacity 240ms ease;
+  pointer-events: none;
+}
+
+.chip-row::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(to bottom, #22d3ee, #6366f1);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition:
+    opacity 240ms ease,
+    transform 240ms ease;
+  pointer-events: none;
+}
+
+/* hover + focus styles */
+.chip-link:hover .chip-row,
+.chip-link:focus-visible .chip-row {
+  transform: translateX(4px);
+  border-color: rgba(191, 219, 254, 0.45);
+  background: rgba(2, 6, 23, 0.26);
+  box-shadow:
+    0 14px 30px rgba(2, 6, 23, 0.45),
+    0 0 0 1px rgba(56, 189, 248, 0.15);
+}
+
+.chip-link:hover .chip-row::before,
+.chip-link:focus-visible .chip-row::before {
+  opacity: 1;
+}
+
+.chip-link:hover .chip-row::after,
+.chip-link:focus-visible .chip-row::after {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* dot pulse */
 .chip-dot {
   width: 10px;
   height: 10px;
   border-radius: 999px;
   background: radial-gradient(circle, #22c55e, transparent 60%);
   box-shadow: 0 0 10px rgba(34, 197, 94, 0.85);
+  flex: 0 0 auto;
+  transform: translateZ(0);
+  transition: transform 240ms cubic-bezier(0.2, 0.9, 0.2, 1), box-shadow 240ms ease;
 }
 
+.chip-link:hover .chip-dot,
+.chip-link:focus-visible .chip-dot {
+  transform: scale(1.25);
+  box-shadow:
+    0 0 14px rgba(34, 197, 94, 0.85),
+    0 0 26px rgba(34, 197, 94, 0.35);
+}
+
+/* text */
 .chip-label {
   flex: 1;
   color: #e5e7eb;
+  font-size: 13px;
+  line-height: 1.25;
+  opacity: 0.95;
 }
 
+/* value badge */
 .chip-value {
-  font-weight: 600;
-  color: #a5b4fc;
+  font-weight: 650;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: #c7d2fe;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(99, 102, 241, 0.14);
+  border: 1px solid rgba(99, 102, 241, 0.28);
+  transition:
+    transform 240ms cubic-bezier(0.2, 0.9, 0.2, 1),
+    background 240ms ease,
+    border-color 240ms ease,
+    color 240ms ease;
+}
+
+.chip-link:hover .chip-value,
+.chip-link:focus-visible .chip-value {
+  transform: translateX(2px);
+  background: rgba(34, 211, 238, 0.14);
+  border-color: rgba(34, 211, 238, 0.35);
+  color: #e0f2fe;
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .chip-stack,
+  .chip-stack::after,
+  .chip-row,
+  .chip-row::before,
+  .chip-row::after,
+  .chip-dot,
+  .chip-value {
+    transition: none !important;
+  }
 }
 
 /* RESPONSIVE */
@@ -581,10 +739,15 @@ onMounted(() => {
   }
 
   .chip-stack {
+    --stack-x: 0%;
     position: static;
     transform: none;
     margin-top: 16px;
     align-self: flex-end;
+  }
+
+  .chip-stack:hover {
+    transform: translateY(-8px) scale(1.01);
   }
 }
 
@@ -605,12 +768,13 @@ onMounted(() => {
     max-width: 280px;
   }
 }
-@media (max-width:785px) {
 
-  .chip-stack{
+@media (max-width:785px) {
+  .chip-stack {
     display: none;
   }
-  .hero-visual{
+
+  .hero-visual {
     display: none;
   }
 }

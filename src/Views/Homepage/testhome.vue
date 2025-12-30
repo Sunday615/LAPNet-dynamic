@@ -2,7 +2,7 @@
 
 
   <!-- Desktop links -->
-  <popupoverlay   
+  <!-- <popupoverlay   
      v-model="show1"
     image-src="/blog/1.jpg"
     title="Popup #1 (Test)"
@@ -25,7 +25,7 @@
     @primary="handleClosed2"
     @secondary="handleClosed2"
     
-    />
+    /> -->
 
 
   
