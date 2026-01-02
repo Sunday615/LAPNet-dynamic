@@ -11,7 +11,7 @@
                 v-if="logoSrc"
                 :src="logoSrc"
                 class="brandLogo"
-                alt="Company logo"
+                alt="LAPNet logo"
               />
               <div class="brandText">
                 <div class="brandName">{{ companyName }}</div>
