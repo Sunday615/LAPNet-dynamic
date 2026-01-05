@@ -8,7 +8,7 @@
     <div class="section-inner">
       <!-- Main heading -->
       <h1 class="hero-title">
-        ຜົນປະໂຫຍດທີ່ໄດ້ຮັບ<br />
+        ຜົນປະໂຫຍດທີ່ໄດ້ຮັບ <br />
         <span style="font-size: var(--fs-md);">ດ້ານທະນາຄານສະມາຊິກ ແລະ ດ້ານລູກຄ້າຂອງທະນາຄານ.</span>
       </h1>
 

@@ -9,7 +9,7 @@ import tablefee from '../../components/tablefee/tablefee.vue';
 import stepwork from './stepwork/stepwork.vue';
 import hero_sectionproduct3 from '../../Views/products/product_herosection/hero_sectionproduct3.vue'
 import secondfooter from '../../components/footer/mainfooter/secondfooter.vue';
-import cardbenetfitpd3 from '../../Views/products/benetfit/cardbenetfitpd3.vue'
+import product3tech from '../techbenetfit/product3tech.vue';
 import { onMounted } from 'vue';
 onMounted(() => {
    window.scrollTo({
@@ -99,7 +99,7 @@ const memberLogos = [
       <hero_sectionproduct3 />
    </div>
    <div class="benetfix">
-      <cardbenetfitpd3 />
+      <product3tech />
    </div>
    <div class="cardscrolling">
 

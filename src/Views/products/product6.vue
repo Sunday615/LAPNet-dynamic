@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import navbar from '../../components/miannavbar/main_navbar.vue';
-
-
-
-import cardbenetfitpd6 from '../../Views/products/benetfit/cardbenetfitpd6.vue'
-
+import product6benetfit from '../techbenetfit/product6benetfit.vue'
 import product6swiper from '../../Views/products/swipper/product6swiper.vue';
 import crossborderbtn from '../../components/button/crossborderbtn.vue';
 import product6tech from '../techbenetfit/product6tech.vue';
@@ -95,7 +91,7 @@ watch(
      
    </div>
    <div class="benetfix">
-      <cardbenetfitpd6/>
+      <product6benetfit/>
    </div>
    <div class="slidecontainer">
       <product6swiper />
@@ -123,6 +119,7 @@ watch(
 
 
 <style scoped>
+ 
 .descriptionforcustomer {
    width: 100%;
    height: auto;

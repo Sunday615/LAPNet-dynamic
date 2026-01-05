@@ -254,7 +254,10 @@ onBeforeUnmount(() => {
 
 .hero-subtitle {
     margin-top: 1rem;
+text-align: justify;
+
     font-size: 0.98rem;
+ 
     line-height: 1.7;
     margin-bottom: 40px;
     color: #566280;

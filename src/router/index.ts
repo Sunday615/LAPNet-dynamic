@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHashHistory, type RouteRecordRaw } from "vue-router";
 
 import product1 from "../Views/products/product1.vue";
 import product2 from "../Views/products/product2.vue";
@@ -39,8 +39,36 @@ import allproduct from "../Views/products/allproduct.vue";
 import atmmockup from "../components/mockup/atmmockup.vue";
 import testhome from "../Views/Homepage/testhome.vue";
 import allbox from "../Views/Aboutus/companystructure/allbox.vue";
+import testinfocomponent from "../Views/products/procomponent/testinfocomponent.vue";
+/** =========================
+ *  Path Masking (Base64 URL-safe)
+ *  ========================= */
+function base64UrlEncode(input: string): string {
+  const bytes = new TextEncoder().encode(input);
+  let binary = "";
+  for (const b of bytes) binary += String.fromCharCode(b);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
 
-const routes = [
+function base64UrlDecode(b64url: string): string {
+  const b64 = b64url.replace(/-/g, "+").replace(/_/g, "/");
+  const pad = b64.length % 4 ? "=".repeat(4 - (b64.length % 4)) : "";
+  const binary = atob(b64 + pad);
+
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+
+  return new TextDecoder().decode(bytes);
+}
+
+const TOKEN_PREFIX = "/r/";
+
+const routes: RouteRecordRaw[] = [
+  {
+    path: "/t",
+    name: "t",
+    component: testinfocomponent,
+  },
   {
     path: "/",
     name: "home",
@@ -85,17 +113,18 @@ const routes = [
     component: Productqrpayment,
   },
 
-  // ❗ แก้: route นี้ name ซ้ำกับ qrpayment เดิม ("qr-payment") → เปลี่ยนเป็นชื่อใหม่
+  // Crossborder overview
   {
     path: "/products_service/crossborder",
     name: "crossborder-overview",
     component: Product6,
   },
 
+  // Crossborder detail by pair
   {
     path: "/products_service/crossborder/:pair(kh-la|la-kh|th-la|la-th|vn-la|la-vn|ch-la|la-ch)",
     name: "crossborder-product",
-    component: () => import("../Views/products/product6.vue"),
+    component: Product6,
   },
 
   // ############################### member path #####################################
@@ -142,7 +171,6 @@ const routes = [
     component: Companystructure,
   },
 
-  // ❗ แก้: route นี้ name ซ้ำกับ companystructure → เปลี่ยนเป็นชื่อใหม่
   {
     path: "/aboutus/companystructureimage",
     name: "companystructureimage",
@@ -242,7 +270,14 @@ const routes = [
     component: Adminlogin,
   },
 
- 
+  /** ✅ Masked route: /r/<token> (ต้องอยู่ก่อน catch-all) */
+  {
+    path: "/r/:token(.*)",
+    name: "masked",
+    component: testhome, // ใช้ตัวไหนก็ได้ เพราะจะ redirect ใน beforeEach
+    meta: { noMask: true }, // กัน afterEach มาทับซ้ำ
+  },
+
   {
     path: "/:pathMatch(.*)*",
     redirect: "/",
@@ -250,9 +285,62 @@ const routes = [
 ];
 
 const router = createRouter({
-  
+  // Hash mode: ไม่ต้องตั้ง server rewrite
   history: createWebHashHistory(import.meta.env.BASE_URL),
   routes,
 });
 
+/** ✅ เปิดลิงก์แบบ #/r/<token> -> decode -> ไป path จริง */
+router.beforeEach((to) => {
+  if (to.path.startsWith(TOKEN_PREFIX) && typeof to.params.token === "string") {
+    try {
+      const realFullPath = base64UrlDecode(to.params.token);
+      return { path: realFullPath, replace: true };
+    } catch {
+      return { path: "/", replace: true };
+    }
+  }
+});
+
+/** ✅ เข้า route จริงแล้ว -> เปลี่ยน address bar เป็น #/r/<token> (ไม่ trigger navigation) */
+router.afterEach((to) => {
+  if ((to.meta as any)?.noMask) return;
+
+  // กัน loop: ถ้า address bar เป็น #/r/... อยู่แล้วก็ไม่ต้อง replace ซ้ำ
+  if (window.location.hash.startsWith(`#${TOKEN_PREFIX}`)) return;
+
+  const token = base64UrlEncode(to.fullPath);
+  const maskedHash = `#${TOKEN_PREFIX}${token}`;
+
+  // ทำให้ URL เปลี่ยน แต่ไม่ทำให้ router วิ่งใหม่
+  const newUrl = `${window.location.pathname}${window.location.search}${maskedHash}`;
+  window.history.replaceState(window.history.state, "", newUrl);
+});
+
+
+// router/index.ts
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+  }
+}
+
+function trackPageView(fullPath: string) {
+  window.gtag?.("event", "page_view", {
+    page_path: fullPath,
+    // คุณใช้ hash router → ทำ URL ให้เป็นแบบจริงในรายงาน (ไม่ใช่ /r/token)
+    page_location: `${window.location.origin}/#${fullPath}`,
+    page_title: document.title,
+  });
+}
+
+// ยิงทุกครั้งที่เปลี่ยนหน้า
+router.afterEach((to) => {
+  trackPageView(to.fullPath);
+});
+
+// กันบางที initial load ไม่ยิง (เผื่อไว้)
+router.isReady().then(() => {
+  trackPageView(router.currentRoute.value.fullPath);
+});
 export default router;

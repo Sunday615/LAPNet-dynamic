@@ -751,6 +751,7 @@ h1 {
   margin: 0;
   color: rgba(234, 241, 255, .78);
   font-size: 14.2px;
+  text-align: justify;
   line-height: 1.7;
   display: -webkit-box;
   -webkit-line-clamp: 4;

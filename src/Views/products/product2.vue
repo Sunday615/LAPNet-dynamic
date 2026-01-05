@@ -1,7 +1,7 @@
 <script setup>
 import navbar from '../../components/miannavbar/main_navbar.vue';
 
-import cardbenetfitpd2 from '../../Views/products/benetfit/cardbenetfitpd2.vue'
+import product2tech from '../techbenetfit/product2tech.vue';
 import tagproduct from '../../components/tagproduct/tagproduct.vue';
 import product1_footerlogomember from '../../components/footer/logomemberfooter/product1_footerlogomember.vue';
 import cardscrolling from './cardscrolling/cardscrolling.vue';
@@ -101,7 +101,7 @@ const memberLogos = [
       <hero_sectionproduct2/>
    </div>
    <div class="benetfix">
-     <cardbenetfitpd2/>
+     <product2tech/>
    </div>
    <div class="cardscrolling">
 

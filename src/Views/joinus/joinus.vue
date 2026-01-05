@@ -282,7 +282,7 @@ const activities = [
 
 // DROPDOWN STATE (FILTERS)
 const positions = ['All Position', 'Frontend Developer', 'Backend Developer', 'UI/UX Designer'];
-const departments = ['All Department', 'Engineering', 'Design', 'Marketing', 'Product'];
+const departments = ['All Department', 'Administration', 'Accounting & Finance', 'IT', 'Operation' , 'Internal Audit'];
 const levels = ['Levels', 'Intern', 'Junior', 'Mid', 'Senior', 'Lead'];
 
 const selectedPosition = ref('All Position');

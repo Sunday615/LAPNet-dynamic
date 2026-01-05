@@ -261,6 +261,7 @@ onBeforeUnmount(() => {
     font-size: 0.98rem;
     line-height: 1.7;
     margin-bottom: 40px;
+    text-align: justify;
     color: #566280;
 }
 

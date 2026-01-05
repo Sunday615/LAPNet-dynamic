@@ -58,7 +58,7 @@
               ຊຳລະຂ້າມທະນາຄານຜ່ານ LAPNet
             </li>
             <li class="sidebar-subitem" @click.stop="goTo('/products_service/crossborder'); closeSidebar()">
-              ຊຳລະຂ້າມແດນຜ່ານ QR CODE 
+              ຊຳລະຂ້າມແດນຜ່ານ QR CODE
             </li>
           </ul>
         </li>
@@ -128,11 +128,53 @@
       </ul>
 
       <footer class="sidebar-footer">
-        <div class="status-pill" @click="goTo('/contactus'); closeSidebar()">
-          <span class="status-dot"></span>
-          <div class="status-text">
-            <span>Help Center</span>
-            <small>Contact us</small>
+        <!-- ✅ Separate containers (NOT merged) -->
+        <div class="footerRow">
+          <!-- Help Center container -->
+          <div class="status-pill" @click="goTo('/contactus'); closeSidebar()">
+            <span class="status-dot"></span>
+            <div class="status-text">
+              <span>Help Center</span>
+              <small>Contact us</small>
+            </div>
+          </div>
+
+          <!-- ✅ Viewer container (NEW) -->
+          <div class="viewerContainer">
+            <button
+              ref="viewerBtnEl"
+              class="viewerBtn"
+              type="button"
+              aria-label="Open visitor overlay"
+              @click.stop="toggleViewer"
+            >
+              <i class="fa-solid fa-eye"></i>
+            </button>
+
+            <!-- ✅ Visitor overlay (glass) -->
+            <div ref="viewerPopoverEl" class="viewerPopover" aria-hidden="true" @click.stop>
+              <div class="viewerPopoverInner">
+                <div class="viewerTop">
+                  <div class="viewerTitle">Visitor</div>
+                  <button class="viewerClose" type="button" aria-label="Close" @click="closeViewer">✕</button>
+                </div>
+
+                <div class="viewerRow">
+                  <span class="viewerLabel">Views today</span>
+                  <span class="viewerChip">{{ viewerToday }}</span>
+                </div>
+
+                <div class="viewerRow">
+                  <span class="viewerLabel">Views this week</span>
+                  <span class="viewerChip chipBlue">{{ viewerWeek }}</span>
+                </div>
+
+                <div class="viewerActions">
+                  <button class="viewerAction" type="button" @click="refreshViewer">↻ Refresh</button>
+                  <button class="viewerAction ghost" type="button" @click="closeViewer">Close</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </footer>
@@ -141,14 +183,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { gsap } from 'gsap'
 import { defineExpose } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
 const openKey = ref(null)
-
 const toggleMenu = (key) => {
   openKey.value = openKey.value === key ? null : key
 }
@@ -158,9 +199,47 @@ const isOpen = ref(false)
 const sidebarEl = ref(null)
 const backdropEl = ref(null)
 
+/* ===========================
+   ✅ Visitor overlay state
+   =========================== */
+const viewerOpen = ref(false)
+const viewerToday = ref(300)
+const viewerWeek = ref(300)
+
+const viewerPopoverEl = ref(null)
+const viewerBtnEl = ref(null)
+
+const toggleViewer = () => {
+  viewerOpen.value = !viewerOpen.value
+}
+const closeViewer = () => {
+  viewerOpen.value = false
+}
+const refreshViewer = () => {
+  pulseViewer()
+}
+
+/**
+ * FUTURE (DB/API):
+ * async function loadViews() {
+ *   const res = await fetch("/api/views") // { today: number, week: number }
+ *   const data = await res.json()
+ *   viewerToday.value = data.today
+ *   viewerWeek.value = data.week
+ * }
+ */
+
+const pulseViewer = () => {
+  if (!viewerBtnEl.value) return
+  gsap.fromTo(
+    viewerBtnEl.value,
+    { scale: 1 },
+    { scale: 1.08, duration: 0.16, ease: 'power2.out', yoyo: true, repeat: 1 }
+  )
+}
+
 const initPosition = () => {
   if (!sidebarEl.value || !backdropEl.value) return
-  // start off-screen on the right
   gsap.set(sidebarEl.value, { x: '100%' })
   gsap.set(backdropEl.value, { opacity: 0 })
   isOpen.value = false
@@ -170,37 +249,22 @@ const openSidebar = () => {
   if (!sidebarEl.value) return
   isOpen.value = true
 
-  gsap.to(sidebarEl.value, {
-    duration: 0.45,
-    x: 0,
-    ease: 'power3.out'
-  })
+  gsap.to(sidebarEl.value, { duration: 0.45, x: 0, ease: 'power3.out' })
 
   if (backdropEl.value) {
-    gsap.to(backdropEl.value, {
-      duration: 0.35,
-      opacity: 1,
-      ease: 'power2.out'
-    })
+    gsap.to(backdropEl.value, { duration: 0.35, opacity: 1, ease: 'power2.out' })
   }
 }
 
 const closeSidebar = () => {
   if (!sidebarEl.value) return
   isOpen.value = false
+  viewerOpen.value = false // ✅ close overlay when sidebar closes
 
-  gsap.to(sidebarEl.value, {
-    duration: 0.4,
-    x: '100%',
-    ease: 'power3.inOut'
-  })
+  gsap.to(sidebarEl.value, { duration: 0.4, x: '100%', ease: 'power3.inOut' })
 
   if (backdropEl.value) {
-    gsap.to(backdropEl.value, {
-      duration: 0.3,
-      opacity: 0,
-      ease: 'power2.inOut'
-    })
+    gsap.to(backdropEl.value, { duration: 0.3, opacity: 0, ease: 'power2.inOut' })
   }
 }
 
@@ -208,13 +272,32 @@ const toggleSidebar = () => {
   isOpen.value ? closeSidebar() : openSidebar()
 }
 
-onMounted(() => {
+const onKeydown = (e) => {
+  if (e.key === 'Escape') closeViewer()
+}
+
+onMounted(async () => {
   initPosition()
   window.addEventListener('resize', initPosition)
+  window.addEventListener('keydown', onKeydown)
+
+  await nextTick()
+
+  // init viewer popover hidden
+  if (viewerPopoverEl.value) {
+    gsap.set(viewerPopoverEl.value, {
+      autoAlpha: 0,
+      y: 10,
+      scale: 0.98,
+      pointerEvents: 'none'
+    })
+    viewerPopoverEl.value.setAttribute('aria-hidden', 'true')
+  }
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', initPosition)
+  window.removeEventListener('keydown', onKeydown)
 })
 
 // ✅ expose functions so parent (homepage) can call them
@@ -227,8 +310,38 @@ defineExpose({
 // function receives path from click
 const goTo = (path) => {
   router.push(path)
-  // or: router.push({ path })
 }
+
+/* ✅ animate viewer popover */
+watch(
+  () => viewerOpen.value,
+  async (open) => {
+    await nextTick()
+    const el = viewerPopoverEl.value
+    if (!el) return
+
+    gsap.killTweensOf(el)
+
+    if (open) {
+      gsap.set(el, { pointerEvents: 'auto' })
+      gsap.to(el, { autoAlpha: 1, y: 0, scale: 1, duration: 0.22, ease: 'power2.out' })
+      el.setAttribute('aria-hidden', 'false')
+      pulseViewer()
+    } else {
+      gsap.to(el, {
+        autoAlpha: 0,
+        y: 10,
+        scale: 0.98,
+        duration: 0.18,
+        ease: 'power2.in',
+        onComplete: () => {
+          gsap.set(el, { pointerEvents: 'none' })
+          el.setAttribute('aria-hidden', 'true')
+        }
+      })
+    }
+  }
+)
 </script>
 
 <style scoped>
@@ -406,12 +519,12 @@ const goTo = (path) => {
   100% { transform: scale(1.4); opacity: 0; }
 }
 
-/* Dropdown (โครงสร้างแบบตัวอย่าง) */
+/* Dropdown */
 .has-children {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  padding: 0; /* padding ไปอยู่ที่ .sidebar-item-main */
+  padding: 0;
 }
 
 .sidebar-item-main {
@@ -490,7 +603,17 @@ const goTo = (path) => {
   z-index: 1;
 }
 
+/* ✅ row for separate containers */
+.footerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
 .status-pill {
+  flex: 1;
+  min-width: 0;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -522,5 +645,139 @@ const goTo = (path) => {
 }
 .status-text small {
   color: #9ca3af;
+}
+
+/* =========================
+   ✅ Viewer container + overlay
+   ========================= */
+.viewerContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.viewerBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  background: radial-gradient(circle at 30% 20%, rgba(56, 189, 248, 0.22), rgba(15, 23, 42, 0.6));
+  color: rgba(255, 255, 255, 0.92);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  box-shadow:
+    0 0 14px rgba(56, 189, 248, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+}
+.viewerBtn:hover {
+  box-shadow:
+    0 0 18px rgba(56, 189, 248, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.viewerPopover {
+  position: absolute;
+  right: 0;
+  bottom: 52px;
+  width: min(320px, 78vw);
+  border-radius: 16px;
+  overflow: hidden;
+
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.40), rgba(2, 6, 23, 0.26));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+
+  transform-origin: bottom right;
+  z-index: 5;
+}
+
+.viewerPopoverInner {
+  padding: 12px;
+}
+
+.viewerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 10px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.viewerTitle {
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.viewerClose {
+  width: 32px;
+  height: 32px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+}
+.viewerClose:hover {
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.viewerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 2px;
+}
+
+.viewerLabel {
+  font-size: 12px;
+  opacity: 0.8;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.viewerChip {
+  font-size: 12px;
+  font-weight: 900;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.chipBlue {
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  background: rgba(56, 189, 248, 0.10);
+}
+
+.viewerActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.viewerAction {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.18), rgba(14, 165, 233, 0.06));
+  cursor: pointer;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.92);
+}
+.viewerAction:hover {
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.24), rgba(14, 165, 233, 0.08));
+}
+.viewerAction.ghost {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
 }
 </style>

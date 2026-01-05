@@ -52,8 +52,7 @@
                 <div class="footer-column column-1">
                     <h3>ກ່ຽວກັບບໍລິສັດ</h3>
                     <p>
-                        ພັດທະນາລະບົບການຊໍາລະທຸລະກຳຍ່ອຍໃຫ້ເປັນສູນກາງ<br>ການຊໍາລະຂອງບັນດາຜູ້ໃຫ້ບໍລິການຊໍາລະ ທັງພາຍໃນ ແລະ
-                        ສາກົນ.
+                        ພັດທະນາລະບົບການຊໍາລະທຸລະກຳຍ່ອຍ ໃຫ້ເປັນສູນກາງການຊໍາລະຂອງບັນດາຜູ້ໃຫ້ບໍລິການຊໍາລະ ທັງພາຍໃນ ແລະ ສາກົນ, ແນໃສ່ໃຫ້ປະຊາຊົນລາວໄດ້ໃຊ້ບໍລິການຊໍາລະທີ່ສະດວກວ່ອງໄວ, ທັນສະໄໝ, ປອດໄພ ແລະ ຕົ້ນທືນຕໍ່າ.
                     </p>
                     <div class="footer-badges">
                         <span class="badge">19 ທະນາຄານສະມາຊິກ</span>
@@ -327,6 +326,11 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.column-1 p{
+    
+    width: 90%;
+    text-align: justify;
+}
 .footer-wrapper {
     color: #ffffff;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;

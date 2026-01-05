@@ -57,13 +57,14 @@
           </button>
 
           <!-- Facebook -->
-          <a class="iconLink" href="https://www.facebook.com/laonationalpaymentnetwork" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook">
-           <i class="fa-brands fa-facebook-f"></i>
+          <a class="iconLink" href="https://www.facebook.com/laonationalpaymentnetwork" target="_blank" rel="noopener"
+            aria-label="Facebook" title="Facebook">
+            <i class="fa-brands fa-facebook-f"></i>
           </a>
 
           <!-- Email -->
           <a class="iconLink" href="http://103.27.200.222/roundcube/" target="_blank" aria-label="Email" title="Email">
-           <i class="fa-solid fa-envelope"></i>
+            <i class="fa-solid fa-envelope"></i>
           </a>
 
           <!-- Login -->
@@ -90,7 +91,7 @@
             </h1>
 
             <p class="heroPara" ref="paraRef">
-              ພັດທະນາລະບົບການຊໍາລະທຸລະກຳຍ່ອຍໃຫ້ເປັນສູນກາງການຊໍາລະຂອງບັນດາຜູ້ໃຫ້ບໍລິການຊໍາລະ ທັງພາຍໃນ ແລະ ສາກົນ, ແນໃສ່ໃຫ້ປະຊາຊົນລາງໄດ້ໃຊ້ບໍລິການຊໍາລະທີ່ສະດວກວ່ອງໄວ, ທັນສະໄໝ, ປອດໄພ, ຕົ້ນທືນຕໍາ ແລະ ເພື່ອໃຫ້ບໍລິສັດການເປັນໂຄງຮ່າງພື້ນຖານໃຫ້ແກ່ການຊໍາລະໃນ ສປປ ລາວ.
+              ພັດທະນາລະບົບການຊໍາລະທຸລະກຳຍ່ອຍ ໃຫ້ເປັນສູນກາງການຊໍາລະຂອງບັນດາຜູ້ໃຫ້ບໍລິການຊໍາລະ ທັງພາຍໃນ ແລະ ສາກົນ, ແນໃສ່ໃຫ້ປະຊາຊົນລາວໄດ້ໃຊ້ບໍລິການຊໍາລະທີ່ສະດວກວ່ອງໄວ, ທັນສະໄໝ, ປອດໄພ ແລະ ຕົ້ນທືນຕໍ່າ.
             </p>
 
             <div class="ctaRow" ref="ctaRef">
@@ -105,7 +106,7 @@
 
           <section class="heroRight" ref="rightRef">
             <div class="mockupSlot" ref="mockupRef">
-            
+
               <div class="mockupInner" :style="mockupInnerStyle">
                 <atmmockup class="mockupFill" />
               </div>
@@ -490,17 +491,16 @@ onBeforeUnmount(() => {
     rgba(4, 8, 23, 1);
   backdrop-filter: blur(14px);
 }
+
 /* ✅ Modern Primary Button */
 .btnPrimary {
   position: relative;
   border: 1px solid rgba(255, 255, 255, 0.14);
   color: rgba(255, 255, 255, 0.95);
 
-  background: linear-gradient(
-    90deg,
-    rgba(0, 101, 201, 1) 35%,
-    rgba(46, 138, 158, 1) 100%
-  );
+  background: linear-gradient(90deg,
+      rgba(0, 101, 201, 1) 35%,
+      rgba(46, 138, 158, 1) 100%);
 
   box-shadow:
     0 14px 34px rgba(0, 101, 201, 0.25),
@@ -519,11 +519,9 @@ onBeforeUnmount(() => {
   position: absolute;
   inset: 1px;
   border-radius: inherit;
-  background: radial-gradient(
-    120px 60px at 25% 20%,
-    rgba(255, 255, 255, 0.22),
-    transparent 65%
-  );
+  background: radial-gradient(120px 60px at 25% 20%,
+      rgba(255, 255, 255, 0.22),
+      transparent 65%);
   opacity: 0.85;
   pointer-events: none;
 }
@@ -729,7 +727,7 @@ onBeforeUnmount(() => {
 }
 
 .btn {
-    
+
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 999px;
   padding: 11px 16px;
@@ -808,7 +806,7 @@ onBeforeUnmount(() => {
 
 .heroTitle {
   margin: 16px 0 10px;
-  font-size: clamp(42px, 5.1vw, 65px);
+  font-size: clamp(42px, 5.1vw, 51px);
   line-height: 1.03;
   letter-spacing: -0.03em;
   font-weight: 600;
@@ -817,16 +815,21 @@ onBeforeUnmount(() => {
 .ai {
   background: linear-gradient(135deg, rgba(86, 204, 255, 1), rgba(43, 109, 255, 1));
   -webkit-background-clip: text;
+
   background-clip: text;
   color: transparent;
-    font-size: clamp(42px, 5.1vw, 51px);
+  width: 100%;
+  font-size: clamp(42px, 5.1vw, 50px);
   text-shadow: 0 0 40px rgba(43, 109, 255, 0.22);
 }
 
 .heroPara {
   margin: 0;
-  max-width: 520px;
+  max-width: 550px;
   font-size: 14.5px;
+  text-align: justify;
+    hyphens: auto;     
+
   line-height: 1.75;
   color: rgba(255, 255, 255, 0.72);
 }
@@ -905,17 +908,22 @@ onBeforeUnmount(() => {
   .nav {
     display: none;
   }
+
   .hamburger {
     display: inline-flex;
   }
+
   .heroGrid {
     grid-template-columns: 1fr;
   }
+
   .mockupSlot {
     height: 420px;
   }
+
   .sparkles {
-    display: none; /* ✅ ตัดของหนักบนมือถือ */
+    display: none;
+    /* ✅ ตัดของหนักบนมือถือ */
   }
 }
 
@@ -924,9 +932,11 @@ onBeforeUnmount(() => {
     flex-direction: column;
     align-items: stretch;
   }
+
   .btn {
     width: 100%;
   }
+
   .mockupSlot {
     height: 340px;
   }
@@ -939,14 +949,15 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 424px) {
-  .btnGhost{
+  .btnGhost {
     display: none;
   }
-  
+
 }
 
 /* ✅ fallback: ถ้าไม่รองรับ backdrop-filter ให้ปิด blur */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+
   .loaderOverlay,
   .nav,
   .badge,
@@ -956,6 +967,4 @@ onBeforeUnmount(() => {
     backdrop-filter: none !important;
   }
 }
-
-
 </style>

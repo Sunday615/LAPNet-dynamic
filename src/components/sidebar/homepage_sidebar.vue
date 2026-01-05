@@ -98,14 +98,54 @@
       </ul>
 
       <footer class="sidebar-footer">
-        <div class="status-pill" @click="goTo('/contactus')">
-          <span class="status-dot"></span>
-          <router-link to="/contactus">
-          <div class="status-text">
-            <span>Help Center</span>
-            <small>Contact us</small>
+        <!-- ✅ Separate containers (NOT merged) -->
+        <div class="footerRow">
+          <!-- Help Center container -->
+          <div class="status-pill" @click="goTo('/contactus')">
+            <span class="status-dot"></span>
+            <div class="status-text">
+              <span>Help Center</span>
+              <small>Contact us</small>
+            </div>
           </div>
-          </router-link>
+
+          <!-- Viewer container (new) -->
+          <div class="viewerContainer" ref="viewerContainerEl">
+            <button
+              ref="viewerBtnEl"
+              class="viewerBtn"
+              type="button"
+              aria-label="Open visitor overlay"
+              @click.stop="toggleViewer"
+            >
+              <i class="fa-solid fa-eye"></i>
+            </button>
+
+            <!-- ✅ Visitor overlay (glass) -->
+            <div ref="viewerPopoverEl" class="viewerPopover" aria-hidden="true" @click.stop>
+              <div class="viewerPopoverInner">
+                <div class="viewerTop">
+                  <div class="viewerTitle">Visitor</div>
+                  <button class="viewerClose" type="button" aria-label="Close" @click="closeViewer">✕</button>
+                </div>
+
+                <div class="viewerRow">
+                  <span class="viewerLabel">Views today</span>
+                  <span class="viewerChip">{{ viewerToday }}</span>
+                </div>
+
+                <div class="viewerRow">
+                  <span class="viewerLabel">Views this week</span>
+                  <span class="viewerChip chipBlue">{{ viewerWeek }}</span>
+                </div>
+
+                <div class="viewerActions">
+                  <button class="viewerAction" type="button" @click="refreshViewer">↻ Refresh</button>
+                  <button class="viewerAction ghost" type="button" @click="closeViewer">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </footer>
     </nav>
@@ -113,7 +153,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, nextTick } from "vue";
+import { ref, onMounted, watch, nextTick, onBeforeUnmount } from "vue";
 import gsap from "gsap";
 import { useRouter } from "vue-router";
 
@@ -146,6 +186,37 @@ const toggleMenu = (key: string) => {
   openKey.value = openKey.value === key ? null : key;
 };
 
+/* ===========================
+   ✅ Visitor overlay state
+   =========================== */
+const viewerOpen = ref(false);
+const viewerToday = ref(300);
+const viewerWeek = ref(300);
+
+const viewerPopoverEl = ref<HTMLElement | null>(null);
+const viewerBtnEl = ref<HTMLElement | null>(null);
+const viewerContainerEl = ref<HTMLElement | null>(null);
+
+const toggleViewer = () => {
+  viewerOpen.value = !viewerOpen.value;
+};
+const closeViewer = () => {
+  viewerOpen.value = false;
+};
+const refreshViewer = () => {
+  pulseViewer();
+};
+
+const pulseViewer = () => {
+  if (viewerBtnEl.value) {
+    gsap.fromTo(
+      viewerBtnEl.value,
+      { scale: 1 },
+      { scale: 1.08, duration: 0.16, ease: "power2.out", yoyo: true, repeat: 1 }
+    );
+  }
+};
+
 const initPosition = () => {
   if (!sidebarEl.value || !backdropEl.value) return;
   gsap.set(sidebarEl.value, { x: "100%" });
@@ -157,17 +228,8 @@ const playOpen = () => {
 
   gsap.killTweensOf([sidebarEl.value, backdropEl.value]);
 
-  gsap.to(sidebarEl.value, {
-    duration: 0.45,
-    x: 0,
-    ease: "power3.out",
-  });
-
-  gsap.to(backdropEl.value, {
-    duration: 0.35,
-    opacity: 1,
-    ease: "power2.out",
-  });
+  gsap.to(sidebarEl.value, { duration: 0.45, x: 0, ease: "power3.out" });
+  gsap.to(backdropEl.value, { duration: 0.35, opacity: 1, ease: "power2.out" });
 };
 
 const playClose = () => {
@@ -175,32 +237,48 @@ const playClose = () => {
 
   gsap.killTweensOf([sidebarEl.value, backdropEl.value]);
 
-  gsap.to(sidebarEl.value, {
-    duration: 0.4,
-    x: "100%",
-    ease: "power3.inOut",
-  });
-
-  gsap.to(backdropEl.value, {
-    duration: 0.3,
-    opacity: 0,
-    ease: "power2.inOut",
-  });
+  gsap.to(sidebarEl.value, { duration: 0.4, x: "100%", ease: "power3.inOut" });
+  gsap.to(backdropEl.value, { duration: 0.3, opacity: 0, ease: "power2.inOut" });
 
   openKey.value = null;
+  viewerOpen.value = false; // ✅ close visitor overlay when sidebar closes
 };
 
-const emitClose = () => emit("update:modelValue", false);
+const emitClose = () => {
+  viewerOpen.value = false; // ✅ close overlay too
+  emit("update:modelValue", false);
+};
 
 const goTo = (path: string) => {
   router.push(path);
   emitClose();
 };
 
+const onKeydown = (e: KeyboardEvent) => {
+  if (e.key === "Escape") closeViewer();
+};
+
 onMounted(async () => {
   initPosition();
   await nextTick();
+
+  // init viewer popover hidden
+  if (viewerPopoverEl.value) {
+    gsap.set(viewerPopoverEl.value, {
+      autoAlpha: 0,
+      y: 10,
+      scale: 0.98,
+      pointerEvents: "none",
+    });
+  }
+
+  window.addEventListener("keydown", onKeydown);
+
   if (props.modelValue) playOpen();
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("keydown", onKeydown);
 });
 
 watch(
@@ -208,6 +286,36 @@ watch(
   async (v) => {
     await nextTick();
     v ? playOpen() : playClose();
+  }
+);
+
+watch(
+  () => viewerOpen.value,
+  async (open) => {
+    await nextTick();
+    const el = viewerPopoverEl.value;
+    if (!el) return;
+
+    gsap.killTweensOf(el);
+
+    if (open) {
+      gsap.set(el, { pointerEvents: "auto" });
+      gsap.to(el, { autoAlpha: 1, y: 0, scale: 1, duration: 0.22, ease: "power2.out" });
+      pulseViewer();
+      el.setAttribute("aria-hidden", "false");
+    } else {
+      gsap.to(el, {
+        autoAlpha: 0,
+        y: 10,
+        scale: 0.98,
+        duration: 0.18,
+        ease: "power2.in",
+        onComplete: () => {
+          gsap.set(el, { pointerEvents: "none" });
+          el.setAttribute("aria-hidden", "true");
+        },
+      });
+    }
   }
 );
 </script>
@@ -269,14 +377,14 @@ watch(
   position: relative;
 }
 
-.closeBtn{
+.closeBtn {
   margin-left: auto;
   width: 34px;
   height: 34px;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(10, 8, 18, 0.35);
-  color: rgba(255,255,255,0.92);
+  color: rgba(255, 255, 255, 0.92);
   cursor: pointer;
 }
 
@@ -425,18 +533,31 @@ watch(
   margin-top: auto;
   padding-top: 14px;
   border-top: 1px dashed rgba(148, 163, 184, 0.4);
+  position: relative;
 }
+
+.footerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
 .status-pill {
-  display: inline-flex;
+  flex: 1;
+  display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 10px;
+
+  padding: 8px 10px;
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.75);
   border: 1px solid rgba(52, 211, 153, 0.5);
   box-shadow: 0 0 18px rgba(16, 185, 129, 0.6);
   cursor: pointer;
+  min-width: 200px;
 }
+
 .status-dot {
   width: 9px;
   height: 9px;
@@ -444,7 +565,143 @@ watch(
   background: radial-gradient(circle at 30% 20%, #bbf7d0, #22c55e);
   box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
 }
-.status-text { display:flex; flex-direction:column; font-size: 0.7rem; color:#e5e7eb; }
+
+.status-text {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.7rem;
+  color: #e5e7eb;
+  line-height: 1.1;
+}
 .status-text span { font-size: 0.75rem; font-weight: 500; }
-.status-text small { color:#9ca3af; }
+.status-text small { color: #9ca3af; }
+
+/* ✅ NEW viewer container */
+.viewerContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Viewer button */
+.viewerBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  background: radial-gradient(circle at 30% 20%, rgba(56, 189, 248, 0.22), rgba(15, 23, 42, 0.6));
+  color: rgba(255, 255, 255, 0.92);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  box-shadow:
+    0 0 14px rgba(56, 189, 248, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+}
+.viewerBtn:hover {
+  box-shadow:
+    0 0 18px rgba(56, 189, 248, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Visitor overlay popover (glass) */
+.viewerPopover {
+  position: absolute;
+  right: 0;
+  bottom: 52px;
+  width: min(320px, 78vw);
+  border-radius: 16px;
+  overflow: hidden;
+
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.40), rgba(2, 6, 23, 0.26));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+
+  transform-origin: bottom right;
+}
+
+.viewerPopoverInner { padding: 12px; }
+
+.viewerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 10px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.viewerTitle {
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.viewerClose {
+  width: 32px;
+  height: 32px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+}
+.viewerClose:hover { background: rgba(255, 255, 255, 0.10); }
+
+.viewerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 2px;
+}
+
+.viewerLabel {
+  font-size: 12px;
+  opacity: 0.8;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.viewerChip {
+  font-size: 12px;
+  font-weight: 900;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.chipBlue {
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  background: rgba(56, 189, 248, 0.10);
+}
+
+.viewerActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.viewerAction {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.18), rgba(14, 165, 233, 0.06));
+  cursor: pointer;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.92);
+}
+.viewerAction:hover {
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.24), rgba(14, 165, 233, 0.08));
+}
+.viewerAction.ghost {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+}
 </style>

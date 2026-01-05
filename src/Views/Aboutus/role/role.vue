@@ -394,6 +394,7 @@ onMounted(() => {
 .hero-subtitle {
   margin: 0 0 20px;
   font-size: 14px;
+  text-align: justify;
   line-height: 1.6;
   color: #e5e7eb;
   opacity: 0.9;

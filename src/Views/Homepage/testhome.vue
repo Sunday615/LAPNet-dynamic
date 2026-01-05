@@ -1,9 +1,8 @@
 <template>
-
-
   <!-- Desktop links -->
-  <!-- <popupoverlay   
-     v-model="show1"
+  <!--
+  <popupoverlay
+    v-model="show1"
     image-src="/blog/1.jpg"
     title="Popup #1 (Test)"
     description="Show popup 1"
@@ -12,10 +11,9 @@
     @closed="handleClosed1"
     @primary="handleClosed1"
     @secondary="handleClosed1"
-    
-    />
-  <popupoverlay   
-     v-model="show2"
+  />
+  <popupoverlay
+    v-model="show2"
     image-src="/footer/backgroundfooter.png"
     title="Popup #2 (Test)"
     description="Show popup 2"
@@ -24,73 +22,80 @@
     @closed="handleClosed2"
     @primary="handleClosed2"
     @secondary="handleClosed2"
-    
-    /> -->
+  />
+  -->
 
-
-  
-  <div class="herosectionhomepage">
+  <div class="herosectionhomepage" id="hero">
     <mockupherosectionpage />
   </div>
-  <div class="vision">
+
+  <div class="vision" id="vision">
     <SwitchSplit
-    
-    company-name="LAPNet"
-    logo-src="/logolapnet/fullcircle.png"
-    image1="/homepage/Vision.png"
-    image2="/homepage/missionhome.png"
-    label-a="VISION"
-    label-b="MISSION"
-  
+      company-name="LAPNet"
+      logo-src="/logolapnet/fullcircle.png"
+      image1="/homepage/Vision.png"
+      image2="/homepage/missionhome.png"
+      label-a="VISION"
+      label-b="MISSION"
+    >
+      <template #content1>
+        <p style="margin: 0; opacity: 0.7">
+          ພັດທະນາລະບົບການຊໍາລະທຸລະກຳຍ່ອຍ ໃຫ້ເປັນສູນກາງການຊໍາລະຂອງບັນດາຜູ້ໃຫ້ບໍລິການຊໍາລະ ທັງພາຍໃນ ແລະ ສາກົນ, ແນໃສ່ໃຫ້ປະຊາຊົນລາວໄດ້ໃຊ້ບໍລິການຊໍາລະທີ່ສະດວກວ່ອງໄວ, ທັນສະໄໝ, ປອດໄພ ແລະ ຕົ້ນທືນຕໍ່າ.
+        </p>
+      </template>
 
-  >
-    <template #content1>
-      
-      <p style="margin:0;opacity:.7;">   ພັດທະນາລະບົບການຊໍາລະທຸລະກຳຍ່ອຍໃຫ້ເປັນສູນກາງການຊໍາລະຂອງບັນດາຜູ້ໃຫ້ບໍລິການຊໍາລະ ທັງພາຍໃນ ແລະ ສາກົນ,
-              ແນໃສ່ໃຫ້ປະຊາຊົນລາງໄດ້ໃຊ້ບໍລິການຊໍາລະທີ່ສະດວກວ່ອງໄວ, ທັນສະໄໝ, ປອດໄພ, ຕົ້ນທືນຕໍາ ແລະ
-              ເພື່ອໃຫ້ບໍລິສັດການເປັນໂຄງຮ່າງພື້ນຖານໃຫ້ແກ່ການຊໍາລະໃນ ສປປ ລາວ.</p>
-    </template>
+      <template #content2>
+        <p style="margin: 0; opacity: 0.7">
+          ພັດທະນາລະບົບການຊໍາລະໃຫ້ມີຄວາມຫຼາກຫຼາຍ, ທັນສະໄໝ, ຕອບຮັບໄດ້ທຸກຊ່ອງທາງການຊໍາລະທີ່ເກີດຂື້ນ,
+          ເຕົ້າໂຮມເອົາບັນດາທະນາຄານທຸລະກິດ, ສະຖາບັນການເງິນ ແລະ ບໍລິສັດ Fintech ທີ່ເປັນຜູ້ໃຫ້ບໍລິການຊໍາລະ
+          ໃຫ້ເຂົ້າມາເປັນສະມາຊີກຂອງບໍລິສັດ ເພື່ອພ້ອມກັນໃຫ້ບໍລິການລະບົບການຊໍາລະແກ່ສັງຄົມ,
+          ຫັນເອົາການເຊື່ອມຕໍ່ສາກົນທີ່ມີລັກສະນະກະແຈກກະຈາຍລວມສູນເຂົ້າມາເຊື່ອມຕໍ່ເປັນຮູບແບບລະບົບປະຕູດຽວເພື່ອຫຼຸດຜ່ອນຕົ້ນທືນລວມຂອງທົ່ວລະບົບ,
+          ເສີມຂະຫຍາຍຄວາມຮູ້-ເຂົ້າໃຈໃຫ້ແກ່ມວນຊົນໄດ້ຮັບຮູ້ເຖິງຄວາມສຳຄັນ ແລະ
+          ປະໂຫຍກຂອງການນຳໃຊ້ລະບົບການຊໍາລະເອເລັກໂຕຣນິກຢ່າງຖ່ອງແທ້ ເພື່ອເຮັດໃຫ້ມວນຊົນໄດ້ນຳໃຊ້ລະບົບການຊໍາລະຢ່າງຖືກຕ້ອງ
+          ແລະ ປອດໄພ ເປັນການເສີມສ້າງຄວາມໝັ້ນໃຈໃຫ້ແກ່ມວນຊົນ.
+        </p>
+      </template>
+    </SwitchSplit>
+  </div>
 
-    <template #content2>
-  
-      <p style="margin:0;opacity:.7;">          ພັດທະນາລະບົບການຊໍາລະໃຫ້ມີຄວາມຫຼາກຫຼາຍ, ທັນສະໄໝ, ຕອບຮັບໄດ້ທຸກຊ່ອງທາງການຊໍາລະທີ່ເກີດຂື້ນ,
-              ເຕົ້າໂຮມເອົາບັນດາທະນາຄານທຸລະກິດ, ສະຖາບັນການເງິນ ແລະ ບໍລິສັດ Fintech ທີ່ເປັນຜູ້ໃຫ້ບໍລິການຊໍາລະ
-              ໃຫ້ເຂົ້າມາເປັນສະມາຊີກຂອງບໍລິສັດ ເພື່ອພ້ອມກັນໃຫ້ບໍລິການລະບົບການຊໍາລະແກ່ສັງຄົມ,
-              ຫັນເອົາການເຊື່ອມຕໍ່ສາກົນທີ່ມີລັກສະນະກະແຈກກະຈາຍລວມສູນເຂົ້າມາເຊື່ອມຕໍ່ເປັນຮູບແບບລະບົບປະຕູດຽວເພື່ອຫຼຸດຜ່ອນຕົ້ນທືນລວມຂອງທົ່ວລະບົບ,
-              ເສີມຂະຫຍາຍຄວາມຮູ້-ເຂົ້າໃຈໃຫ້ແກ່ມວນຊົນໄດ້ຮັບຮູ້ເຖິງຄວາມສຳຄັນ ແລະ
-              ປະໂຫຍກຂອງການນຳໃຊ້ລະບົບການຊໍາລະເອເລັກໂຕຣນິກຢ່າງຖ່ອງແທ້ ເພື່ອເຮັດໃຫ້ມວນຊົນໄດ້ນຳໃຊ້ລະບົບການຊໍາລະຢ່າງຖືກຕ້ອງ
-              ແລະ ປອດໄພ ເປັນການເສີມສ້າງຄວາມໝັ້ນໃຈໃຫ້ແກ່ມວນຊົນ.</p>
-    </template>
-  </SwitchSplit>
+  <div class="whytus" id="why">
+    <whychooseus
+      title="Why choose LAPNET"
+      description="ບໍລິສັດ ລາວເນ ເຊີນນໍ ເພເມັ້ນ ເນັດເວີກ ຈຳກັດ (LAPNet)  ເປັນຜູ້ໃຫ້ບໍລິການລະບົບ ຊໍາລະທຸລະກໍາຍ່ອຍທົ່ວໄປ ຕາມທີ່ໄດ້ກໍານົດໄວ້ໃນກົດໝາຍວ່າດ້ວຍລະບົບການຊໍາລະ. ຊຶ່ງເຮັດໜ້າທີ່ເປັນໂຕກາງໃນການ ເຊື່ອມໂຍງກັບທຸກຂະແໜງການຊຳລະທີ່ເປັນທະນາຄານ, ສະຖາບັນການເງິນ ແລະ ຜູ້ໃຫ້ບໍລິການ ການຊຳລະແຫ່ງດຽວໃນ ສປປ ລາວ;"
+      :stat1Value="19"
+      stat1Label="Commercial Bank"
+      stat1Suffix="19 ທະນາຄານສະມາຊິກທີ່ເຂົ້າຮ່ວມກັບ Lao National Payment Network CO., LTD"
+      :stat2Value="2"
+      stat2Label="Fintech"
+      stat2Suffix=""
+    />
   </div>
-  <div class="whytus">
-    <whychooseus title="Why choose LAPNET"
-      description="ບໍລິສັດ ລາວເນ ເຊີນນໍ ເພເມັ້ນ ເນັດເວີກ ຈຳກັດ (LAPNet) ເຊິ່ງບໍລິສັດ LAPNet ເປັນຜູ້ໃຫ້ບໍລິການລະບົບ ການຊໍາລະທຸລະກໍາຍ່ອຍ ຕາມທີ່ໄດ້ກໍານົດໄວ້ໃນກົດໝາຍວ່າດ້ວຍລະບົບ ການຊໍາລະ. ຊຶ່ງເຮັດໜ້າທີ່ເປັນໂຕກາງໃນການ ເຊື່ອມໂຍງກັບທຸກຂະແໜງການຊຳລະທີ່ເປັນທະນາຄານ, ສະຖາບັນການເງິນ ແລະ ຜູ້ໃຫ້ບໍລິການ ການຊຳລະແຫ່ງດຽວໃນ ສປປ ລາວ;"
-      :stat1Value="19" stat1Label="Commercial Bank"
-      stat1Suffix="19 ທະນາຄານສະມາຊິກທີ່ເຂົ້າຮ່ວມກັບ Lao National Payment Network CO., LTD" :stat2Value="2"
-      stat2Label="Fintech" stat2Suffix="" />
-  </div>
-  <div class="memberscroll">
+
+  <div class="memberscroll" id="members">
     <allmemberscrolling />
   </div>
-  <div class="heroproduct">
+
+  <div class="heroproduct" id="products">
     <productherosectionhomepage />
   </div>
-  <div class="boxpadding" style="width: 100%; height:15vh"></div>
-  <div class="bloghomepage">
+
+  <div class="boxpadding" style="width: 100%; height: 15vh"></div>
+
+  <div class="bloghomepage" id="blog">
     <bloghomepage />
   </div>
-  <div class="boxpadding" style="width: 100%; height:15vh"></div>
-  <secondfooter />
 
+  <div class="boxpadding" style="width: 100%; height: 15vh"></div>
+
+  <secondfooter id="footer" />
+
+  
 </template>
-
 
 <style scoped>
 .herosectionhomepage {
   width: 100%;
   height: auto;
-
 }
 
 .globemockup {
@@ -103,7 +108,6 @@
   width: 100%;
   height: auto;
   margin: 0 auto;
-
 }
 
 .heroproduct {
@@ -128,20 +132,28 @@
   max-width: 100%;
   height: auto;
 }
-</style>
-<script setup>
-import mockupherosectionpage from './mockupherosectionpage.vue';
-import atmmockup from '../../components/mockup/atmmockup.vue';
-import bloghomepage from '../../components/blog/hompage/bloghomepage.vue';
-import main_navbar from '../../components/miannavbar/main_navbar.vue';
-import SwitchSplit from './visionherosection.vue';
-import whychooseus from './whychooseus.vue';
-import allmemberscrolling from '../../components/swiper/memberscrolling/allmemberscrolling.vue';
-import productherosectionhomepage from './productherosectionhomepage.vue';
-import secondfooter from '../../components/footer/mainfooter/secondfooter.vue';
-import popupoverlay from '../../components/popup/popupoverlay.vue';
-import { ref, onMounted } from "vue"
 
+/* =========================
+   ✅ Bottom-left Eye Viewer
+   Glassmorphism + Modern Blue
+   ========================= */
+
+</style>
+
+<script setup>
+import mockupherosectionpage from "./mockupherosectionpage.vue"
+import atmmockup from "../../components/mockup/atmmockup.vue"
+import bloghomepage from "../../components/blog/hompage/bloghomepage.vue"
+import main_navbar from "../../components/miannavbar/main_navbar.vue"
+import SwitchSplit from "./visionherosection.vue"
+import whychooseus from "./whychooseus.vue"
+import allmemberscrolling from "../../components/swiper/memberscrolling/allmemberscrolling.vue"
+import productherosectionhomepage from "./productherosectionhomepage.vue"
+import secondfooter from "../../components/footer/mainfooter/secondfooter.vue"
+import popupoverlay from "../../components/popup/popupoverlay.vue"
+
+import { ref, onMounted, onBeforeUnmount, nextTick, watch } from "vue"
+import { gsap } from "gsap"
 
 /** ✅ TEST MODE: 3 Hour per show  */
 const INTERVAL_MS = 3 * 60 * 60 * 1000 // 3 hours
@@ -184,16 +196,9 @@ function setState(val) {
 }
 
 onMounted(() => {
-  // ยังไม่ครบ 2 นาที → ไม่โชว์
   if (!shouldShowNow()) return
-
-  // ครบแล้ว → บันทึกเวลาทันที (กันรีเฟรชเด้งซ้ำ)
   markShownNow()
-
-  // เริ่มรอบใหม่จาก popup1 เสมอ
   setState("step1")
-
-  // หน่วงตอนโหลดหน้า (ปรับได้)
   setTimeout(() => {
     show1.value = true
   }, 500)
@@ -211,4 +216,118 @@ function handleClosed2() {
   show2.value = false
   setState("done")
 }
+
+/* ===========================
+   ✅ Viewer Today + Week (static now)
+   =========================== */
+const viewerToday = ref(300)
+const viewerWeek = ref(300)
+
+const viewerOpen = ref(false)
+
+const viewerWrapRef = ref(null)
+const viewerPanelRef = ref(null)
+const eyeIconRef = ref(null)
+
+function toggleViewer() {
+  viewerOpen.value = !viewerOpen.value
+}
+function closeViewer() {
+  viewerOpen.value = false
+}
+function refreshViewer() {
+  // future: fetch again, for now pulse animation
+  pulseViewer()
+}
+
+/**
+ * ✅ FUTURE (DB/API example):
+ * async function loadViews() {
+ *   const res = await fetch("/api/views") // { today: number, week: number }
+ *   const data = await res.json()
+ *   viewerToday.value = data.today
+ *   viewerWeek.value = data.week
+ * }
+ */
+
+function pulseViewer() {
+  const wrap = viewerWrapRef.value
+  if (!wrap) return
+
+  gsap.fromTo(
+    wrap,
+    { y: 0 },
+    { y: -6, duration: 0.18, ease: "power2.out", yoyo: true, repeat: 1 }
+  )
+
+  if (eyeIconRef.value) {
+    gsap.fromTo(
+      eyeIconRef.value,
+      { scale: 1 },
+      { scale: 1.08, duration: 0.18, ease: "power2.out", yoyo: true, repeat: 1 }
+    )
+  }
+}
+
+function onKeydown(e) {
+  if (e.key === "Escape") closeViewer()
+}
+
+onMounted(async () => {
+  window.addEventListener("keydown", onKeydown)
+  await nextTick()
+
+  // entrance
+  if (viewerWrapRef.value) {
+    gsap.from(viewerWrapRef.value, {
+      y: 18,
+      autoAlpha: 0,
+      duration: 0.8,
+      ease: "power3.out",
+      delay: 0.1,
+    })
+  }
+
+  // panel initial (no padding on wrapper to allow true height 0)
+  if (viewerPanelRef.value) {
+    gsap.set(viewerPanelRef.value, {
+      height: 0,
+      autoAlpha: 0,
+      y: 8,
+      pointerEvents: "none",
+      overflow: "hidden",
+    })
+  }
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener("keydown", onKeydown)
+})
+
+watch(viewerOpen, async (open) => {
+  await nextTick()
+  const panel = viewerPanelRef.value
+  if (!panel) return
+
+  gsap.killTweensOf(panel)
+
+  if (open) {
+    gsap.set(panel, { pointerEvents: "auto" })
+    gsap.fromTo(
+      panel,
+      { height: 0, autoAlpha: 0, y: 10 },
+      { height: "auto", autoAlpha: 1, y: 0, duration: 0.32, ease: "power2.out" }
+    )
+    pulseViewer()
+  } else {
+    gsap.to(panel, {
+      height: 0,
+      autoAlpha: 0,
+      y: 8,
+      duration: 0.22,
+      ease: "power2.in",
+      onComplete: () => gsap.set(panel, { pointerEvents: "none" }),
+    })
+  }
+})
 </script>

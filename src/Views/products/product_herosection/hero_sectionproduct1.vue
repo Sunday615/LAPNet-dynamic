@@ -14,18 +14,13 @@
                     ຍອດເງິນຂ້າມທະນາຄານໄດ້.
                 </p>
                 <router-link :to="{ path: '/products_service/allproduct', query: { id: 1 } }">
-          <tagproduct label="ຜະລິດຕະພັນ ແລະ ການບໍລິການ ທັງໝົດ" />
-        </router-link>
-             
+                    <tagproduct label="ຜະລິດຕະພັນ ແລະ ການບໍລິການ ທັງໝົດ" />
+                </router-link>
+
             </div>
 
             <!-- RIGHT: SINGLE 3D MOCKUP FOLLOW MOUSE -->
-            <div
-                class="hero-right"
-                ref="wrapperRef"
-                @mousemove="onMouseMove"
-                @mouseleave="onMouseLeave"
-            >
+            <div class="hero-right" ref="wrapperRef" @mousemove="onMouseMove" @mouseleave="onMouseLeave">
                 <!-- soft glowing shapes behind -->
                 <div class="bg-orb bg-orb-1"></div>
                 <div class="bg-orb bg-orb-2"></div>
@@ -43,26 +38,16 @@
                             </div>
                             <div class="top-status">
                                 <span class="status-dot"></span>
-                                <span
-                                    class="status-text"
-                                    style="display:flex; align-items: center;"
-                                >
+                                <span class="status-text" style="display:flex; align-items: center;">
                                     ຜະລິດຕະພັນຂອງ • LAPNet
-                                    <img
-                                        style="width: 20px; height:20px ; margin-left: 5px;"
-                                        src="/logolapnet/fullcircle.png"
-                                        alt=""
-                                    />
+                                    <img style="width: 20px; height:20px ; margin-left: 5px;"
+                                        src="/logolapnet/fullcircle.png" alt="" />
                                 </span>
                             </div>
                         </div>
 
                         <div class="mockup-inner">
-                            <img
-                                class="mockup-image"
-                                :src="imageSrc"
-                                alt="3D product mockup"
-                            />
+                            <img class="mockup-image" :src="imageSrc" alt="3D product mockup" />
 
                             <!-- ✨ strong light sweep over image -->
                             <div class="image-sweep"></div>
@@ -270,7 +255,10 @@ onBeforeUnmount(() => {
     font-size: 0.98rem;
     line-height: 1.7;
     margin-bottom: 40px;
+    text-align: justify;
+
     color: #566280;
+
 }
 
 /* RIGHT */
@@ -295,11 +283,9 @@ onBeforeUnmount(() => {
 .bg-orb-1 {
     width: 220px;
     height: 220px;
-    background: linear-gradient(
-            95deg,
+    background: linear-gradient(95deg,
             rgba(0, 3, 41, 0.2) 0%,
-            rgba(0, 51, 171, 0.35) 46%
-        );
+            rgba(0, 51, 171, 0.35) 46%);
     top: -10%;
     left: 10%;
 }
@@ -307,11 +293,9 @@ onBeforeUnmount(() => {
 .bg-orb-2 {
     width: 260px;
     height: 260px;
-    background: radial-gradient(
-            circle at 30% 30%,
+    background: radial-gradient(circle at 30% 30%,
             rgba(0, 51, 171, 0.25),
-            rgba(0, 3, 41, 0.15)
-        );
+            rgba(0, 3, 41, 0.15));
     bottom: -12%;
     right: 0;
 }
@@ -333,11 +317,9 @@ onBeforeUnmount(() => {
     z-index: 1;
     padding: 1px;
     border-radius: 28px;
-    background: linear-gradient(
-            95deg,
+    background: linear-gradient(95deg,
             rgba(0, 3, 41, 1) 0%,
-            rgba(0, 51, 171, 1) 46%
-        );
+            rgba(0, 51, 171, 1) 46%);
     box-shadow:
         0 24px 70px rgba(0, 15, 45, 0.18),
         0 0 0 1px rgba(10, 20, 60, 0.08);
@@ -349,11 +331,9 @@ onBeforeUnmount(() => {
     position: absolute;
     inset: -16px;
     border-radius: 36px;
-    background: radial-gradient(
-            circle at 50% -10%,
+    background: radial-gradient(circle at 50% -10%,
             rgba(255, 255, 255, 0.3),
-            transparent 65%
-        );
+            transparent 65%);
     opacity: 0.9;
     pointer-events: none;
 }
@@ -364,7 +344,7 @@ onBeforeUnmount(() => {
     width: 430px;
     height: 620px;
     border-radius: 26px;
- 
+
     overflow: hidden;
 }
 
@@ -411,7 +391,8 @@ onBeforeUnmount(() => {
     overflow: hidden;
     transform: translateZ(30px);
     box-shadow: 0 16px 45px rgba(9, 22, 70, 0.22);
-    background: #000; /* in case image has transparency */
+    background: #000;
+    /* in case image has transparency */
 }
 
 .mockup-image {
@@ -427,12 +408,10 @@ onBeforeUnmount(() => {
     left: -40%;
     width: 60%;
     height: 140%;
-    background: linear-gradient(
-        120deg,
-        rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.9) 45%,
-        rgba(255, 255, 255, 0) 100%
-    );
+    background: linear-gradient(120deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.9) 45%,
+            rgba(255, 255, 255, 0) 100%);
     transform: skewX(-20deg);
     mix-blend-mode: screen;
     pointer-events: none;
@@ -447,11 +426,9 @@ onBeforeUnmount(() => {
     left: -10%;
     width: 130%;
     height: 40%;
-    background: linear-gradient(
-            180deg,
+    background: linear-gradient(180deg,
             rgba(255, 255, 255, 0.3),
-            transparent 80%
-        );
+            transparent 80%);
     transform: skewY(-10deg);
     pointer-events: none;
     z-index: 1;
@@ -461,12 +438,10 @@ onBeforeUnmount(() => {
 .mockup-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-            135deg,
+    background: linear-gradient(135deg,
             rgba(0, 51, 171, 0.12),
             transparent 45%,
-            rgba(0, 3, 41, 0.32) 100%
-        );
+            rgba(0, 3, 41, 0.32) 100%);
     mix-blend-mode: screen;
     pointer-events: none;
     z-index: 2;
@@ -499,11 +474,9 @@ onBeforeUnmount(() => {
     width: 16px;
     height: 8px;
     border-radius: 999px;
-    background: linear-gradient(
-            95deg,
+    background: linear-gradient(95deg,
             rgba(0, 3, 41, 1) 0%,
-            rgba(0, 51, 171, 1) 46%
-        );
+            rgba(0, 51, 171, 1) 46%);
 }
 
 /* extra floating accents around mockup */

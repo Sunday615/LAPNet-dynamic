@@ -739,6 +739,8 @@ onBeforeUnmount(() => {
   max-width: 88ch;
   font-size: 15px;
   line-height: 1.7;
+
+  text-align: justify;
   color: rgba(255, 255, 255, 0.72);
 }
 
@@ -824,6 +826,7 @@ onBeforeUnmount(() => {
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.68);
   font-weight: 700;
+ 
 }
 
 .value {

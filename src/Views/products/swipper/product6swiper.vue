@@ -115,9 +115,10 @@ onBeforeUnmount(() => {
 /* Dark blue modern gradient */
 .slideshow-container {
   width: 100%;
-  height: 100%;
+  height: 60vh;
   position: relative;
   overflow: hidden;
+
 
   background:
     radial-gradient(900px 600px at 70% 15%, rgba(96,165,250,.22), transparent 55%),

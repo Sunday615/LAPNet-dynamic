@@ -7,7 +7,7 @@ import tagproduct from '../../components/tagproduct/tagproduct.vue';
 import product1_footerlogomember from '../../components/footer/logomemberfooter/product1_footerlogomember.vue';
 import hero_sectionproduct1 from './product_herosection/hero_sectionproduct1.vue';
 import secondfooter from '../../components/footer/mainfooter/secondfooter.vue';
-import cardbenetfitpd1 from '../../Views/products/benetfit/cardbenetfitpd1.vue'
+import product1tech from '../techbenetfit/product1tech.vue';
 import { onMounted } from 'vue';
 onMounted(() => {
   window.scrollTo({
@@ -108,7 +108,7 @@ const memberLogos = [
       <hero_sectionproduct1/>
   </div>
      <div class="benetfix">
-      <cardbenetfitpd1/>
+      <product1tech/>
      </div>
 <div class="footermemberproduct1">
 
