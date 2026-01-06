@@ -14,35 +14,5 @@
 </template>
 
 <script setup lang="ts">
-import atmmockup from './globe.vue'
-
-const nodes = [
-  { name: "Binance", logo: "/logoallmember/circle_scale/BCEL.png" },
-  { name: "Binance", logo: "/logoallmember/circle_scale/LDB.PNG" },
-  { name: "Binance", logo: "/logoallmember/circle_scale/APBB.PNG" },
-  { name: "Binance", logo: "/logoallmember/circle_scale/JDB.png" },
-  { name: "Binance", logo: "/logoallmember/circle_scale/Maruhan.png" },
-  { name: "Binance", logo: "/logoallmember/circle_scale/lvb.PNG" },
-  { name: "Binance", logo: "/logoallmember/circle_scale/ICBC.png" },
-  { name: "Binance", logo: "/logoallmember/circle_scale/bankofchina.png" },
-  { name: "Binance", logo: "/logoallmember/circle_scale/VTB.png" },
-  { name: "Binance", logo: "/logoallmember/circle_scale/IB.png" },
-  { name: "Binance", logo: "/logoallmember/circle_scale/ACLB.png" },
-  { name: "Binance", logo: "/logoallmember/circle_scale/BIC.png" },
-  { name: "Binance", logo: "/logoallmember/circle_scale/SACOM.PNG" },
-  { name: "Binance", logo: "/logoallmember/circle_scale/STB.png" },
-  { name: "Binance", logo: "/logoallmember/circle_scale/Kasikorn.png" },
-  { name: "Binance", logo: "/logoallmember/circle_scale/PUB.png" },
-  { name: "Binance", logo: "/logoallmember/circle_scale/BFL.png" },
-  { name: "Binance", logo: "/logoallmember/circle_scale/PSVB.png" },
-  { name: "Binance", logo: "/logoallmember/circle_scale/mb.png" },
-  { name: "Binance", logo: "/logoallmember/circle_scale/mmoney.png" },
-  { name: "Binance", logo: "/logoallmember/circle_scale/umoney.png" },
- 
-  
-
-
-];
-
-
+import atmmockup from './globe.vue';
 </script>

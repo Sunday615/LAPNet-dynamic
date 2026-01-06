@@ -80,7 +80,7 @@ const bodyEl = ref(null)
 const actionsEl = ref(null)
 const gridEl = ref(null)
 
-/** ✅ aspect ratio จะถูกอัปเดตจากขนาดจริงของรูป */
+
 const imgAspect = ref("16 / 9")
 
 function onImgLoad(e) {

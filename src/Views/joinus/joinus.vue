@@ -1,103 +1,87 @@
 <template>
   <main_navbar
     title="ຮ່ວມງານກັບເຮົາ"
-    :breadcrumb="[
-      'ໜ້າຫຼັກ',
-      'ຮ່ວມງານກັບເຮົາ',
-    ]"
+    :breadcrumb="['ໜ້າຫຼັກ', 'ຮ່ວມງານກັບເຮົາ']"
     background-image="/aboutus/joinus/navigatorjoinus.png"
   />
+
   <div class="joinus-page">
     <!-- SECTION 1: HERO -->
     <section class="hero-section" ref="heroRef">
       <div class="hero-content">
         <h1 class="hero-title">Join Our Team</h1>
         <p class="hero-text">
-            ພັດທະນາລະບົບການຊໍາລະທຸລະກຳຍ່ອຍໃຫ້ເປັນສູນກາງການຊໍາລະຂອງບັນດາຜູ້ໃຫ້ບໍລິການຊໍາລະ ທັງພາຍໃນ ແລະ ສາກົນ, ແນໃສ່ໃຫ້ປະຊາຊົນລາງໄດ້ໃຊ້ບໍລິການຊໍາລະທີ່ສະດວກວ່ອງໄວ, ທັນສະໄໝ, ປອດໄພ, ຕົ້ນທືນຕໍາ ແລະ ເພື່ອໃຫ້ບໍລິສັດການເປັນໂຄງຮ່າງພື້ນຖານໃຫ້ແກ່ການຊໍາລະໃນ ສປປ ລາວ.
-
-
+          ພັດທະນາລະບົບການຊໍາລະທຸລະກຳຍ່ອຍໃຫ້ເປັນສູນກາງການຊໍາລະຂອງບັນດາຜູ້ໃຫ້ບໍລິການຊໍາລະ ທັງພາຍໃນ ແລະ ສາກົນ, ແນໃສ່ໃຫ້ປະຊາຊົນລາງໄດ້ໃຊ້ບໍລິການຊໍາລະທີ່ສະດວກວ່ອງໄວ,
+          ທັນສະໄໝ, ປອດໄພ, ຕົ້ນທືນຕໍາ ແລະ ເພື່ອໃຫ້ບໍລິສັດການເປັນໂຄງຮ່າງພື້ນຖານໃຫ້ແກ່ການຊໍາລະໃນ ສປປ ລາວ.
         </p>
         <router-link to="/contactus">
-        <button class="hero-button">
-          ຕິດຕໍ່ພວກເຮົາ
-        </button>
+          <button class="hero-button">ຕິດຕໍ່ພວກເຮົາ</button>
         </router-link>
       </div>
 
       <div class="hero-image-wrapper">
-        <img
-          class="hero-image"
-          src="/aboutus/joinus/interview.png"
-          alt="Team working together"
-        />
+        <img class="hero-image" src="/aboutus/joinus/interview.png" alt="Team working together" />
       </div>
     </section>
 
     <!-- SECTION 2: SWIPER (ACTIVITIES) -->
-  <!-- SECTION 2: SWIPER (ACTIVITIES) -->
-<section class="swiper-section" ref="swiperRef">
-  <div class="section-header swiper-header">
-    <div>
-      <h2>Life at LAPNet</h2>
-      <p>ກິດຈະກຳຕ່າງໆຂອງບໍລິສັດ LAPNet
-      </p>
-    </div>
-    <div class="swiper-meta">
-    
-    </div>
-  </div>
-
-  <Swiper
-    class="activities-swiper"
-    :modules="swiperModules"
-    :slides-per-view="1"
-    :space-between="32"
-    :loop="true"
-    :speed="800"
-    :autoplay="{
-      delay: 2600,
-      disableOnInteraction: false
-    }"
-    :breakpoints="{
-      768: { slidesPerView: 2 },
-      1024: { slidesPerView: 3 }
-    }"
-  
-  >
-    <SwiperSlide
-      v-for="(item, index) in activities"
-      :key="index"
-      class="activity-card"
-    >
-      <div class="activity-image-wrapper">
-        <img
-          :src="item.image"
-          :alt="item.title"
-          class="activity-image"
-        />
-
-        <div class="activity-chip">
-          <span class="activity-index">
-            {{ String(index + 1).padStart(2, '0') }}
-          </span>
-          <span class="activity-chip-text">Activity</span>
+    <section class="swiper-section" ref="swiperRef">
+      <div class="section-header swiper-header">
+        <div>
+          <h2>Life at LAPNet</h2>
+          <p>ກິດຈະກຳຕ່າງໆຂອງບໍລິສັດ LAPNet</p>
         </div>
+        <div class="swiper-meta"></div>
       </div>
 
-      <div class="activity-info">
-        <h3 class="activity-title">{{ item.title }}</h3>
-        <p class="activity-subtitle">{{ item.subtitle }}</p>
-      </div>
-    </SwiperSlide>
-  </Swiper>
-</section>
+      <Swiper
+        class="activities-swiper"
+        :modules="swiperModules"
+        :slides-per-view="1"
+        :space-between="32"
+        :loop="true"
+        :speed="800"
+        :autoplay="{ delay: 2600, disableOnInteraction: false }"
+        :breakpoints="{
+          768: { slidesPerView: 2 },
+          1024: { slidesPerView: 3 }
+        }"
+      >
+        <SwiperSlide v-for="(item, index) in activities" :key="index" class="activity-card">
+          <div class="activity-image-wrapper">
+            <img :src="item.image" :alt="item.title" class="activity-image" />
 
+            <div class="activity-chip">
+              <span class="activity-index">{{ String(index + 1).padStart(2, '0') }}</span>
+              <span class="activity-chip-text">Activity</span>
+            </div>
+          </div>
+
+          <div class="activity-info">
+            <h3 class="activity-title">{{ item.title }}</h3>
+            <p class="activity-subtitle">{{ item.subtitle }}</p>
+          </div>
+        </SwiperSlide>
+      </Swiper>
+    </section>
 
     <!-- SECTION 3: FILTERS + DROPDOWNS WITH GSAP -->
     <section class="filters-section" ref="filterRef">
       <div class="section-header">
         <h2>Position</h2>
         <p>LAPNet ຕ້ອງການເພື່ອນຮ່ວມງານ</p>
+      </div>
+
+      <!-- ✅ Loading / Error from API -->
+      <div v-if="jobsLoading" class="not-found" style="margin-top: 0; margin-bottom: 18px;">
+        <p>Loading jobs...</p>
+      </div>
+
+      <div v-else-if="jobsError" class="not-found" style="margin-top: 0; margin-bottom: 18px;">
+        <p>{{ jobsError }}</p>
+        <button class="hero-button" style="padding: 0.7rem 1.2rem; font-size: 0.95rem;" @click="fetchJobs">
+          Retry
+        </button>
       </div>
 
       <div class="filters-grid">
@@ -108,11 +92,7 @@
             <span class="chevron" :class="{ open: isPositionOpen }">⌄</span>
           </button>
 
-          <div
-            v-if="isPositionOpen"
-            class="dropdown-menu"
-            ref="positionMenuRef"
-          >
+          <div v-if="isPositionOpen" class="dropdown-menu" ref="positionMenuRef">
             <button
               class="dropdown-item"
               v-for="(item, index) in positions"
@@ -124,18 +104,14 @@
           </div>
         </div>
 
-        <!-- BOX 2: All Department -->
+        <!-- BOX 2: All departments -->
         <div class="dropdown" @click.stop="toggleDropdown('department')">
           <button class="dropdown-trigger">
             <span>{{ selectedDepartment }}</span>
             <span class="chevron" :class="{ open: isDepartmentOpen }">⌄</span>
           </button>
 
-          <div
-            v-if="isDepartmentOpen"
-            class="dropdown-menu"
-            ref="departmentMenuRef"
-          >
+          <div v-if="isDepartmentOpen" class="dropdown-menu" ref="departmentMenuRef">
             <button
               class="dropdown-item"
               v-for="(item, index) in departments"
@@ -154,11 +130,7 @@
             <span class="chevron" :class="{ open: isLevelOpen }">⌄</span>
           </button>
 
-          <div
-            v-if="isLevelOpen"
-            class="dropdown-menu"
-            ref="levelMenuRef"
-          >
+          <div v-if="isLevelOpen" class="dropdown-menu" ref="levelMenuRef">
             <button
               class="dropdown-item"
               v-for="(item, index) in levels"
@@ -171,69 +143,58 @@
         </div>
       </div>
 
-      <!-- JOB POSTS DROPDOWN LIST (LIKE YOUR IMAGE) -->
+      <!-- JOB POSTS DROPDOWN LIST -->
       <div class="jobs-list">
-        <div
-          v-for="job in jobs"
-          :key="job.id"
-          class="job-card"
-        >
+        <div v-for="job in filteredJobs" :key="job.id" class="job-card">
           <button class="job-header" @click="toggleJob(job.id)">
             <h3 class="job-title">{{ job.title }}</h3>
             <span class="job-chevron" :class="{ open: openJobId === job.id }">⌄</span>
           </button>
 
           <transition name="job-collapse">
-            <div
-              v-if="openJobId === job.id"
-              class="job-body"
-            >
+            <div v-if="openJobId === job.id" class="job-body">
               <ul class="job-detail-list">
-                <li
-                  v-for="(item, idx) in job.details"
-                  :key="idx"
-                >
+                <li v-for="(item, idx) in job.details" :key="idx">
                   {{ item }}
                 </li>
               </ul>
 
-              <p class="job-date">
-                ໂພສເມື່ອ {{ job.postedAt }}
-              </p>
+              <!-- ✅ dd/mm/yy -->
+              <p class="job-date">ໂພສເມື່ອ {{ job.postedAt }}</p>
 
-              <button class="job-apply-btn">
-                Apply Now
-              </button>
+              <router-link to="/contactus">
+                <button class="job-apply-btn">Apply Now</button>
+              </router-link>
             </div>
           </transition>
         </div>
+
+     
       </div>
     </section>
 
-    <div class="boxmargin" style="width: 100%; height:15vh"></div>
+    <div class="boxmargin" style="width: 100%; height: 15vh"></div>
   </div>
-  <secondfooter/>
+
+  <secondfooter />
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, nextTick, onBeforeUnmount } from 'vue';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Autoplay, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import gsap from 'gsap';
-import main_navbar from '../../components/miannavbar/main_navbar.vue';
 
+import main_navbar from '../../components/miannavbar/main_navbar.vue';
 import secondfooter from '../../components/footer/mainfooter/secondfooter.vue';
+
 const swiperModules = [Autoplay, Pagination];
 
-onMounted(() => {
-  window.scrollTo({
-    top: 0,
-    left: 0,
-    behavior: 'smooth'
-  });
-});
+// ✅ API
+
+const JOBS_API = 'http://localhost:3000/api/jobs-list';
 
 // SECTION REFS FOR GSAP
 const heroRef = ref(null);
@@ -247,47 +208,28 @@ const levelMenuRef = ref(null);
 
 // SWIPER CONTENT (6 ACTIVITIES)
 const activities = [
-  {
-    title: 'ງານລ້ຽງ',
-    subtitle: 'ງານລ້ຽງປີໃໝ່ລາວປີ 2025 ຂອງບໍລິສັດ LAPNet.',
-    image:'/aboutus/joinus/joinusswiper/swiper1.jpeg'
-  },
-  {
-    title: 'ທ່ອງທ່ຽວ',
-    subtitle: 'LAPNet ທ່ອງທ່ຽວທີ່ນະຄອນຫຼວງພະບາງປະຈຳປີ 2025.',
-    image: '/aboutus/joinus/joinusswiper/swiper2.jpeg'
-  },
-  {
-    title: 'ທ່ອງທ່ຽວ',
-    subtitle: 'LAPNet ທ່ອງທ່ຽວທີ່ນະຄອນຫຼວງພະບາງປະຈຳປີ 2025.',
-    image:'/aboutus/joinus/joinusswiper/swiper3.jpeg'
-  },
-  {
-    title: 'ທ່ອງທ່ຽວ',
-    subtitle: 'LAPNet ທ່ອງທ່ຽວທີ່ນະຄອນຫຼວງພະບາງປະຈຳປີ 2025.',
-    image: '/aboutus/joinus/joinusswiper/swiper4.jpeg'
-  },
-  {
-    title: 'ທ່ອງທ່ຽວ',
-    subtitle: 'LAPNet ທ່ອງທ່ຽວທີ່ນະຄອນຫຼວງພະບາງປະຈຳປີ 2025.',
-    image: '/aboutus/joinus/joinusswiper/swiper5.jpeg'
-  },
-  {
-    title: 'ທ່ອງທ່ຽວ',
-    subtitle: 'LAPNet ທ່ອງທ່ຽວທີ່ວັງວຽງປະຈຳປີ 2023.',
-    image:'/aboutus/joinus/joinusswiper/swiper6.jpeg'
-  }
+  { title: 'ງານລ້ຽງ', subtitle: 'ງານລ້ຽງປີໃໝ່ລາວປີ 2025 ຂອງບໍລິສັດ LAPNet.', image: '/aboutus/joinus/joinusswiper/swiper1.jpeg' },
+  { title: 'ທ່ອງທ່ຽວ', subtitle: 'LAPNet ທ່ອງທ່ຽວທີ່ນະຄອນຫຼວງພະບາງປະຈຳປີ 2025.', image: '/aboutus/joinus/joinusswiper/swiper2.jpeg' },
+  { title: 'ທ່ອງທ່ຽວ', subtitle: 'LAPNet ທ່ອງທ່ຽວທີ່ນະຄອນຫຼວງພະບາງປະຈຳປີ 2025.', image: '/aboutus/joinus/joinusswiper/swiper3.jpeg' },
+  { title: 'ທ່ອງທ່ຽວ', subtitle: 'LAPNet ທ່ອງທ່ຽວທີ່ນະຄອນຫຼວງພະບາງປະຈຳປີ 2025.', image: '/aboutus/joinus/joinusswiper/swiper4.jpeg' },
+  { title: 'ທ່ອງທ່ຽວ', subtitle: 'LAPNet ທ່ອງທ່ຽວທີ່ນະຄອນຫຼວງພະບາງປະຈຳປີ 2025.', image: '/aboutus/joinus/joinusswiper/swiper5.jpeg' },
+  { title: 'ທ່ອງທ່ຽວ', subtitle: 'LAPNet ທ່ອງທ່ຽວທີ່ວັງວຽງປະຈຳປີ 2023.', image: '/aboutus/joinus/joinusswiper/swiper6.jpeg' }
 ];
 
+// ✅ Filter labels (ตามที่คุณขอ)
+const ALL_POSITION = 'All Position';
+const ALL_DEPARTMENT = 'All departments';
+const ALL_LEVEL = 'Levels';
 
-// DROPDOWN STATE (FILTERS)
-const positions = ['All Position', 'Frontend Developer', 'Backend Developer', 'UI/UX Designer'];
-const departments = ['All Department', 'Administration', 'Accounting & Finance', 'IT', 'Operation' , 'Internal Audit'];
-const levels = ['Levels', 'Intern', 'Junior', 'Mid', 'Senior', 'Lead'];
+// ✅ Jobs from API
+const jobsLoading = ref(false);
+const jobsError = ref(null);
+const jobs = ref([]);
 
-const selectedPosition = ref('All Position');
-const selectedDepartment = ref('All Department');
-const selectedLevel = ref('Levels');
+// ✅ Dropdown State (Filters)
+const selectedPosition = ref(ALL_POSITION);
+const selectedDepartment = ref(ALL_DEPARTMENT);
+const selectedLevel = ref(ALL_LEVEL);
 
 const isPositionOpen = ref(false);
 const isDepartmentOpen = ref(false);
@@ -303,11 +245,7 @@ const animateMenuOpen = (menuRef) => {
   nextTick(() => {
     const el = menuRef.value;
     if (!el) return;
-    gsap.fromTo(
-      el,
-      { opacity: 0, y: -10 },
-      { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out' }
-    );
+    gsap.fromTo(el, { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out' });
   });
 };
 
@@ -345,82 +283,159 @@ const selectLevel = (value) => {
   isLevelOpen.value = false;
 };
 
-// JOB POSTS (FOR BOX 3 ACCORDION)
-const jobs = ref([
-  {
-    id: 1,
-    title: 'IT Front-End Developer',
-    postedAt: '29/05/2025',
-    details: [
-      'Developer/Software Engineer (Front-end / Back-end / FullStack)',
-      'Application Support',
-      'Quality Assurance (Tester)',
-      'Database',
-      'IT Governance & Security',
-      'Risk Management',
-      'IT Compliance',
-      'Finance & Accounting',
-      'Business Development'
-    ]
-  },
-   {
-    id: 2,
-    title: 'IT Front-End Developer',
-    postedAt: '29/05/2025',
-    details: [
-      'Developer/Software Engineer (Front-end / Back-end / FullStack)',
-      'Application Support',
-      'Quality Assurance (Tester)',
-      'Database',
-      'IT Governance & Security',
-      'Risk Management',
-      'IT Compliance',
-      'Finance & Accounting',
-      'Business Development'
-    ]
-  },
-  // you can add more jobs here
-  // {
-  //   id: 2,
-  //   title: 'IT Back-End Developer',
-  //   postedAt: '10/06/2025',
-  //   details: [...]
-  // }
-]);
+// ✅ helpers
+const unique = (arr) => Array.from(new Set(arr.filter(Boolean)));
 
+const pad2 = (n) => String(n).padStart(2, '0');
+
+// ✅ dd/mm/yy only
+const formatDDMMYY = (input) => {
+  if (input == null) return '';
+
+  const s = String(input).trim();
+  if (!s) return '';
+
+  // already dd/mm/yyyy OR dd-mm-yy
+  const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+  if (m) {
+    const dd = pad2(m[1]);
+    const mm = pad2(m[2]);
+    const yy = String(m[3]).slice(-2);
+    return `${dd}/${mm}/${yy}`;
+  }
+
+  // try timestamp number (ms / sec)
+  const num = Number(s);
+  let d = null;
+
+  if (Number.isFinite(num) && s.length >= 10) {
+    // if seconds (10 digits) convert to ms
+    d = new Date(s.length === 10 ? num * 1000 : num);
+  } else {
+    d = new Date(s); // ISO string etc.
+  }
+
+  if (Number.isNaN(d.getTime())) return s;
+
+  const dd = pad2(d.getDate());
+  const mm = pad2(d.getMonth() + 1);
+  const yy = String(d.getFullYear()).slice(-2);
+  return `${dd}/${mm}/${yy}`;
+};
+
+// ✅ Build filter lists from API (positions / departments / levels)
+const positions = computed(() => {
+  const list = unique(jobs.value.map((j) => j.position));
+  return [ALL_POSITION, ...list];
+});
+
+const departments = computed(() => {
+  const list = unique(jobs.value.map((j) => j.department));
+  return [ALL_DEPARTMENT, ...list];
+});
+
+const levels = computed(() => {
+  const list = unique(jobs.value.map((j) => j.level));
+  return [ALL_LEVEL, ...list];
+});
+
+// ✅ Filtered Jobs (active=1 เท่านั้น) + filter by dropdown
+const filteredJobs = computed(() => {
+  return jobs.value
+    .filter((j) => Number(j.active) === 1) // ✅ active = 1 show, active = 0 hide
+    .filter((j) => (selectedPosition.value === ALL_POSITION ? true : j.position === selectedPosition.value))
+    .filter((j) => (selectedDepartment.value === ALL_DEPARTMENT ? true : j.department === selectedDepartment.value))
+    .filter((j) => (selectedLevel.value === ALL_LEVEL ? true : j.level === selectedLevel.value));
+});
+
+// ✅ Accordion
 const openJobId = ref(null);
-
 const toggleJob = (id) => {
   openJobId.value = openJobId.value === id ? null : id;
 };
 
-// GSAP PAGE LOAD ANIMATIONS
+// ✅ Normalize from API structure:
+// title -> title
+// features.items -> details
+// time -> postedAt (dd/mm/yy)
+// + department/level/position (ถ้าไม่มีจะใส่ '-' / ใช้ title แทน position)
+const normalizeJob = (item) => {
+  const id = item?.id ?? item?.job_id ?? item?._id ?? `${Math.random()}`;
+
+  const title = String(item?.title ?? '-').trim();
+
+  const detailsRaw = item?.features?.items ?? item?.features_items ?? item?.details ?? [];
+  const details = Array.isArray(detailsRaw)
+    ? detailsRaw.map((x) => String(x).trim()).filter(Boolean)
+    : typeof detailsRaw === 'string'
+      ? detailsRaw.split('\n').map((x) => x.trim()).filter(Boolean)
+      : [];
+
+  // ✅ force dd/mm/yy
+  const postedAt = formatDDMMYY(item?.time ?? item?.postedAt ?? item?.posted_at ?? '');
+
+  // filters (try common field names)
+  const department = String(item?.department ?? item?.dept ?? item?.departments ?? '-').trim() || '-';
+  const level = String(item?.level ?? item?.levels ?? '-').trim() || '-';
+
+  // Position: ถ้า API ไม่มี position ใช้ title แทน
+  const position = String(item?.position ?? item?.job_position ?? title).trim() || title;
+
+  const active = item?.active ?? 1;
+
+  return { id, title, details, postedAt, department, level, position, active };
+};
+
+// ✅ Fetch jobs list
+const fetchJobs = async () => {
+  jobsLoading.value = true;
+  jobsError.value = null;
+
+  try {
+    const res = await fetch(JOBS_API);
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+
+    const json = await res.json();
+
+    // support: [ ... ] OR { data: [ ... ] } OR { jobs: [ ... ] } OR { result: [ ... ] }
+    const list =
+      Array.isArray(json) ? json :
+      Array.isArray(json?.data) ? json.data :
+      Array.isArray(json?.jobs) ? json.jobs :
+      Array.isArray(json?.result) ? json.result :
+      [];
+
+    jobs.value = list.map(normalizeJob).filter(Boolean);
+
+    // reset accordion if current open job disappeared
+    if (openJobId.value != null && !jobs.value.some((j) => j.id === openJobId.value)) {
+      openJobId.value = null;
+    }
+  } catch (e) {
+    const msg = e?.message || 'Failed to load jobs.';
+    jobsError.value =
+      msg.includes('Failed to fetch') || msg.includes('NetworkError')
+        ? 'Failed to fetch jobs.'
+        : msg;
+    jobs.value = [];
+  } finally {
+    jobsLoading.value = false;
+  }
+};
+
+// ✅ Page load animations + events
 onMounted(() => {
-  gsap.from(heroRef.value, {
-    opacity: 0,
-    y: 40,
-    duration: 1,
-    ease: 'power3.out'
-  });
+  window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
 
-  gsap.from(swiperRef.value, {
-    opacity: 0,
-    y: 40,
-    duration: 1,
-    delay: 0.2,
-    ease: 'power3.out'
-  });
+  // gsap intro
+  gsap.from(heroRef.value, { opacity: 0, y: 40, duration: 1, ease: 'power3.out' });
+  gsap.from(swiperRef.value, { opacity: 0, y: 40, duration: 1, delay: 0.2, ease: 'power3.out' });
+  gsap.from(filterRef.value, { opacity: 0, y: 40, duration: 1, delay: 0.4, ease: 'power3.out' });
 
-  gsap.from(filterRef.value, {
-    opacity: 0,
-    y: 40,
-    duration: 1,
-    delay: 0.4,
-    ease: 'power3.out'
-  });
-
-  // Click outside to close filter dropdowns
   window.addEventListener('click', closeAllDropdowns);
+
+  // ✅ fetch API data
+  fetchJobs();
 });
 
 onBeforeUnmount(() => {
@@ -447,11 +462,7 @@ onBeforeUnmount(() => {
   gap: 2.75rem;
   padding: 3.8rem 3.1rem;
   border-radius: 28px;
-  background: linear-gradient(
-    95deg,
-    rgba(0, 3, 41, 1) 0%,
-    rgba(0, 51, 171, 1) 46%
-  );
+  background: linear-gradient(95deg, rgba(0, 3, 41, 1) 0%, rgba(0, 51, 171, 1) 46%);
   color: #ffffff;
   box-shadow: 0 30px 90px rgba(0, 0, 0, 0.4);
 }
@@ -513,9 +524,8 @@ onBeforeUnmount(() => {
 
 /* COMMON SECTION HEADER */
 .section-header {
-    font-family: "Inter";
+  font-family: "Inter";
   margin-bottom: 1.9rem;
-  
 }
 
 .section-header h2 {
@@ -523,7 +533,7 @@ onBeforeUnmount(() => {
   font-weight: 650;
   margin-bottom: 0.4rem;
   color: #05081b;
-    font-family: "Inter";
+  font-family: "Inter";
 }
 
 .section-header p {
@@ -615,8 +625,7 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   font-size: 0.95rem;
   cursor: pointer;
-  transition: box-shadow 0.16s ease, transform 0.16s ease, border-color 0.16s ease,
-    background 0.16s ease;
+  transition: box-shadow 0.16s ease, transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
 }
 
 .dropdown-trigger:hover {
@@ -668,9 +677,8 @@ onBeforeUnmount(() => {
 }
 
 /* JOB LIST (ACCORDION) */
-
 .jobs-list {
-  display: none;
+  display: flex;
   flex-direction: column;
   gap: 1.2rem;
 }
@@ -754,6 +762,16 @@ onBeforeUnmount(() => {
 .job-collapse-leave-to {
   opacity: 0;
   transform: translateY(-4px);
+}
+
+/* simple "not-found" card reused */
+.not-found {
+  max-width: 520px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #f9fafb;
+  border: 1px dashed rgba(148, 163, 184, 0.8);
+  color: #4b5563;
 }
 
 /* RESPONSIVE */

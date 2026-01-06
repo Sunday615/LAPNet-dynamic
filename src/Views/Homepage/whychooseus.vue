@@ -21,8 +21,15 @@
 
       <div class="stats">
         <!-- Box 1 -->
-        <article ref="card1" class="card cardClickable" role="button" tabindex="0" @click="openOverlay('banks')"
-          @keydown.enter.prevent="openOverlay('banks')" @keydown.space.prevent="openOverlay('banks')">
+        <article
+          ref="card1"
+          class="card cardClickable"
+          role="button"
+          tabindex="0"
+          @click="openOverlay('banks')"
+          @keydown.enter.prevent="openOverlay('banks')"
+          @keydown.space.prevent="openOverlay('banks')"
+        >
           <div class="cardTop">
             <div class="iconOrb" aria-hidden="true">
               <i class="fa-solid fa-building-columns"></i>
@@ -32,7 +39,7 @@
               <div class="label">{{ stat1Label }}</div>
               <div class="value">
                 <span ref="count1El" class="count">0</span>
-                <span class="suffix"></span>
+                <span class="suffix">{{ stat1Suffix }}</span>
               </div>
             </div>
           </div>
@@ -46,9 +53,15 @@
         </article>
 
         <!-- Box 2 -->
-        <article ref="card2" class="card cardAccent cardClickable" role="button" tabindex="0"
-          @click="openOverlay('right')" @keydown.enter.prevent="openOverlay('right')"
-          @keydown.space.prevent="openOverlay('right')">
+        <article
+          ref="card2"
+          class="card cardAccent cardClickable"
+          role="button"
+          tabindex="0"
+          @click="openOverlay('right')"
+          @keydown.enter.prevent="openOverlay('right')"
+          @keydown.space.prevent="openOverlay('right')"
+        >
           <div class="cardTop">
             <div class="iconOrb" aria-hidden="true">
               <i class="fa-solid fa-wallet"></i>
@@ -87,7 +100,7 @@
               </h3>
 
               <p class="overlayDesc">
-                19 ທະນາຄານສະມາຊິກ ແລະ 2 Fintech
+                {{ banksCount }} ທະນາຄານສະມາຊິກ ແລະ {{ fintechCount }} Fintech
               </p>
             </div>
 
@@ -118,10 +131,20 @@
                 <div class="panelTools">
                   <div class="searchWrap" role="search">
                     <span class="searchIcon" aria-hidden="true">🔍</span>
-                    <input v-model="searchText" class="searchInput" type="text" placeholder="Search Commercial Bank..."
-                      autocomplete="off" />
-                    <button v-if="searchText" class="searchClear" type="button" @click="searchText = ''"
-                      aria-label="Clear search">
+                    <input
+                      v-model="searchText"
+                      class="searchInput"
+                      type="text"
+                      placeholder="Search Commercial Bank..."
+                      autocomplete="off"
+                    />
+                    <button
+                      v-if="searchText"
+                      class="searchClear"
+                      type="button"
+                      @click="searchText = ''"
+                      aria-label="Clear search"
+                    >
                       ✕
                     </button>
                   </div>
@@ -129,40 +152,65 @@
               </div>
 
               <div class="memberGrid" ref="memberGridEl" :key="'banks' + searchText">
-                <article v-for="(m, i) in filteredMembers" :key="'bank' + i" class="memberCard"
-                  @mouseenter="onMemberEnter" @mouseleave="onMemberLeave">
-                  <div class="memberTop">
-                    <div class="logoWrap">
-                      <img v-if="m.logo" class="logoImg" :src="m.logo" :alt="m.name" loading="lazy" />
-                      <div v-else class="logoFallback" aria-hidden="true">
-                        {{ initials(m.name) }}
+                <!-- ✅ Loading / Error states for API -->
+                <div v-if="banksLoading" class="emptyState">Loading...</div>
+                <div v-else-if="banksError" class="emptyState">{{ banksError }}</div>
+
+                <template v-else>
+                  <article
+                    v-for="(m, i) in filteredMembers"
+                    :key="'bank' + i"
+                    class="memberCard"
+                    @mouseenter="onMemberEnter"
+                    @mouseleave="onMemberLeave"
+                  >
+                    <div class="memberTop">
+                      <div class="logoWrap">
+                        <img v-if="m.logo" class="logoImg" :src="m.logo" :alt="m.name" loading="lazy" />
+                        <div v-else class="logoFallback" aria-hidden="true">
+                          {{ initials(m.name) }}
+                        </div>
+                      </div>
+
+                      <!-- ✅ Hover actions -->
+                      <div class="memberActions" aria-hidden="true">
+                        <a
+                          v-if="m.facebookUrl"
+                          class="actBtn actFb"
+                          :href="m.facebookUrl"
+                          target="_blank"
+                          rel="noopener"
+                          title="Facebook"
+                          aria-label="Open Facebook"
+                        >
+                          <i class="fa-brands fa-facebook-f"></i>
+                        </a>
+
+                        <a
+                          v-if="m.websiteUrl"
+                          class="actBtn actWeb"
+                          :href="m.websiteUrl"
+                          target="_blank"
+                          rel="noopener"
+                          title="Website"
+                          aria-label="Open Website"
+                        >
+                          <i class="fa-solid fa-globe"></i>
+                        </a>
                       </div>
                     </div>
 
-                    <!-- ✅ Hover actions -->
-                    <div class="memberActions" aria-hidden="true">
-                      <a v-if="m.facebookUrl" class="actBtn actFb" :href="m.facebookUrl" target="_blank" rel="noopener"
-                        title="Facebook" aria-label="Open Facebook">
-                        <i class="fa-brands fa-facebook-f"></i>
-                      </a>
+                    <div class="memberName">{{ m.name }}</div>
+                  </article>
 
-                      <a v-if="m.websiteUrl" class="actBtn actWeb" :href="m.websiteUrl" target="_blank" rel="noopener"
-                        title="Website" aria-label="Open Website">
-                        <i class="fa-solid fa-globe"></i>
-                      </a>
-                    </div>
+                  <div v-if="!filteredMembers.length" class="emptyState">
+                    ບໍ່ພົບຜົນການຄົ້ນຫາ
                   </div>
-
-                  <div class="memberName">{{ m.name }}</div>
-                </article>
-
-                <div v-if="!filteredMembers.length" class="emptyState">
-                  ບໍ່ພົບຜົນການຄົ້ນຫາ
-                </div>
+                </template>
               </div>
             </section>
 
-            <!-- FINTECH -->
+            <!-- FINTECH (memberRight from API) -->
             <section v-else class="panel panelActive">
               <div class="panelTop">
                 <div class="panelLeft">
@@ -183,10 +231,20 @@
                 <div class="panelTools">
                   <div class="searchWrap" role="search">
                     <span class="searchIcon" aria-hidden="true">🔍</span>
-                    <input v-model="searchText" class="searchInput" type="text" placeholder="Search Fintech..."
-                      autocomplete="off" />
-                    <button v-if="searchText" class="searchClear" type="button" @click="searchText = ''"
-                      aria-label="Clear search">
+                    <input
+                      v-model="searchText"
+                      class="searchInput"
+                      type="text"
+                      placeholder="Search Fintech..."
+                      autocomplete="off"
+                    />
+                    <button
+                      v-if="searchText"
+                      class="searchClear"
+                      type="button"
+                      @click="searchText = ''"
+                      aria-label="Clear search"
+                    >
                       ✕
                     </button>
                   </div>
@@ -194,36 +252,61 @@
               </div>
 
               <div class="memberGrid" ref="memberGridEl" :key="'right' + searchText">
-                <article v-for="(m, i) in filteredMembers" :key="'right' + i" class="memberCard"
-                  @mouseenter="onMemberEnter" @mouseleave="onMemberLeave">
-                  <div class="memberTop">
-                    <div class="logoWrap">
-                      <img v-if="m.logo" class="logoImg" :src="m.logo" :alt="m.name" loading="lazy" />
-                      <div v-else class="logoFallback" aria-hidden="true">
-                        {{ initials(m.name) }}
+                <!-- ✅ Loading / Error states for API -->
+                <div v-if="fintechLoading" class="emptyState">Loading...</div>
+                <div v-else-if="fintechError" class="emptyState">{{ fintechError }}</div>
+
+                <template v-else>
+                  <article
+                    v-for="(m, i) in filteredMembers"
+                    :key="'right' + i"
+                    class="memberCard"
+                    @mouseenter="onMemberEnter"
+                    @mouseleave="onMemberLeave"
+                  >
+                    <div class="memberTop">
+                      <div class="logoWrap">
+                        <img v-if="m.logo" class="logoImg" :src="m.logo" :alt="m.name" loading="lazy" />
+                        <div v-else class="logoFallback" aria-hidden="true">
+                          {{ initials(m.name) }}
+                        </div>
+                      </div>
+
+                      <!-- ✅ Hover actions -->
+                      <div class="memberActions" aria-hidden="true">
+                        <a
+                          v-if="m.facebookUrl"
+                          class="actBtn actFb"
+                          :href="m.facebookUrl"
+                          target="_blank"
+                          rel="noopener"
+                          title="Facebook"
+                          aria-label="Open Facebook"
+                        >
+                          <i class="fa-brands fa-facebook-f"></i>
+                        </a>
+
+                        <a
+                          v-if="m.websiteUrl"
+                          class="actBtn actWeb"
+                          :href="m.websiteUrl"
+                          target="_blank"
+                          rel="noopener"
+                          title="Website"
+                          aria-label="Open Website"
+                        >
+                          <i class="fa-solid fa-globe"></i>
+                        </a>
                       </div>
                     </div>
 
-                    <!-- ✅ Hover actions -->
-                    <div class="memberActions" aria-hidden="true">
-                      <a v-if="m.facebookUrl" class="actBtn actFb" :href="m.facebookUrl" target="_blank" rel="noopener"
-                        title="Facebook" aria-label="Open Facebook">
-                        <i class="fa-brands fa-facebook-f"></i>
-                      </a>
+                    <div class="memberName">{{ m.name }}</div>
+                  </article>
 
-                      <a v-if="m.websiteUrl" class="actBtn actWeb" :href="m.websiteUrl" target="_blank" rel="noopener"
-                        title="Website" aria-label="Open Website">
-                        <i class="fa-solid fa-globe"></i>
-                      </a>
-                    </div>
+                  <div v-if="!filteredMembers.length" class="emptyState">
+                    ບໍ່ພົບຜົນການຄົ້ນຫາ
                   </div>
-
-                  <div class="memberName">{{ m.name }}</div>
-                </article>
-
-                <div v-if="!filteredMembers.length" class="emptyState">
-                  ບໍ່ພົບຜົນການຄົ້ນຫາ
-                </div>
+                </template>
               </div>
             </section>
           </div>
@@ -247,18 +330,29 @@ import { ref, onMounted, onBeforeUnmount, watch, nextTick, computed } from "vue"
 import { gsap } from "gsap";
 
 type OverlayType = "banks" | "right";
+
 type Member = {
+  id?: number; // for ordering / future key usage
   name: string;
   logo?: string;
   facebookUrl?: string;
   websiteUrl?: string;
 };
 
+type ApiMember = {
+  idmember: number | string;
+  BanknameLA?: string;
+  BanknameEN?: string; // ✅ used for memberRight
+  LinkFB?: string | null;
+  LinkWeb?: string | null;
+  image_url?: string | null;
+};
+
 type Props = {
   title?: string;
   description?: string;
 
-  stat1Value?: number;
+  stat1Value?: number; // fallback if API not ready
   stat1Label?: string;
   stat1Suffix?: string;
   stat1Sub?: string;
@@ -267,9 +361,6 @@ type Props = {
   stat2Label?: string;
   stat2Suffix?: string;
   stat2Sub?: string;
-
-  memberBanks?: Member[];
-  memberRight?: Member[];
 };
 
 const props = withDefaults(defineProps<Props>(), {
@@ -280,138 +371,122 @@ const props = withDefaults(defineProps<Props>(), {
   stat1Value: 19,
   stat1Label: "Commercial Bank",
   stat1Suffix: "+",
-  stat1Sub: "19 ທະນາຄານສະມາຊິກທີ່ເຂົ້າຮ່ວມກັບ Lao National Payment Network CO., LTD",
+  stat1Sub: "ທະນາຄານສະມາຊິກທີ່ເຂົ້າຮ່ວມກັບ Lao National Payment Network CO., LTD",
 
   stat2Value: 2,
   stat2Label: "Members",
   stat2Suffix: "+",
-  stat2Sub: "2 ສະມາຊິກທີ່ເຂົ້າຮ່ວມກັບ Lao National Payment Network CO., LTD",
-
-  memberBanks: () => [
-    {
-      name: "ທະນາຄານ ການຄ້າຕ່າງປະເທດລາວ ມະຫາຊົນ (BCEL)",
-      logo: "/logoallmember/circle_scale/BCEL.png",
-      facebookUrl: "https://www.facebook.com/BCEL.Bank",
-      websiteUrl: "https://www.bcel.com.la",
-    },
-
-    {
-      name: "ທະນາຄານ ສົ່ງເສີມກະສິກຳ ຈຳກັດ (APB) ",
-      logo: "/logoallmember/circle_scale/APBB.PNG",
-      facebookUrl: "https://www.facebook.com/APB.Bank/?locale=th_TH",
-      websiteUrl: "https://www.apb.com.la",
-    },
-        {
-      name: "ທະນາຄານ ພັດທະນາລາວ ຈຳກັດ (LDB)",
-      logo: "/logoallmember/circle_scale/LDB.PNG",
-      facebookUrl: "https://www.facebook.com/ldblao",
-      websiteUrl: "https://www.ldblao.la/",
-    },
-    {
-      name: "ທະນາຄານ ຮ່ວມທຸລະກິດລາວ-ຫວຽດ (LVB)  ",
-      logo: "/logoallmember/circle_scale/lvb.PNG",
-      facebookUrl: "https://www.facebook.com/LaoVietBank",
-      websiteUrl: "https://www.laovietbank.com.la/la/",
-    },
-    {
-      name: "ທະນາຄານ ຮ່ວມພັດທະນາ ມະຫາຊົນ (JDB)",
-      logo: "/logoallmember/circle_scale/JDB.png",
-      facebookUrl: "https://www.facebook.com/jdbbanklaos",
-      websiteUrl: "https://www.jdbbank.com.la/",
-    },
-    {
-      name: "ທະນາຄານ ເອັສທີ ຈຳກັດ (STB) ",
-      logo: "/logoallmember/circle_scale/STB.png",
-      facebookUrl: "https://www.facebook.com/STBankLaos",
-      websiteUrl: "https://www.stbanklaos.la",
-
-
-    },
-    {
-      name: "ທະນາຄານ ບີໄອຊີ ລາວ ຈຳກັດ (BIC) ", logo: "/logoallmember/circle_scale/BIC.png",
-      facebookUrl: "https://www.facebook.com/BICBANKLAO",
-      websiteUrl: "https://www.biclaos.com",
-
-    },
-    {
-      name: "ທະນາຄານ ອຸດສາຫະກຳແລະການຄ້າຈີນ ຈຳກັດ ສາຂານະຄອນຫຼວງວຽງຈັນ (ICBC)  ", logo: "/logoallmember/circle_scale/ICBC.png",
-      facebookUrl: "https://www.facebook.com/icbcglobal/",
-      websiteUrl: "https://vientiane.icbc.com.cn/en/column/1438058341816746015.html",
-
-
-
-    },
-    {
-      name: " ທະນາຄານແຫ່ງ ປະເທດຈີນ (ຮົງກົງ) ສາຂານະຄອນຫຼວງວຽງຈັນ (BOC)", logo: "/logoallmember/circle_scale/bankofchina.png",
-      facebookUrl: "https://www.facebook.com/profile.php?id=100066833677650",
-      websiteUrl: "https://www.boc.cn/en/",
-    },
-    {
-      name: "ທະນາຄານ ຫວຽດຕິນ ລາວ ຈຳກັດ (VTB)", logo: "/logoallmember/circle_scale/VTB.png",
-      facebookUrl: "https://www.facebook.com/vtblao",
-      websiteUrl: "https://laoefast.vietinbank.com.la",
-    },
-    {
-      name: " ທະນາຄານ ອິນໂດຈີນ ຈຳກັດ (IB) ", logo: "/logoallmember/circle_scale/IB.png",
-      facebookUrl: "https://www.facebook.com/indochina.bank.page",
-      websiteUrl: "https://iblaos.com",
-    },
-    {
-      name: "ທະນາຄານ ເອຊີລີດາ ລາວ ຈຳກັດ (ACLEDA)  ", logo: "/logoallmember/circle_scale/ACLB.png",
-      facebookUrl: "https://www.facebook.com/acledabanklao",
-      websiteUrl: "https://www.acledabank.com.la/la/lao/",
-    },
-    {
-      name: "ທະນາຄານ ມາຣູຮານ ເຈແປນ ລາວ ຈຳກັດ (MJBL) ", logo: "/logoallmember/circle_scale/Maruhan.png",
-      facebookUrl: "https://www.facebook.com/MaruhanJapanBankLao/",
-      websiteUrl: "https://maruhanjapanbanklao.com",
-    },
-    {
-      name: "ທະນາຄານ ໄຊງ່ອນເທືອງຕິ່ນ ລາວ ຈຳກັດ (SACOM)", logo: "/logoallmember/circle_scale/SACOM.PNG",
-      facebookUrl: "https://www.facebook.com/SacombankLao",
-      websiteUrl: "https://www.sacombank.com.la",
-    },
-    {
-      name: "ທະນາຄານ ກະສິກອນໄທ ຈຳກັດຜູ້ດຽວ (KBANK)", logo: "/logoallmember/circle_scale/Kasikorn.png",
-      facebookUrl: "https://www.facebook.com/KBankLaos/",
-      websiteUrl: "https://www.kasikornbank.com.la",
-    },
-    {
-      name: "ທະນາຄານ ພາບລິກ ລາວ ຈຳກັດ (PBB)", logo: "/logoallmember/circle_scale/PUB.png",
-      facebookUrl: "https://www.facebook.com/p/Public-Bank-Lao-61566020099587/",
-      websiteUrl: "https://www.publicbank.com.la",
-    },
-    {
-      name: "ທະນາຄານ ລາວຝຣັ່ງ ຈຳກັດ (BFL)", logo: "/logoallmember/circle_scale/BFL.png",
-      facebookUrl: "https://www.facebook.com/bflbank",
-      websiteUrl: "https://bfl-bred.com",
-    },
-    {
-      name: "ທະນາຄານ ພົງສະຫວັນ ຈຳກັດ (PSVB)", logo: "/logoallmember/circle_scale/PSVB.png",
-      facebookUrl: "https://www.facebook.com/phongsavanhbankltd",
-      websiteUrl: "https://www.phongsavanhbank.com",
-    },
-    {
-      name: "ທະນາຄານ ຫຸ້ນສ່ວນການຄ້າທະຫານ ສາຂາລາວ (MB)", logo: "/logoallmember/circle_scale/mb.png",
-      facebookUrl: "https://www.facebook.com/MBBANKLAOS",
-      websiteUrl: "https://mbbank.com.la",
-    },
-  ],
-
-  memberRight: () => [
-    {
-      name: "MmoneyX", logo: "/logoallmember/circle_scale/mmoney.png",
-      facebookUrl: "https://www.facebook.com/laomobilemoney",
-      websiteUrl: "https://www.mmoney.la",
-    },
-    {
-      name: "Umoney", logo: "/logoallmember/circle_scale/umoney.png",
-      facebookUrl: "https://www.facebook.com/umoney.unitel.la",
-      websiteUrl: "https://u-money.com.la",
-    },
-  ],
+  stat2Sub: "2 ສະມາຊິກທີເຂົ້າຮ່ວມກັບ Lao National Payment Network CO., LTD",
 });
 
+/** ✅ API */
+const MEMBERS_API = "http://localhost:3000/api/members";
+const API_BASE = "http://localhost:3000";
+
+/** ✅ BANKS from API */
+const banksFromApi = ref<Member[]>([]);
+const banksLoading = ref(false);
+const banksError = ref<string | null>(null);
+
+/** ✅ FINTECH (memberRight) from API */
+const fintechFromApi = ref<Member[]>([]);
+const fintechLoading = ref(false);
+const fintechError = ref<string | null>(null);
+
+/** ✅ allowed ids: banks 1..18 and 21 */
+const allowedBankIds = new Set<number>([...Array.from({ length: 18 }, (_, i) => i + 1), 21]);
+
+/** ✅ fintech ids (commonly 19 & 20 if banks are 1..18 and 21) */
+const allowedFintechIds = new Set<number>([23, 24]);
+
+const resolveLogo = (u?: string | null) => {
+  if (!u) return undefined;
+  if (/^https?:\/\//i.test(u)) return u;
+  try {
+    return new URL(u, API_BASE).toString();
+  } catch {
+    return u || undefined;
+  }
+};
+
+/** ✅ Load BANKS list (BanknameLA -> name) */
+const loadBanks = async () => {
+  banksLoading.value = true;
+  banksError.value = null;
+
+  try {
+    const res = await fetch(MEMBERS_API, { method: "GET" });
+    if (!res.ok) throw new Error(`Request failed (${res.status})`);
+
+    const json = await res.json();
+
+    const arr: ApiMember[] = Array.isArray(json) ? json : Array.isArray(json?.data) ? json.data : [];
+
+    const cleaned = arr
+      .map((raw) => ({ raw, id: Number(raw?.idmember) }))
+      .filter((x) => Number.isFinite(x.id) && allowedBankIds.has(x.id))
+      .sort((a, b) => a.id - b.id)
+      .map(({ raw, id }) => ({
+        id,
+        name: String(raw.BanknameLA || "").trim(),
+        facebookUrl: raw.LinkFB ? String(raw.LinkFB).trim() : undefined,
+        websiteUrl: raw.LinkWeb ? String(raw.LinkWeb).trim() : undefined,
+        logo: resolveLogo(raw.image_url),
+      }))
+      .filter((m) => m.name.length > 0);
+
+    banksFromApi.value = cleaned;
+  } catch (e: any) {
+    banksFromApi.value = [];
+    banksError.value = e?.message ? `Failed to load banks: ${e.message}` : "Failed to load banks.";
+  } finally {
+    banksLoading.value = false;
+  }
+};
+
+/** ✅ Load FINTECH list (BanknameEN -> name) */
+const loadFintech = async () => {
+  fintechLoading.value = true;
+  fintechError.value = null;
+
+  try {
+    const res = await fetch(MEMBERS_API, { method: "GET" });
+    if (!res.ok) throw new Error(`Request failed (${res.status})`);
+
+    const json = await res.json();
+
+    const arr: ApiMember[] = Array.isArray(json) ? json : Array.isArray(json?.data) ? json.data : [];
+
+    const cleaned = arr
+      .map((raw) => ({ raw, id: Number(raw?.idmember) }))
+      .filter((x) => Number.isFinite(x.id) && allowedFintechIds.has(x.id))
+      .sort((a, b) => a.id - b.id)
+      .map(({ raw, id }) => ({
+        id,
+        // ✅ Map BanknameEN -> name (fallback to BanknameLA if BanknameEN missing)
+        name: String(raw.BanknameEN || raw.BanknameLA || "").trim(),
+        // ✅ Map LinkFB -> facebookUrl
+        facebookUrl: raw.LinkFB ? String(raw.LinkFB).trim() : undefined,
+        // ✅ Map LinkWeb -> websiteUrl
+        websiteUrl: raw.LinkWeb ? String(raw.LinkWeb).trim() : undefined,
+        // ✅ Map image_url -> logo
+        logo: resolveLogo(raw.image_url),
+      }))
+      .filter((m) => m.name.length > 0);
+
+    fintechFromApi.value = cleaned;
+  } catch (e: any) {
+    fintechFromApi.value = [];
+    fintechError.value = e?.message ? `Failed to load fintech: ${e.message}` : "Failed to load fintech.";
+  } finally {
+    fintechLoading.value = false;
+  }
+};
+
+const banksCount = computed(() => banksFromApi.value.length || props.stat1Value);
+const fintechCount = computed(() => fintechFromApi.value.length || props.stat2Value);
+
+/** ===== Refs ===== */
 const root = ref<HTMLElement | null>(null);
 const card1 = ref<HTMLElement | null>(null);
 const card2 = ref<HTMLElement | null>(null);
@@ -455,7 +530,7 @@ const memberGridEl = ref<HTMLElement | null>(null);
 
 let overlayTl: gsap.core.Timeline | null = null;
 
-// ✅ Fix overlay “layout jump” when locking scroll
+/** Fix overlay “layout jump” when locking scroll */
 let prevBodyPaddingRight = "";
 const lockScroll = () => {
   const scrollbar = window.innerWidth - document.documentElement.clientWidth;
@@ -474,7 +549,6 @@ const openOverlay = (type: OverlayType) => {
   overlayOpen.value = true;
 };
 
-// ✅ NO close animation: kill timeline + close instantly
 const closeOverlay = () => {
   overlayTl?.kill();
   overlayTl = null;
@@ -493,20 +567,13 @@ const onKey = (e: KeyboardEvent) => {
 const normalize = (s: string) => s.trim().toLowerCase();
 
 const totalMembers = computed(() =>
-  overlayType.value === "banks"
-    ? (props.memberBanks?.length ?? 0)
-    : (props.memberRight?.length ?? 0)
+  overlayType.value === "banks" ? banksFromApi.value.length : fintechFromApi.value.length
 );
 
 const filteredMembers = computed<Member[]>(() => {
   const q = normalize(searchText.value);
-  const list =
-    overlayType.value === "banks"
-      ? props.memberBanks ?? []
-      : props.memberRight ?? [];
-
+  const list = overlayType.value === "banks" ? banksFromApi.value : fintechFromApi.value;
   if (!q) return list;
-
   return list.filter((m) => normalize(m.name).includes(q));
 });
 
@@ -531,7 +598,7 @@ const animateMembers = () => {
   );
 };
 
-// ✅ hover actions (GSAP)
+// hover actions (GSAP)
 const onMemberEnter = (e: MouseEvent) => {
   const card = e.currentTarget as HTMLElement | null;
   if (!card) return;
@@ -619,7 +686,6 @@ watch(overlayOpen, async (isOpen) => {
       .to(cols, { opacity: 1, y: 0, duration: 0.35 }, "-=0.18")
       .to(memberCards, { opacity: 1, y: 0, duration: 0.32, stagger: 0.02 }, "-=0.22");
   } else {
-    // ✅ ensure no leftover animation when closed (instant)
     overlayTl?.kill();
     overlayTl = null;
     unlockScroll();
@@ -627,7 +693,29 @@ watch(overlayOpen, async (isOpen) => {
   }
 });
 
+/** ✅ If API finishes after section animation, update the counts */
+watch(
+  () => banksFromApi.value.length,
+  (len) => {
+    if (!played) return;
+    if (!count1El.value) return;
+    if (len > 0) animateCount(count1El.value, len);
+  }
+);
+
+watch(
+  () => fintechFromApi.value.length,
+  (len) => {
+    if (!played) return;
+    if (!count2El.value) return;
+    if (len > 0) animateCount(count2El.value, len);
+  }
+);
+
 onMounted(() => {
+  loadBanks();
+  loadFintech();
+
   if (!root.value) return;
 
   gsap.set([card1.value, card2.value], { y: 18, opacity: 0 });
@@ -648,8 +736,8 @@ onMounted(() => {
         "-=0.2"
       );
 
-      if (count1El.value) animateCount(count1El.value, props.stat1Value);
-      if (count2El.value) animateCount(count2El.value, props.stat2Value);
+      if (count1El.value) animateCount(count1El.value, banksCount.value);
+      if (count2El.value) animateCount(count2El.value, fintechCount.value);
     },
     { threshold: 0.25 }
   );
@@ -826,7 +914,6 @@ onBeforeUnmount(() => {
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.68);
   font-weight: 700;
- 
 }
 
 .value {
@@ -1390,7 +1477,6 @@ onBeforeUnmount(() => {
 
 /* ✅ REMOVE ALL line/glow/blur effects when screen <= 984px */
 @media (max-width: 984px) {
-
   .kicker::before,
   .card::before,
   .cardAccent::before,

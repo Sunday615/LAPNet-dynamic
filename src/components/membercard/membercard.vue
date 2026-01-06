@@ -162,9 +162,9 @@ onBeforeUnmount(() => {
   top: 12px;
   width: 120px;
 
-  overflow: hidden;
+
   z-index: 2;
-  border: 1px solid #00000025;
+  border: 1px solid #fff;
   border-radius: 50%;
 }
 

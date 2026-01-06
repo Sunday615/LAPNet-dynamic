@@ -1,420 +1,456 @@
 <script setup>
-import { ref, computed, watch, onMounted, nextTick } from 'vue';
-import { gsap } from 'gsap';
+import { ref, computed, watch, onMounted, nextTick } from "vue";
+import { gsap } from "gsap";
 
-import membercard from '../../../components/membercard/membercard.vue';
-import logofootermembercardatm from '../../../components/footer/logomemberfooter/logofootermembercardatm.vue';
-import secondfooter from '../../../components/footer/mainfooter/secondfooter.vue';
-import main_navbar from '../../../components/miannavbar/main_navbar.vue';
+import membercard from "../../../components/membercard/membercard.vue";
+import logofootermembercardatm from "../../../components/footer/logomemberfooter/logofootermembercardatm.vue";
+import secondfooter from "../../../components/footer/mainfooter/secondfooter.vue";
+import main_navbar from "../../../components/miannavbar/main_navbar.vue";
 
-onMounted(() => {
-  window.scrollTo({
-    top: 0,
-    left: 0,
-    behavior: 'smooth'
+/** ✅ API */
+const API_BASE = "http://localhost:3000";
+const MEMBERS_API_URL = `${API_BASE}/api/members`;
+
+/** ✅ Footer logos (from API) */
+const memberLogos = ref([]);
+
+/** ✅ Members (from API) */
+const members = ref([]);
+
+/** ✅ Helpers */
+const toNumber = (v) => {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+};
+
+const pickMemberId = (item) => {
+  return (
+    toNumber(item?.membersid) ??
+    toNumber(item?.memberid) ??
+    toNumber(item?.memberId) ??
+    toNumber(item?.idmember) ??
+    toNumber(item?.idMember) ??
+    toNumber(item?.id) ??
+    toNumber(item?._id) ??
+    null
+  );
+};
+
+const extractImageString = (img) => {
+  if (!img) return "";
+  if (typeof img === "string") return img;
+
+  if (Array.isArray(img)) {
+    for (const it of img) {
+      const s = extractImageString(it);
+      if (s) return s;
+    }
+    return "";
+  }
+
+  const candidates = [
+    img?.url,
+    img?.path,
+    img?.src,
+    img?.image,
+    img?.file,
+    img?.filePath,
+    img?.filename,
+    img?.name,
+    img?.download_url,
+  ];
+  for (const c of candidates) {
+    if (typeof c === "string" && c.trim()) return c;
+  }
+  if (img?.data) return extractImageString(img.data);
+
+  return "";
+};
+
+const resolveImage = (img) => {
+  const s = extractImageString(img).trim();
+  if (!s) return "";
+  if (/^data:image\//i.test(s)) return s;
+  if (/^https?:\/\//i.test(s)) return s;
+  if (s.startsWith("/")) return `${API_BASE}${s}`;
+  return `${API_BASE}/${s}`;
+};
+
+const extractLinkString = (v) => {
+  if (!v) return "";
+  if (typeof v === "string") return v;
+  const candidates = [v?.url, v?.href, v?.link, v?.value];
+  for (const c of candidates) {
+    if (typeof c === "string" && c.trim()) return c;
+  }
+  return "";
+};
+
+const normalizeUrl = (u) => {
+  const raw = extractLinkString(u).trim();
+  if (!raw) return "";
+  if (/^https?:\/\//i.test(raw)) return raw;
+  if (raw.startsWith("//")) return `https:${raw}`;
+  return `https://${raw.replace(/^\/+/, "")}`;
+};
+
+const getByPath = (obj, path) => {
+  if (!obj || !path) return undefined;
+  const parts = String(path).split(".");
+  let cur = obj;
+  for (const p of parts) {
+    if (cur == null) return undefined;
+    cur = cur[p];
+  }
+  return cur;
+};
+
+const pickFirstString = (item, paths) => {
+  for (const p of paths) {
+    const v = p.includes(".") ? getByPath(item, p) : item?.[p];
+    const s = extractLinkString(v).trim();
+    if (s) return s;
+  }
+  return "";
+};
+
+/** ✅ Convert DB hex to CSS hex (#RRGGBB) */
+const normalizeHex = (c) => {
+  if (c == null) return "";
+  let s = String(c).trim();
+  if (!s) return "";
+
+  if (/^0x[0-9a-f]{6,8}$/i.test(s)) s = s.replace(/^0x/i, "#");
+
+  if (/^#?[0-9a-f]{3,8}$/i.test(s)) {
+    if (!s.startsWith("#")) s = `#${s}`;
+    const hex = s.slice(1);
+
+    if (hex.length === 3) {
+      const r = hex[0],
+        g = hex[1],
+        b = hex[2];
+      return `#${r}${r}${g}${g}${b}${b}`.toUpperCase();
+    }
+
+    if (hex.length === 6) return `#${hex}`.toUpperCase();
+
+    if (hex.length === 8) return `#${hex.slice(2)}`.toUpperCase();
+
+    return s.toUpperCase();
+  }
+
+  return s;
+};
+
+const buildLayer1FromColors = (primary, secondary) => {
+  const p = normalizeHex(primary);
+  const s = normalizeHex(secondary);
+
+  if (!p && !s) {
+    return "linear-gradient(#233f73, #1c335f) 50% 50%/calc(100% - 15px) calc(100% - 15px) no-repeat";
+  }
+  if (p && !s) {
+    return `linear-gradient(${p}, ${p}) 50% 50%/calc(100% - 15px) calc(100% - 15px) no-repeat`;
+  }
+  if (!p && s) {
+    return `linear-gradient(${s}, ${s}) 50% 50%/calc(100% - 15px) calc(100% - 15px) no-repeat`;
+  }
+  return `linear-gradient(${p}, ${s}) 50% 50%/calc(100% - 15px) calc(100% - 15px) no-repeat`;
+};
+
+
+const FILTER_CODE_ORDER = ["atm_inqury", "atm-transfer", "atm-transfer-card", "atm-cash-withdraw"];
+
+const normKey = (s) =>
+  String(s || "")
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "")
+    .replace(/[_-]/g, "");
+
+const FILTER_ALIASES = {
+  "atm_inqury": [
+    "atm_inqury",
+    "atm_inquiry",
+    "atminquiry",
+    "balanceinquiry",
+    "balance_inquiry",
+  
+    "ກວດສອບຍອດເງິນຂ້າມທະນາຄານຜ່ານຕູ້atm",
+  ],
+  "atm-transfer": [
+    "atm-transfer",
+    "atm_transfer",
+    "atmtransfer",
+    "transfer",
+    // Lao label
+    "ໂອນເງິນຂ້າມທະນາຄານຜ່ານຕູ້atm",
+  ],
+  "atm-transfer-card": [
+    "atm-transfer-card",
+    "atm_transfer_card",
+    "atmtransfercard",
+    "transfercard",
+    // Lao label
+    "ໂອນເງິນຂ້າມທະນາຄານຜ່ານໂທລະສັບດ້ວຍເລກໜ້າບັດ",
+  ],
+  "atm-cash-withdraw": [
+    "atm-cash-withdraw",
+    "atm_cash_withdraw",
+    "atmcashwithdraw",
+    "cashwithdraw",
+    "withdraw",
+    // Lao label
+    "ຖອນເງິນສົດຂ້າມທະນາຄານຜ່ານຕູ້atm",
+  ],
+};
+
+const isItemEnabled = (obj) => {
+  if (!obj || typeof obj !== "object") return true;
+
+  const candidates = [
+    obj.enabled,
+    obj.enable,
+    obj.active,
+    obj.isActive,
+    obj.status,
+    obj.available,
+    obj.allow,
+    obj.value,
+    obj.flag,
+  ];
+
+  // ถ้าไม่มี flag ใด ๆ ถือว่า "มี item" = ใช้งานได้
+  const hasAnyFlag = candidates.some((v) => v !== undefined);
+  if (!hasAnyFlag) return true;
+
+  // ถ้ามี flag อย่างน้อยหนึ่งอัน ใช้ logic truthy แบบ common
+  return candidates.some((v) => v === true || v === 1 || v === "1" || v === "true" || v === "Y" || v === "y");
+};
+
+const detectFilterCode = (raw) => {
+  const nk = normKey(raw);
+  if (!nk) return "";
+
+  for (const code of FILTER_CODE_ORDER) {
+    const aliases = FILTER_ALIASES[code] || [];
+    const hit = aliases.some((a) => normKey(a) === nk);
+    if (hit) return code;
+  }
+  return "";
+};
+
+const buildFiltersFromApi = (item) => {
+  // ✅ ใช้ "เฉพาะ" CardATM.items (รองรับตัวพิมพ์/เคสต่าง ๆ นิดหน่อย)
+  const rawItems =
+    item?.CardATM?.items ??
+    item?.CardAtm?.items ??
+    item?.cardATM?.items ??
+    item?.cardAtm?.items ??
+    [];
+
+  const arr = Array.isArray(rawItems) ? rawItems : [];
+  const set = new Set();
+
+  for (const it of arr) {
+    // item อาจเป็น string หรือ object
+    if (typeof it === "string") {
+      const code = detectFilterCode(it);
+      if (code) set.add(code);
+      continue;
+    }
+
+    if (it && typeof it === "object") {
+      if (!isItemEnabled(it)) continue;
+
+      const candidate =
+        it.code ?? it.key ?? it.serviceCode ?? it.service ?? it.type ?? it.name ?? it.label ?? it.value ?? "";
+      const code = detectFilterCode(candidate);
+      if (code) set.add(code);
+    }
+  }
+
+  // จัดเรียงให้ออกมาตาม order เดิม
+  return FILTER_CODE_ORDER.filter((c) => set.has(c));
+};
+
+async function fetchJson(url) {
+  const res = await fetch(url, {
+    method: "GET",
+    cache: "no-store",
   });
-});
+  if (!res.ok) throw new Error(`API error: ${res.status}`);
+  return res.json();
+}
 
-const memberLogos = [
-  {
-    src: "/logoallmember/circle_scale/BCEL.png",
-    alt: "Space AI",
-  },
-    {
-    src: "/logoallmember/circle_scale/APBB.PNG",
-    alt: "Partner B",
-  },
-  {
-    src: "/logoallmember/circle_scale/LDB.PNG",
-    alt: "Partner A",
-  },
+const mapApiMemberToCard = (item) => {
+  const memberId = pickMemberId(item);
 
-   {
-    src: "/logoallmember/circle_scale/lvb.PNG",
-    alt: "Client Z",
-  },
-  {
-    src: "/logoallmember/circle_scale/JDB.png",
-    alt: "Client X",
-  },
-   {
-    src: "/logoallmember/circle_scale/STB.png",
-    alt: "Client Z",
-  },
-   {
-    src: "/logoallmember/circle_scale/BIC.png",
-    alt: "Client Z",
-  },
- 
-  {
-    src: "/logoallmember/circle_scale/ICBC.png",
-    alt: "Client Z",
-  },
-  {
-    src: "/logoallmember/circle_scale/BOC.png",
-    alt: "Client Z",
-  },
-  {
-    src: "/logoallmember/circle_scale/VTB.png",
-    alt: "Client Z",
-  },
-  {
-    src: "/logoallmember/circle_scale/IB.png",
-    alt: "Client Z",
-  },
-  {
-    src: "/logoallmember/circle_scale/ACLB.png",
-    alt: "Client Z",
-  },
-   {
-    src: "/logoallmember/circle_scale/Maruhan.png",
-    alt: "Client Y",
-  },
- 
-  {
-    src: "/logoallmember/circle_scale/SACOM.PNG",
-    alt: "Client Z",
-  },
+  const bankCode = String(item?.BankCode ?? item?.bankCode ?? item?.bank_code ?? "").trim();
 
-  {
-    src: "/logoallmember/circle_scale/Kasikorn.png",
-    alt: "Client Z",
-  },
-  {
-    src: "/logoallmember/circle_scale/PUB.png",
-    alt: "Client Z",
-  },
+  const title = String(item?.BanknameLA ?? item?.bankNameLA ?? item?.banknameLA ?? item?.bank_name_la ?? "").trim();
 
-   {
-    src: "/logoallmember/circle_scale/PSVB.png",
-    alt: "Client Z",
-  },
-  {
-    src: "/logoallmember/circle_scale/lcnb.png",
-    alt: "Client Z",
-  },
-];
+  const subtitle = String(
+    item?.banknameEng ?? item?.BanknameEng ?? item?.BanknameEN ?? item?.bankNameEN ?? item?.bank_name_en ?? ""
+  ).trim();
 
+  const link1 = normalizeUrl(pickFirstString(item, ["LinkFB", "linkFB", "linkFb", "facebook", "fb", "LinkFacebook"]));
+
+  const link2 = normalizeUrl(
+    pickFirstString(item, [
+      "linkweb",
+      "linkWeb",
+      "LinkWeb",
+      "LinkWEB",
+      "website",
+      "Website",
+      "web",
+      "LinkWebsite",
+      "linkWebsite",
+      "urlWeb",
+      "UrlWeb",
+    ])
+  );
+
+  const img =
+    item?.image_url ??
+    item?.Image_url ??
+    item?.imageUrl ??
+    item?.image ??
+    item?.logo ??
+    item?.logo_img ??
+    item?.member_logo ??
+    "";
+  const image = resolveImage(img) || "";
+
+  const primary =
+    item?.Color?.primary ??
+    item?.color?.primary ??
+    item?.colors?.primary ??
+    item?.Colors?.primary ??
+    item?.primary ??
+    "";
+  const secondary =
+    item?.Color?.secondary ??
+    item?.color?.secondary ??
+    item?.colors?.secondary ??
+    item?.Colors?.secondary ??
+    item?.secondary ??
+    "";
+
+  const layer1 = buildLayer1FromColors(primary, secondary);
+
+  const layer2 = "linear-gradient(321deg, transparent 0%, #b88a44 100%)";
+  const layer3 = "linear-gradient(26deg, transparent 0%, #faf398 100%)";
+  const layer4 = "linear-gradient(172deg, transparent 0%, #e0aa4e 100%)";
+  const layer5 = "linear-gradient(270deg, transparent 0%, #f9f295 100%)";
+
+  // ✅ filter จริงจาก CardATM.items เท่านั้น
+  const filters = buildFiltersFromApi(item);
+
+  return {
+    memberId,
+    bankCode,
+    image,
+    title,
+    subtitle,
+    link1,
+    link2,
+    layer1,
+    layer2,
+    layer3,
+    layer4,
+    layer5,
+    filters,
+  };
+};
+
+async function loadMembersFromApi() {
+  const json = await fetchJson(MEMBERS_API_URL);
+
+  const list = Array.isArray(json)
+    ? json
+    : Array.isArray(json?.data)
+    ? json.data
+    : Array.isArray(json?.members)
+    ? json.members
+    : Array.isArray(json?.result)
+    ? json.result
+    : [];
+
+  // ✅ only memberATM = 1 (เหมือนเดิม)
+  const onlyAtm = list.filter((it) => {
+    const v = it?.memberATM ?? it?.MemberATM ?? it?.member_atm ?? it?.atmMember ?? 0;
+    return v === 1 || v === "1" || v === true;
+  });
+
+  const mapped = onlyAtm.map(mapApiMemberToCard);
+
+  // ✅ sort by membersid so memberId=1 always on page 1
+  mapped.sort((a, b) => {
+    const A = a.memberId ?? 999999;
+    const B = b.memberId ?? 999999;
+    if (A !== B) return A - B;
+    return String(a.bankCode).localeCompare(String(b.bankCode));
+  });
+
+  members.value = mapped;
+
+  memberLogos.value = mapped
+    .filter((m) => !!m.image)
+    .map((m) => ({
+      src: m.image,
+      alt: m.title || m.bankCode || "Member",
+    }));
+}
+
+/** ✅ Pagination / Filter UI */
 const itemsPerPage = 5;
 const currentPage = ref(1);
 
-// --- Aside state (search + checkboxes) ---
-const searchQuery = ref('');
+const searchQuery = ref("");
 const selectedFilters = ref([]);
 
-// value = internal code
-// "all" = select all
 const filterOptions = [
-  { label: 'ເລືອກທັງໝົດ', value: 'all' },
-  { label: 'ກວດສອບຍອດເງິນຂ້າມທະນາຄານຜ່ານຕູ້ ATM', value: 'atm_inqury' },
-  { label: 'ໂອນເງິນຂ້າມທະນາຄານຜ່ານຕູ້ ATM', value: 'atm-transfer' },
-  { label: 'ໂອນເງິນຂ້າມທະນາຄານຜ່ານໂທລະສັບດ້ວຍເລກໜ້າບັດ', value: 'atm-transfer-card' },
-  { label: 'ຖອນເງິນສົດຂ້າມທະນາຄານຜ່ານຕູ້ ATM', value: 'atm-cash-withdraw' },
+  { label: "ເລືອກທັງໝົດ", value: "all" },
+  { label: "ກວດສອບຍອດເງິນຂ້າມທະນາຄານຜ່ານຕູ້ ATM", value: "atm_inqury" },
+  { label: "ໂອນເງິນຂ້າມທະນາຄານຜ່ານຕູ້ ATM", value: "atm-transfer" },
+  { label: "ໂອນເງິນຂ້າມທະນາຄານຜ່ານໂທລະສັບດ້ວຍເລກໜ້າບັດ", value: "atm-transfer-card" },
+  { label: "ຖອນເງິນສົດຂ້າມທະນາຄານຜ່ານຕູ້ ATM", value: "atm-cash-withdraw" },
 ];
-
-const members = ref([
-  {
-    bankCode: 'BCEL',
-    image: "/logoallmember/circle_scale/BCEL.png",
-    title: "ທະນາຄານ ການຄ້າຕ່າງປະເທດລາວ ມະຫາຊົນ (BCEL)",
-    subtitle: "Banque Pour Le Commerce Exterieur Lao Public ",
-    link1: "https://www.facebook.com/BCEL.Bank",
-    link2: "https://www.bcel.com.la",
-    layer1: "linear-gradient(#cb0202, #a71f33) 50% 50%/calc(100% - 15px) calc(100% - 15px) no-repeat",
-    layer2: "linear-gradient(321deg, transparent 0%, #b88a44 100%)",
-    layer3: "linear-gradient(26deg, transparent 0%, #faf398 100%)",
-    layer4: "linear-gradient(172deg, transparent 0%, #e0aa4e 100%)",
-    layer5: "linear-gradient(270deg, transparent 0%, #f9f295 100%)",
-    filters: ['atm_inqury', 'atm-transfer', 'atm-transfer-card', 'atm-cash-withdraw'],
-  },
-  {
-    bankCode: 'APB',
-    image: "/logoallmember/circle_scale/APBB.PNG",
-    title: "ທະນາຄານ ສົ່ງເສີມກະສິກຳ ຈຳກັດ (APB)",
-    subtitle: "Agricultural Promotion Bank ",
-    link1: "https://www.facebook.com/APB.Bank/?locale=th_TH",
-    link2: "https://www.apb.com.la",
-    layer1: "linear-gradient(#379685, #215a50) 50% 50%/calc(100% - 15px) calc(100% - 15px) no-repeat",
-    layer2: "linear-gradient(321deg, transparent 0%, #b88a44 100%)",
-    layer3: "linear-gradient(26deg, transparent 0%, #faf398 100%)",
-    layer4: "linear-gradient(172deg, transparent 0%, #e0aa4e 100%)",
-    layer5: "linear-gradient(270deg, transparent 0%, #f9f295 100%)",
-    filters: ['atm_inqury', 'atm-transfer', 'atm-cash-withdraw'],
-  },
-  {
-    bankCode: 'LDB',
-    image: "/logoallmember/circle_scale/LDB.PNG",
-    title: "ທະນາຄານ ພັດທະນາລາວ ຈຳກັດ (LDB)",
-    subtitle: "Lao Development Bank ",
-    link1: "https://www.facebook.com/ldblao",
-    link2: "https://www.ldblao.la/",
-    layer1: "linear-gradient(#233f73, #1c335f) 50% 50%/calc(100% - 15px) calc(100% - 15px) no-repeat",
-    layer2: "linear-gradient(321deg, transparent 0%, #b88a44 100%)",
-    layer3: "linear-gradient(26deg, transparent 0%, #faf398 100%)",
-    layer4: "linear-gradient(172deg, transparent 0%, #e0aa4e 100%)",
-    layer5: "linear-gradient(270deg, transparent 0%, #f9f295 100%)",
-    filters: ['atm_inqury', 'atm-transfer', 'atm-transfer-card', 'atm-cash-withdraw'],
-  },
-  
-  {
-    bankCode: 'LVB',
-    image: "/logoallmember/circle_scale/lvb.PNG",
-    title: "ທະນາຄານ ຮ່ວມທຸລະກິດລາວ-ຫວຽດ (LVB) ",
-    subtitle: "Laos - Vietnam Joint Venture Bank",
-    link1: "https://www.facebook.com/LaoVietBank",
-    link2: "https://www.laovietbank.com.la/la/",
-    layer1: "linear-gradient(#18479e, #232299) 50% 50%/calc(100% - 15px) calc(100% - 15px) no-repeat",
-    layer2: "linear-gradient(321deg, transparent 0%, #b88a44 100%)",
-    layer3: "linear-gradient(26deg, transparent 0%, #faf398 100%)",
-    layer4: "linear-gradient(172deg, transparent 0%, #e0aa4e 100%)",
-    layer5: "linear-gradient(270deg, transparent 0%, #f9f295 100%)",
-    filters: ['atm_inqury', 'atm-transfer', 'atm-cash-withdraw'],
-  },
-  {
-    bankCode: 'JDB',
-    image: "/logoallmember/circle_scale/JDB.png",
-    title: "ທະນາຄານ ຮ່ວມພັດທະນາ ມະຫາຊົນ (JDB)",
-    subtitle: "Joint Development Bank ",
-    link1: "https://www.facebook.com/jdbbanklaos",
-    link2: "https://www.jdbbank.com.la/",
-    layer1: "linear-gradient(#2b83df, #0953a0) 50% 50%/calc(100% - 15px) calc(100% - 15px) no-repeat",
-    layer2: "linear-gradient(321deg, transparent 0%, #b88a44 100%)",
-    layer3: "linear-gradient(26deg, transparent 0%, #faf398 100%)",
-    layer4: "linear-gradient(172deg, transparent 0%, #e0aa4e 100%)",
-    layer5: "linear-gradient(270deg, transparent 0%, #f9f295 100%)",
-    filters: ['atm_inqury', 'atm-transfer', 'atm-cash-withdraw'],
-  },
-  {
-    bankCode: 'STB',
-    image: "/logoallmember/circle_scale/STB.png",
-    title: "ທະນາຄານ ເອັສທີ ຈຳກັດ (STB) ",
-    subtitle: "ST Bank Limited",
-    link1: "https://www.facebook.com/STBankLaos",
-    link2: "https://www.stbanklaos.la",
-    layer1: "linear-gradient(#0903ff, #010098) 50% 50%/calc(100% - 15px) calc(100% - 15px) no-repeat",
-    layer2: "linear-gradient(321deg, transparent 0%, #b88a44 100%)",
-    layer3: "linear-gradient(26deg, transparent 0%, #faf398 100%)",
-    layer4: "linear-gradient(172deg, transparent 0%, #e0aa4e 100%)",
-    layer5: "linear-gradient(270deg, transparent 0%, #f9f295 100%)",
-    filters: ['atm_inqury', 'atm-transfer', 'atm-cash-withdraw'],
-  },
-  {
-    bankCode: 'BIC',
-    image: "/logoallmember/circle_scale/BIC.png",
-    title: "ທະນາຄານ ບີໄອຊີ ລາວ ຈຳກັດ (BIC)    ",
-    subtitle: "BIC Bank Lao ",
-    link1: "https://www.facebook.com/BICBANKLAO",
-    link2: "https://www.biclaos.com",
-    layer1: "linear-gradient(#344872, #213051) 50% 50%/calc(100% - 15px) calc(100% - 15px) no-repeat",
-    layer2: "linear-gradient(321deg, transparent 0%, #b88a44 100%)",
-    layer3: "linear-gradient(26deg, transparent 0%, #faf398 100%)",
-    layer4: "linear-gradient(172deg, transparent 0%, #e0aa4e 100%)",
-    layer5: "linear-gradient(270deg, transparent 0%, #f9f295 100%)",
-    filters: ['atm_inqury', 'atm-transfer', 'atm-cash-withdraw'],
-  },
-  
-  
-  {
-    bankCode: 'ICBC',
-    image: "/logoallmember/circle_scale/ICBCborder.png",
-    title: "ທະນາຄານ ອຸດສາຫະກຳແລະການຄ້າຈີນ ຈຳກັດ ສາຂານະຄອນຫຼວງວຽງຈັນ (ICBC)   ",
-    subtitle: "Industrial and Commercial Bank of China Limited ",
-    link1: "https://www.facebook.com/icbcglobal/",
-    link2: "https://vientiane.icbc.com.cn/en/column/1438058341816746015.html",
-    layer1: "linear-gradient(#cb0202, #a71f33) 50% 50%/calc(100% - 15px) calc(100% - 15px) no-repeat",
-    layer2: "linear-gradient(321deg, transparent 0%, #b88a44 100%)",
-    layer3: "linear-gradient(26deg, transparent 0%, #faf398 100%)",
-    layer4: "linear-gradient(172deg, transparent 0%, #e0aa4e 100%)",
-    layer5: "linear-gradient(270deg, transparent 0%, #f9f295 100%)",
-    filters: ['atm_inqury', 'atm-transfer', 'atm-cash-withdraw'],
-  },
-  {
-    bankCode: 'BOC',
-    image: "/logoallmember/circle_scale/bocborder.png",
-    title: "ທະນາຄານແຫ່ງ ປະເທດຈີນ (ຮົງກົງ) ສາຂານະຄອນຫຼວງວຽງຈັນ (BOC) ",
-    subtitle: "Bank of China ",
-    link1: "https://www.facebook.com/profile.php?id=100066833677650",
-    link2: "https://www.boc.cn/en/",
-    layer1: "linear-gradient(#c00b11, #a71f33) 50% 50%/calc(100% - 15px) calc(100% - 15px) no-repeat",
-    layer2: "linear-gradient(321deg, transparent 0%, #b88a44 100%)",
-    layer3: "linear-gradient(26deg, transparent 0%, #faf398 100%)",
-    layer4: "linear-gradient(172deg, transparent 0%, #e0aa4e 100%)",
-    layer5: "linear-gradient(270deg, transparent 0%, #f9f295 100%)",
-    filters: ['atm_inqury', 'atm-cash-withdraw'],
-  },
-  {
-    bankCode: 'VTB',
-    image: "/logoallmember/retangle_scale/VTB.jpg",
-    title: " ທະນາຄານ ຫວຽດຕິນ ລາວ ຈຳກັດ (VTB) ",
-    subtitle: "VietinBank ",
-    link1: "https://www.facebook.com/vtblao",
-    link2: "https://laoefast.vietinbank.com.la",
-    layer1: "linear-gradient(#0086e7, #0c51d1) 50% 50%/calc(100% - 15px) calc(100% - 15px) no-repeat",
-    layer2: "linear-gradient(321deg, transparent 0%, #b88a44 100%)",
-    layer3: "linear-gradient(26deg, transparent 0%, #faf398 100%)",
-    layer4: "linear-gradient(172deg, transparent 0%, #e0aa4e 100%)",
-    layer5: "linear-gradient(270deg, transparent 0%, #f9f295 100%)",
-    filters: ['atm_inqury', 'atm-cash-withdraw'],
-  },
-  {
-    bankCode: 'IB',
-    image: "/logoallmember/circle_scale/IB.png",
-    title: " ທະນາຄານ ອິນໂດຈີນ ຈຳກັດ (IB) ",
-    subtitle: "Indochina Bank ",
-    link1: "https://www.facebook.com/indochina.bank.page",
-    link2: "https://iblaos.com",
-    layer1: "linear-gradient(#8828d1, #430076) 50% 50%/calc(100% - 15px) calc(100% - 15px) no-repeat",
-    layer2: "linear-gradient(321deg, transparent 0%, #b88a44 100%)",
-    layer3: "linear-gradient(26deg, transparent 0%, #faf398 100%)",
-    layer4: "linear-gradient(172deg, transparent 0%, #e0aa4e 100%)",
-    layer5: "linear-gradient(270deg, transparent 0%, #f9f295 100%)",
-    filters: ['atm_inqury', 'atm-transfer', 'atm-cash-withdraw'],
-  },
-  {
-    bankCode: 'ACL',
-    image: "/logoallmember/circle_scale/ACL2.png",
-    title: "ທະນາຄານ ເອຊີລີດາ ລາວ ຈຳກັດ (ACLEDA)  ",
-    subtitle: "ACLEDA BANK",
-    link1: "https://www.facebook.com/acledabanklao",
-    link2: "https://www.acledabank.com.la/la/lao/",
-    layer1: "linear-gradient(#006DBD, #183A67) 50% 50%/calc(100% - 15px) calc(100% - 15px) no-repeat",
-    layer2: "linear-gradient(321deg, transparent 0%, #b88a44 100%)",
-    layer3: "linear-gradient(26deg, transparent 0%, #faf398 100%)",
-    layer4: "linear-gradient(172deg, transparent 0%, #e0aa4e 100%)",
-    layer5: "linear-gradient(270deg, transparent 0%, #f9f295 100%)",
-    filters: ['atm_inqury', 'atm-transfer', 'atm-cash-withdraw'],
-  },
-  {
-    bankCode: 'MRB',
-    image: "/logoallmember/circle_scale/Maruhan.png",
-    title: "ທະນາຄານ ມາຣູຮານ ເຈແປນ ລາວ ຈຳກັດ (MJBL) ",
-    subtitle: "MARUHAN Japan Bank Lao ",
-    link1: "https://www.facebook.com/MaruhanJapanBankLao/",
-    link2: "https://maruhanjapanbanklao.com",
-    layer1: "linear-gradient(#eb1c24, #6d0302) 50% 50%/calc(100% - 15px) calc(100% - 15px) no-repeat",
-    layer2: "linear-gradient(321deg, transparent 0%, #b88a44 100%)",
-    layer3: "linear-gradient(26deg, transparent 0%, #faf398 100%)",
-    layer4: "linear-gradient(172deg, transparent 0%, #e0aa4e 100%)",
-    layer5: "linear-gradient(270deg, transparent 0%, #f9f295 100%)",
-    filters: ['atm_inqury', 'atm-transfer', 'atm-cash-withdraw'],
-  },
-  
-  {
-    bankCode: 'SACOM',
-    image: "/logoallmember/circle_scale/SACOM.PNG",
-    title: "ທະນາຄານ ໄຊງ່ອນເທືອງຕິ່ນ ລາວ ຈຳກັດ (SACOM)  ",
-    subtitle: "Saigon Thuong Tin Commercial Joint Stock Bank ",
-    link1: "https://www.facebook.com/SacombankLao",
-    link2: "https://www.sacombank.com.la",
-    layer1: "linear-gradient(#18479e, #232299) 50% 50%/calc(100% - 15px) calc(100% - 15px) no-repeat",
-    layer2: "linear-gradient(321deg, transparent 0%, #b88a44 100%)",
-    layer3: "linear-gradient(26deg, transparent 0%, #faf398 100%)",
-    layer4: "linear-gradient(172deg, transparent 0%, #e0aa4e 100%)",
-    layer5: "linear-gradient(270deg, transparent 0%, #f9f295 100%)",
-    filters: ['atm_inqury', 'atm-transfer', 'atm-cash-withdraw'],
-  },
-  
-  {
-    bankCode: 'KBANK',
-    image: "/logoallmember/circle_scale/Kasikorn.png",
-    title: "ທະນາຄານ ກະສິກອນໄທ ຈຳກັດຜູ້ດຽວ (KBANK) ",
-    subtitle: "KASIKORNBANK Public Company Limited ",
-    link1: "https://www.facebook.com/KBankLaos/",
-    link2: "https://www.kasikornbank.com.la",
-    layer1: "linear-gradient(#00a850, #006530) 50% 50%/calc(100% - 15px) calc(100% - 15px) no-repeat",
-    layer2: "linear-gradient(321deg, transparent 0%, #b88a44 100%)",
-    layer3: "linear-gradient(26deg, transparent 0%, #faf398 100%)",
-    layer4: "linear-gradient(172deg, transparent 0%, #e0aa4e 100%)",
-    layer5: "linear-gradient(270deg, transparent 0%, #f9f295 100%)",
-    filters: ['atm_inqury', 'atm-transfer', 'atm-cash-withdraw'],
-  },
-  {
-    bankCode: 'PB',
-    image: "/logoallmember/circle_scale/PUB.png",
-    title: "ທະນາຄານ ພາບລິກ ລາວ ຈຳກັດ (PBB)",
-    subtitle: "PUBLIC Bank",
-    link1: "https://www.facebook.com/p/Public-Bank-Lao-61566020099587/",
-    link2: "https://www.publicbank.com.la",
-    layer1: "linear-gradient(#f32b24, #c32c2c) 50% 50%/calc(100% - 15px) calc(100% - 15px) no-repeat",
-    layer2: "linear-gradient(321deg, transparent 0%, #b88a44 100%)",
-    layer3: "linear-gradient(26deg, transparent 0%, #faf398 100%)",
-    layer4: "linear-gradient(172deg, transparent 0%, #e0aa4e 100%)",
-    layer5: "linear-gradient(270deg, transparent 0%, #f9f295 100%)",
-    filters: ['atm_inqury', 'atm-transfer', 'atm-cash-withdraw'],
-  },
-
-
-  {
-    bankCode: 'PSV',
-    image: "/logoallmember/circle_scale/PSVB.png",
-    title: "ທະນາຄານ ພົງສະຫວັນ ຈຳກັດ (PSVB)",
-    subtitle: "Phongsavanh Bank ",
-    link1: "https://web.facebook.com/phongsavanhbankltd/",
-    link2: "https://www.phongsavanhbank.com/",
-    layer1: "linear-gradient(#12a14d, #0b6f3a) 50% 50%/calc(100% - 15px) calc(100% - 15px) no-repeat",
-    layer2: "linear-gradient(321deg, transparent 0%, #b88a44 100%)",
-    layer3: "linear-gradient(26deg, transparent 0%, #faf398 100%)",
-    layer4: "linear-gradient(172deg, transparent 0%, #e0aa4e 100%)",
-    layer5: "linear-gradient(270deg, transparent 0%, #f9f295 100%)",
-    filters: ['atm_inqury' , 'atm-cash-withdraw'],
-  },
-
-  {
-    bankCode: 'LCNB',
-    image: "/logoallmember/circle_scale/lcnb.png",
-    title: "ທະນາຄານ ລາວຈີນ ຈຳກັດ (LCNB)",
-    subtitle: "Lao China Bank ",
-    link1: "https://web.facebook.com/laochinabank",
-    link2: "https://lcnb.la/lcnbhome-la.php",
-    layer1: "linear-gradient(#019ce0, #0472bb) 50% 50%/calc(100% - 15px) calc(100% - 15px) no-repeat",
-    layer2: "linear-gradient(321deg, transparent 0%, #b88a44 100%)",
-    layer3: "linear-gradient(26deg, transparent 0%, #faf398 100%)",
-    layer4: "linear-gradient(172deg, transparent 0%, #e0aa4e 100%)",
-    layer5: "linear-gradient(270deg, transparent 0%, #f9f295 100%)",
-      filters: ['atm_inqury', 'atm-transfer', 'atm-cash-withdraw' ],
-  },
-
-
-  
-]);
 
 const filteredMembers = computed(() => {
   const q = searchQuery.value.trim().toLowerCase();
   const activeFilters = selectedFilters.value;
 
   return members.value.filter((m) => {
-    const title = (m.title || '').toLowerCase();
-    const subtitle = (m.subtitle || '').toLowerCase();
+    const title = (m.title || "").toLowerCase();
+    const subtitle = (m.subtitle || "").toLowerCase();
 
-    // Search
     const matchesSearch = !q || title.includes(q) || subtitle.includes(q);
     if (!matchesSearch) return false;
 
-    // No checkbox selected => show all (only filtered by search)
+    // ไม่เลือก checkbox => แสดงทั้งหมด (ตาม search)
     if (!activeFilters.length) return true;
 
-    // Click "all" => show all members
-    if (activeFilters.includes('all')) return true;
+    // เลือก "all" => แสดงทั้งหมด
+    if (activeFilters.includes("all")) return true;
 
+    // ✅ FILTER จริง: bank ต้องมี service ครบทุกตัวที่เลือก (AND)
     const memberFilters = m.filters || [];
-
-  
-    const matchesFilter = activeFilters.every((f) => memberFilters.includes(f));
-
-    return matchesFilter;
+    return activeFilters.every((f) => memberFilters.includes(f));
   });
 });
 
-const totalPages = computed(() =>
-  Math.max(1, Math.ceil(filteredMembers.value.length / itemsPerPage))
-);
+const totalPages = computed(() => Math.max(1, Math.ceil(filteredMembers.value.length / itemsPerPage)));
 
 const paginatedMembers = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage;
   return filteredMembers.value.slice(start, start + itemsPerPage);
 });
 
-// --- GSAP animation setup ---
+/** ✅ GSAP animation */
 const cardsGridEl = ref(null);
 
 const animateCards = () => {
@@ -425,22 +461,10 @@ const animateCards = () => {
   if (!cards || !cards.length) return;
 
   gsap.killTweensOf(cards);
-
   gsap.fromTo(
     cards,
-    {
-      autoAlpha: 0,
-      y: 24,
-      scale: 0.96,
-    },
-    {
-      autoAlpha: 1,
-      y: 0,
-      scale: 1,
-      duration: 0.55,
-      ease: 'power2.out',
-      stagger: 0.06,
-    }
+    { autoAlpha: 0, y: 24, scale: 0.96 },
+    { autoAlpha: 1, y: 0, scale: 1, duration: 0.55, ease: "power2.out", stagger: 0.06 }
   );
 };
 
@@ -449,65 +473,59 @@ function goToPage(p) {
   if (next === currentPage.value) return;
   currentPage.value = next;
 }
-
 function prevPage() {
   goToPage(currentPage.value - 1);
 }
-
 function nextPage() {
   goToPage(currentPage.value + 1);
 }
 
-// --- handle checkbox change (ALL logic here) ---
+/** ✅ checkbox logic */
 const onFilterChange = (value, event) => {
   const checked = event.target.checked;
 
-  if (value === 'all') {
-    if (checked) {
-      // select ALL options (so all checkboxes show checked)
-      selectedFilters.value = filterOptions.map(o => o.value);
-    } else {
-      // uncheck ALL
-      selectedFilters.value = [];
-    }
+  if (value === "all") {
+    if (checked) selectedFilters.value = filterOptions.map((o) => o.value);
+    else selectedFilters.value = [];
   } else {
-    // if any individual box is changed while "all" is in the list,
-    // remove "all" so filters become specific
-    if (selectedFilters.value.includes('all')) {
-      selectedFilters.value = selectedFilters.value.filter(v => v !== 'all');
+    if (selectedFilters.value.includes("all")) {
+      selectedFilters.value = selectedFilters.value.filter((v) => v !== "all");
     }
   }
 };
 
-// keep currentPage valid when totalPages changes
 watch(totalPages, (tp) => {
   if (currentPage.value > tp) currentPage.value = tp;
 });
-
-// reset to first page when searching
 watch(searchQuery, () => {
   currentPage.value = 1;
 });
-
-// reset to first page when changing filters
 watch(selectedFilters, () => {
   currentPage.value = 1;
 });
-
-// Animate on mount
-onMounted(async () => {
-  await nextTick();
-  animateCards();
-});
-
-// Animate whenever page changes
 watch(currentPage, async () => {
   await nextTick();
   animateCards();
 });
-
-// Animate when filtered list changes (search/filter)
 watch(filteredMembers, async () => {
+  await nextTick();
+  animateCards();
+});
+
+/** ✅ onMounted */
+onMounted(async () => {
+  window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+
+  try {
+    await loadMembersFromApi();
+    currentPage.value = 1;
+  } catch (e) {
+    console.error("โหลด /api/members ไม่สำเร็จ:", e);
+    members.value = [];
+    memberLogos.value = [];
+    currentPage.value = 1;
+  }
+
   await nextTick();
   animateCards();
 });
@@ -516,20 +534,17 @@ watch(filteredMembers, async () => {
 <template>
   <main_navbar
     title="ສະມາຊິກລະບົບບັດທະນາຄານຮ່ວມກັນ"
-    :breadcrumb="[
-      'ໜ້າຫຼັກ',
-      'ສະມາຊິກ',
-      'ສະມາຊິກລະບົບບັດທະນາຄານຮ່ວມກັນ'
-    ]"
+    :breadcrumb="['ໜ້າຫຼັກ', 'ສະມາຊິກ', 'ສະມາຊິກລະບົບບັດທະນາຄານຮ່ວມກັນ']"
     background-image="/member/membercard/membercrd-2.png"
   />
-  <div class="boxmargin" style="width: 100%; height:20vh"></div>
+  <div class="boxmargin" style="width: 100%; height: 20vh"></div>
+
   <div class="membercardcontainer">
     <div class="leftsection">
       <div class="cardsgrid" ref="cardsGridEl">
         <membercard
           v-for="(m, idx) in paginatedMembers"
-          :key="`${m.title}-${idx}`"
+          :key="m.memberId ?? `${m.bankCode}-${idx}`"
           :image="m.image"
           :title="m.title"
           :subtitle="m.subtitle"
@@ -549,17 +564,15 @@ watch(filteredMembers, async () => {
         <div class="filterHeader">
           <div>
             <h2 class="filterTitle">ຄົ້ນຫາທະນາຄານສະມາຊິກ</h2>
-            <p class="filterSubtitle">
-              ຄົ້ນຫາທະນາຄານສະມາຊິກລະບົບບັດຮ່ວມກັນ
-            </p>
+            <p class="filterSubtitle">ຄົ້ນຫາທະນາຄານສະມາຊິກລະບົບບັດຮ່ວມກັນ</p>
           </div>
-
-          <span class="filterBadge">LAPNet </span>
+          <span class="filterBadge">LAPNet</span>
         </div>
 
-        <!-- Search box -->
         <div class="searchBox">
-          <span class="searchIcon"><img src="/icon/search2.png" alt="" style="width: 30px; height: 30px;"></span>
+          <span class="searchIcon">
+            <img src="/icon/search2.png" alt="" style="width: 30px; height: 30px" />
+          </span>
           <input
             v-model="searchQuery"
             type="text"
@@ -570,7 +583,6 @@ watch(filteredMembers, async () => {
 
         <div class="filterDivider"></div>
 
-        <!-- Checkbox filters -->
         <div class="filterGroup">
           <div class="filterGroupHeader">
             <span class="filterGroupTitle">ຄົ້ນໝວດໝູ່ທະນາຄານສະມາຊິກ</span>
@@ -578,20 +590,9 @@ watch(filteredMembers, async () => {
           </div>
 
           <div class="filterChecks">
-            <label
-              v-for="opt in filterOptions"
-              :key="opt.value"
-              class="filterCheck"
-            >
-              <input
-                type="checkbox"
-                :value="opt.value"
-                v-model="selectedFilters"
-                @change="onFilterChange(opt.value, $event)"
-              />
-              <span class="checkFake">
-                <span class="checkTick">✓</span>
-              </span>
+            <label v-for="opt in filterOptions" :key="opt.value" class="filterCheck">
+              <input type="checkbox" :value="opt.value" v-model="selectedFilters" @change="onFilterChange(opt.value, $event)" />
+              <span class="checkFake"><span class="checkTick">✓</span></span>
               <span class="checkLabel">{{ opt.label }}</span>
             </label>
           </div>
@@ -599,10 +600,7 @@ watch(filteredMembers, async () => {
 
         <div class="filterFooter">
           <p class="filterFooterText">
-            ຄົ້ນຫາພົບ :
-            <span class="filterFooterHighlight">
-              {{ filteredMembers.length }}
-            </span>
+            ຄົ້ນຫາພົບ : <span class="filterFooterHighlight">{{ filteredMembers.length }}</span>
             ສະມາຊິກລະບົບບັດທະນາຄານຮ່ວມກັນ
           </p>
         </div>
@@ -612,12 +610,7 @@ watch(filteredMembers, async () => {
 
   <div class="paginationcontainer">
     <div class="pagerWrap" aria-label="Pagination">
-      <button
-        class="pagerBtn"
-        :disabled="currentPage === 1"
-        @click="prevPage"
-        aria-label="Previous page"
-      >
+      <button class="pagerBtn" :disabled="currentPage === 1" @click="prevPage" aria-label="Previous page">
         <span class="chev">‹</span>
         <span class="txt">Prev</span>
       </button>
@@ -636,12 +629,7 @@ watch(filteredMembers, async () => {
         </button>
       </div>
 
-      <button
-        class="pagerBtn"
-        :disabled="currentPage === totalPages"
-        @click="nextPage"
-        aria-label="Next page"
-      >
+      <button class="pagerBtn" :disabled="currentPage === totalPages" @click="nextPage" aria-label="Next page">
         <span class="txt">Next</span>
         <span class="chev">›</span>
       </button>
@@ -654,6 +642,7 @@ watch(filteredMembers, async () => {
 </template>
 
 <style scoped>
+/* ✅ keep ALL your original styles (unchanged) */
 .membercardcontainer {
   width: 90%;
   margin: 0 auto;
@@ -662,65 +651,49 @@ watch(filteredMembers, async () => {
   gap: 18px;
   height: auto;
 }
-
-/* Left section (cards) */
 .leftsection {
   width: 55%;
   height: auto;
 }
-
-/* Right aside container (42% of parent, full height) */
 .rightcontainer {
   width: 42%;
   height: 700px;
   display: flex;
   align-items: stretch;
 }
-
-/* Tech-style panel */
 .filterPanel {
   width: 100%;
   height: 100%;
   padding: 18px 20px;
   border-radius: 20px;
-
   background: linear-gradient(145deg, #ffffff 0%, #e7f0ff 35%, #f6fbff 100%);
   border: 1px solid rgba(58, 123, 255, 0.5);
-  box-shadow:
-    0 14px 40px rgba(10, 32, 94, 0.28),
-    0 0 0 1px rgba(255, 255, 255, 0.7);
-
+  box-shadow: 0 14px 40px rgba(10, 32, 94, 0.28), 0 0 0 1px rgba(255, 255, 255, 0.7);
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
-
-/* Header */
 .filterHeader {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
 }
-
 .filterTitle {
   font-size: var(--fs-lg);
   font-weight: 700;
   color: #0a1f55;
   margin: 0;
 }
-
 .filterSubtitle {
   margin: 3px 0 0;
   font-size: var(--fs-sm);
   color: #5a6f9f;
 }
-
 .filterBadge img {
   width: 30px;
   height: auto;
 }
-
 .filterBadge {
   font-size: 11px;
   padding: 6px 10px;
@@ -734,28 +707,20 @@ watch(filteredMembers, async () => {
   box-shadow: 0 0 12px rgba(58, 123, 255, 0.75);
   align-self: center;
 }
-
-/* Search box */
 .searchBox {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 20px 32px;
   border-radius: 999px;
-
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(102, 153, 255, 0.7);
-  box-shadow:
-    0 6px 16px rgba(9, 30, 66, 0.18),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.9);
-
+  box-shadow: 0 6px 16px rgba(9, 30, 66, 0.18), inset 0 0 0 1px rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
 }
-
 .searchIcon {
   font-size: var(--fs-md);
 }
-
 .searchInput {
   flex: 1;
   border: none;
@@ -764,12 +729,9 @@ watch(filteredMembers, async () => {
   font-size: var(--fs-xs);
   color: #10275b;
 }
-
 .searchInput::placeholder {
   color: #9aaad9;
 }
-
-/* Divider line */
 .filterDivider {
   height: 1px;
   width: 100%;
@@ -782,39 +744,31 @@ watch(filteredMembers, async () => {
     rgba(46, 94, 255, 0) 100%
   );
 }
-
-/* Checkbox group */
 .filterGroup {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
-
 .filterGroupHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-
 .filterGroupTitle {
   font-size: var(--fs-md);
   font-weight: 600;
   color: #12306a;
 }
-
 .filterGroupHint {
   font-size: 11px;
   color: #7d90c7;
 }
-
 .filterChecks {
   display: flex;
   flex-direction: column;
   gap: 25px;
   margin-top: 30px;
 }
-
-/* Checkbox item */
 .filterCheck {
   display: flex;
   align-items: center;
@@ -824,12 +778,9 @@ watch(filteredMembers, async () => {
   color: #21345f;
   user-select: none;
 }
-
-/* hide default checkbox */
 .filterCheck input {
   display: none;
 }
-
 .checkFake {
   width: 28px;
   height: 28px;
@@ -839,64 +790,43 @@ watch(filteredMembers, async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.9),
-    0 4px 10px rgba(44, 93, 255, 0.35);
-  transition:
-    background 0.16s ease,
-    border-color 0.16s ease,
-    box-shadow 0.16s ease,
-    transform 0.12s ease;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.9), 0 4px 10px rgba(44, 93, 255, 0.35);
+  transition: background 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, transform 0.12s ease;
 }
-
 .checkTick {
   font-size: 12px;
   opacity: 0;
   transform: scale(0.3);
-  transition:
-    opacity 0.12s ease,
-    transform 0.12s ease;
+  transition: opacity 0.12s ease, transform 0.12s ease;
 }
-
-/* checked state */
 .filterCheck input:checked + .checkFake {
   background: linear-gradient(135deg, #1a57ff, #47b3ff);
   border-color: #ffffff;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.7),
-    0 6px 14px rgba(43, 100, 255, 0.5);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7), 0 6px 14px rgba(43, 100, 255, 0.5);
   transform: translateY(-1px);
 }
-
 .filterCheck input:checked + .checkFake .checkTick {
   opacity: 1;
   transform: scale(1);
   color: #ffffff;
 }
-
 .checkLabel {
   font-size: var(--fs-base);
 }
-
-/* Footer info */
 .filterFooter {
   margin-top: auto;
   padding-top: 4px;
   border-top: 1px dashed rgba(148, 179, 255, 0.7);
 }
-
 .filterFooterText {
   font-size: var(--fs-sm);
   color: #1e3567;
   margin: 6px 0 0;
 }
-
 .filterFooterHighlight {
   font-weight: 700;
   color: #275eff;
 }
-
-/* Grid of member cards */
 .cardsgrid {
   display: grid;
   gap: 18px;
@@ -904,25 +834,20 @@ watch(filteredMembers, async () => {
   align-items: stretch;
   overflow: hidden;
 }
-
-/* Pagination */
 .paginationcontainer {
   width: 40%;
   margin: 0 auto;
   height: auto;
   border: none;
 }
-
 .pagerWrap {
   margin-top: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-
   padding: 10px 14px;
   border-radius: 999px;
-
   background: #00123d;
   background: linear-gradient(
     95deg,
@@ -931,11 +856,8 @@ watch(filteredMembers, async () => {
     rgba(6, 0, 120, 1) 100%
   );
   border: 1px solid rgba(152, 189, 255, 0.8);
-  box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.45),
-    0 0 0 1px rgba(255, 255, 255, 0.06);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
-
 .pagerBtn {
   display: inline-flex;
   gap: 8px;
@@ -945,113 +867,83 @@ watch(filteredMembers, async () => {
   border-radius: 999px;
   cursor: pointer;
   user-select: none;
-
   font-size: 13px;
   letter-spacing: 0.2px;
-
   color: #e9f3ff;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(184, 210, 255, 0.7);
-
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(6px);
-  transition:
-    transform 0.16s ease,
-    box-shadow 0.16s ease,
-    background 0.16s ease,
-    opacity 0.16s ease;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease, opacity 0.16s ease;
 }
-
 .pagerBtn:hover {
   transform: translateY(-1px);
   background: rgba(255, 255, 255, 0.16);
   box-shadow: 0 7px 16px rgba(0, 0, 0, 0.35);
 }
-
 .pagerBtn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
 }
-
 .chev {
   font-size: 16px;
   line-height: 1;
 }
-
 .pagerPills {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 4px 6px;
   border-radius: 999px;
-
   background: rgba(1, 8, 30, 0.55);
   border: 1px solid rgba(167, 199, 255, 0.6);
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
 }
-
 .pagePill {
   width: 34px;
   height: 34px;
   border-radius: 999px;
   cursor: pointer;
-
   font-size: 13px;
   font-weight: 500;
-
   color: #dbe8ff;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(179, 204, 255, 0.7);
-
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
-  transition:
-    transform 0.16s ease,
-    box-shadow 0.16s ease,
-    background 0.16s ease,
-    color 0.16s ease,
+  transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease, color 0.16s ease,
     border-color 0.16s ease;
 }
-
 .pagePill:hover {
   transform: translateY(-1px);
   background: rgba(255, 255, 255, 0.18);
   border-color: #c4d6ff;
   box-shadow: 0 5px 12px rgba(0, 0, 0, 0.45);
 }
-
 .pagePill.active {
   background: #ffffff;
   color: #0b2e7e;
   border-color: #ffffff;
-  box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.5),
-    0 0 0 3px rgba(116, 170, 255, 0.6);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), 0 0 0 3px rgba(116, 170, 255, 0.6);
 }
-
-/* Responsive tweak */
 @media (max-width: 900px) {
   .membercardcontainer {
     flex-direction: column;
     width: 95%;
   }
-
   .rightcontainer {
     width: 100%;
     height: auto;
     order: 1;
   }
-
   .leftsection {
     width: 100%;
     order: 2;
   }
-
   .paginationcontainer {
     width: 100%;
   }
-
   .pagerWrap {
     flex-wrap: wrap;
     padding: 10px 10px;

@@ -1,5 +1,6 @@
 <template>
-  <div class="detail-wrapper">
+  <!-- ✅ FIX: force re-render when id changes -->
+  <div class="detail-wrapper" :key="postId">
     <!-- NAVBAR -->
     <main_navbar
       title="ຂ່າວສານ ແລະ ກິດຈະກຳ"
@@ -37,7 +38,20 @@
         </div>
       </header>
 
-      <div v-if="!activePost" class="not-found">
+      <!-- (optional) loading / error -->
+      <div v-if="isLoading" class="not-found">
+        <p>Loading...</p>
+      </div>
+
+      <div v-else-if="error" class="not-found">
+        <p>{{ error }}</p>
+        <button class="back-btn" @click="fetchNews">
+          <span class="back-icon">⟳</span>
+          <span class="back-text">Retry</span>
+        </button>
+      </div>
+
+      <div v-else-if="!activePost" class="not-found">
         <p>ບໍ່ພົບຂ່າວສານ ແລະ ກີດຈະກຳ</p>
         <button class="back-btn" @click="goBack">
           <span class="back-icon">←</span>
@@ -145,7 +159,12 @@
                 v-for="post in filteredLatestPosts"
                 :key="post.id"
                 class="latest-link"
-                :to="{ name: 'BlogDetail', params: { id: post.id } }"
+                :to="{
+                  name: 'BlogDetail',
+                  params: { id: post.id },
+                  // ✅ FIX: keep query (page) so back works + less weird state
+                  query: { ...$route.query }
+                }"
               >
                 <article class="latest-item">
                   <div class="latest-thumb">
@@ -168,43 +187,27 @@
       </div>
     </section>
 
-    <!-- ✅ Lightbox Overlay + Prev/Next + Swipe (GSAP) -->
+    <!-- ✅ Lightbox -->
     <div
       v-if="isLightboxOpen && currentLightboxImage"
       class="lightbox-overlay"
       ref="lightboxOverlay"
       @click.self="closeLightbox"
     >
-      <!-- Close -->
       <button class="lightbox-close" @click="closeLightbox">✕</button>
 
-      <!-- Prev/Next -->
-      <button
-        class="lb-nav lb-prev"
-        :disabled="!canNavigate"
-        @click.stop="prevImage"
-        aria-label="Previous image"
-      >
+      <button class="lb-nav lb-prev" :disabled="!canNavigate" @click.stop="prevImage">
         <span class="lb-nav-icon">‹</span>
       </button>
 
-      <button
-        class="lb-nav lb-next"
-        :disabled="!canNavigate"
-        @click.stop="nextImage"
-        aria-label="Next image"
-      >
+      <button class="lb-nav lb-next" :disabled="!canNavigate" @click.stop="nextImage">
         <span class="lb-nav-icon">›</span>
       </button>
 
-      <!-- Counter -->
       <div class="lb-counter" v-if="galleryCount">
-        <span class="lb-counter-pill">
-          {{ activeImageIndex + 1 }} / {{ galleryCount }}
-        </span>
+        <span class="lb-counter-pill">{{ activeImageIndex + 1 }} / {{ galleryCount }}</span>
       </div>
 
-      <!-- Image (✅ swipe here) -->
       <div
         class="lightbox-inner"
         :class="{ 'vertical-scroll': isVerticalImage }"
@@ -222,36 +225,34 @@
     </div>
 
     <div class="boxmargin" style="width: 100%; height: 10vh"></div>
-    <!-- FOOTER -->
     <mainfooter />
   </div>
 </template>
 
 <script>
 import { gsap } from "gsap";
-import { getPostById, getLatestPosts } from "../../../data/blogDetailsDummy.js";
 
 import main_navbar from "../../../components/miannavbar/main_navbar.vue";
 import mainfooter from "../../../components/footer/mainfooter/secondfooter.vue";
 
+const API_BASE = "http://localhost:3000";
+const NEWS_API = `${API_BASE}/api/news`;
+
 export default {
   name: "BlogDetail",
 
-  components: {
-    main_navbar,
-    mainfooter
-  },
+  components: { main_navbar, mainfooter },
 
   props: {
-    id: {
-      type: [String, Number],
-      required: true
-    }
+    id: { type: [String, Number], default: null }
   },
 
   data() {
     return {
-      // Sidebar search + tag filters
+      isLoading: false,
+      error: null,
+      posts: [],
+
       searchQuery: "",
       tagFilters: [
         { id: "Meeting", label: "Meeting" },
@@ -263,33 +264,42 @@ export default {
       ],
       selectedTags: [],
 
-      // Lightbox state
       isLightboxOpen: false,
       activeImageIndex: null,
       isVerticalImage: false,
 
-      // ✅ Swipe state
-      swipe: {
-        active: false,
-        pointerId: null,
-        startX: 0,
-        startY: 0,
-        lastX: 0,
-        lastY: 0
-      },
-      swipeCooldown: false
+      swipe: { active: false, pointerId: null, startX: 0, startY: 0, lastX: 0, lastY: 0 },
+      swipeCooldown: false,
+
+      aborter: null,
+
+      // ✅ FIX: keep timeline to kill safely
+      introTl: null
     };
   },
 
   computed: {
-    // main detail by id
-    activePost() {
-      return getPostById(this.id);
+    postId() {
+      const raw =
+        this.id != null
+          ? this.id
+          : this.$route && this.$route.params
+            ? this.$route.params.id
+            : null;
+      return raw == null ? "" : String(raw).trim();
     },
 
-    // latest from same dummy data
+    activePost() {
+      if (!Array.isArray(this.posts) || !this.posts.length) return null;
+      const pid = this.postId;
+      if (!pid) return null;
+      return this.posts.find((p) => String(p.id).trim() === pid) || null;
+    },
+
     latestPosts() {
-      return getLatestPosts(5);
+      const arr = Array.isArray(this.posts) ? [...this.posts] : [];
+      arr.sort((a, b) => this.safeTime(b.dateTime) - this.safeTime(a.dateTime));
+      return arr.slice(0, 5);
     },
 
     filteredLatestPosts() {
@@ -297,26 +307,17 @@ export default {
       const hasTagFilter = this.selectedTags.length > 0;
 
       return this.latestPosts.filter((post) => {
-        // Tag filter
         if (hasTagFilter) {
-          const matchTag = post.tags?.some((t) => this.selectedTags.includes(t));
+          const matchTag = (post.tags || []).some((t) => this.selectedTags.includes(t));
           if (!matchTag) return false;
         }
-
-        // Search filter
         if (!q) return true;
-        const haystack = (
-          post.title +
-          " " +
-          post.category +
-          " " +
-          (post.tags || []).join(" ")
-        ).toLowerCase();
+
+        const haystack = (post.title + " " + post.category + " " + (post.tags || []).join(" ")).toLowerCase();
         return haystack.includes(q);
       });
     },
 
-    // current lightbox image
     currentLightboxImage() {
       if (!this.activePost || !this.activePost.gallery) return null;
       return this.activePost.gallery[this.activeImageIndex] || null;
@@ -332,14 +333,29 @@ export default {
   },
 
   watch: {
-    searchQuery() {
-      this.$nextTick(() => this.animateLatest());
-    },
-    selectedTags() {
-      this.$nextTick(() => this.animateLatest());
+    // ✅ FIX: when id changes, wait DOM ready + avoid gsap crash
+    postId() {
+      this.scrollToTop();
+      this.closeLightbox();
+
+      // if posts not loaded yet, fetch again (safe)
+      if (!this.posts.length) {
+        this.fetchNews();
+        return;
+      }
+
+      this.$nextTick(() => {
+        if (this.activePost) this.animateIntroSafe();
+      });
     },
 
-    // ✅ keyboard + lock scroll only when lightbox open
+    searchQuery() {
+      this.$nextTick(() => this.animateLatestSafe());
+    },
+    selectedTags() {
+      this.$nextTick(() => this.animateLatestSafe());
+    },
+
     isLightboxOpen(val) {
       if (val) {
         window.addEventListener("keydown", this.onLightboxKeydown);
@@ -357,10 +373,12 @@ export default {
     }
   },
 
+  created() {
+    this.fetchNews();
+  },
+
   mounted() {
-    // Scroll to top on first load
     this.scrollToTop();
-    this.animateIntro();
   },
 
   beforeDestroy() {
@@ -369,81 +387,253 @@ export default {
       document.documentElement.style.overflow = "";
       document.body.style.overflow = "";
     } catch {}
+
+    try {
+      if (this.aborter) this.aborter.abort();
+    } catch {}
+
+    try {
+      if (this.introTl) this.introTl.kill();
+    } catch {}
   },
 
-  // For Vue 2 + vue-router: handle param change (click latest news)
+  // Vue 2 route update hook
   beforeRouteUpdate(to, from, next) {
     next();
+
+    // ✅ FIX: close lightbox + run after DOM updated
+    this.closeLightbox();
     this.scrollToTop();
+
     this.$nextTick(() => {
-      this.animateIntro();
+      if (this.activePost) this.animateIntroSafe();
     });
   },
 
   methods: {
+    async fetchNews() {
+      this.isLoading = true;
+      this.error = null;
+
+      try {
+        if (this.aborter) this.aborter.abort();
+        this.aborter = new AbortController();
+
+        const res = await fetch(NEWS_API, { method: "GET", signal: this.aborter.signal });
+        if (!res.ok) throw new Error(`API error: ${res.status}`);
+
+        const json = await res.json();
+
+        const list =
+          Array.isArray(json) ? json :
+          Array.isArray(json?.data) ? json.data :
+          Array.isArray(json?.news) ? json.news :
+          Array.isArray(json?.result) ? json.result :
+          [];
+
+        this.posts = list.map((item) => this.normalizeNewsItem(item)).filter(Boolean);
+
+        this.$nextTick(() => {
+          if (this.activePost) this.animateIntroSafe();
+        });
+      } catch (e) {
+        if (e?.name === "AbortError") return;
+        this.posts = [];
+        const msg = e?.message || "Failed to load news from API.";
+        this.error =
+          msg.includes("Failed to fetch") || msg.includes("NetworkError")
+            ? `Failed to fetch. ถ้าเปิดจากมือถือ/เครื่องอื่น ให้เปลี่ยน API_BASE จาก localhost เป็น IP เครื่อง backend และเช็ค CORS ด้วย`
+            : msg;
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    normalizeNewsItem(item) {
+      const id =
+        item?.id ??
+        item?.news_id ??
+        item?.id_news ??
+        item?.idnews ??
+        item?._id ??
+        null;
+
+      if (id == null) return null;
+
+      const category = String(item?.category ?? "").trim();
+      const titleRaw = item?.header_news ?? item?.title ?? "";
+      const title = String(titleRaw).trim() || "-";
+
+      const rawTags = item?.tags ?? item?.tag ?? [];
+      const tags = Array.isArray(rawTags)
+        ? rawTags.map((t) => String(t).trim()).filter(Boolean)
+        : typeof rawTags === "string"
+          ? rawTags.split(",").map((s) => s.trim()).filter(Boolean)
+          : [];
+
+      const rawDesc = item?.description_news ?? item?.description ?? "";
+      const content = this.toParagraphs(rawDesc);
+
+      const heroImage = this.resolveImage(item?.hero_img ?? item?.heroImage ?? "");
+
+      const galleryRaw = this.parseMaybeJson(item?.gallery ?? item?.images ?? []);
+      const gallery = Array.isArray(galleryRaw)
+        ? galleryRaw
+            .map((g) => {
+              if (typeof g === "string") {
+                const src = this.resolveImage(g);
+                return src ? { src, alt: "" } : null;
+              }
+              if (g && typeof g === "object") {
+                const src = this.resolveImage(g.src || g.url || g.path || g.image || "");
+                if (!src) return null;
+                return { src, alt: String(g.alt || "").trim() };
+              }
+              return null;
+            })
+            .filter(Boolean)
+        : [];
+
+      const dateTime =
+        item?.datetime ??
+        item?.date_time ??
+        item?.created_at ??
+        item?.createdAt ??
+        item?.updated_at ??
+        item?.updatedAt ??
+        "";
+
+      const d = new Date(dateTime);
+
+      return {
+        id,
+        category,
+        title,
+        tags,
+        content,
+        heroImage,
+        gallery,
+        image: heroImage,
+        dateTime,
+        date: this.formatDate(d),
+        readTime: this.timeAgo(d)
+      };
+    },
+
+    parseMaybeJson(v) {
+      if (typeof v !== "string") return v;
+      const s = v.trim();
+      if (!s) return [];
+      try {
+        return JSON.parse(s);
+      } catch {
+        if (s.includes(",")) return s.split(",").map((x) => x.trim()).filter(Boolean);
+        return [s];
+      }
+    },
+
+    toParagraphs(desc) {
+      if (Array.isArray(desc)) return desc.map((x) => String(x).trim()).filter(Boolean);
+
+      const s = String(desc || "").trim();
+      if (!s) return [];
+
+      const noHtml = s.replace(/<\/?[^>]+(>|$)/g, " ");
+      return noHtml.split(/\n+/).map((x) => x.trim()).filter(Boolean);
+    },
+
+    resolveImage(url) {
+      if (!url) return "";
+      const s = String(url).trim();
+      if (!s) return "";
+      if (/^https?:\/\//i.test(s)) return s;
+      if (s.startsWith("/")) return `${API_BASE}${s}`;
+      return `${API_BASE}/${s}`;
+    },
+
+    safeTime(dt) {
+      const t = new Date(dt || 0).getTime();
+      return Number.isFinite(t) ? t : 0;
+    },
+
+    formatDate(d) {
+      if (!(d instanceof Date) || Number.isNaN(d.getTime())) return "";
+      return d.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
+    },
+
+    timeAgo(d) {
+      if (!(d instanceof Date) || Number.isNaN(d.getTime())) return "";
+
+      let diffMs = Date.now() - d.getTime();
+      if (diffMs < 0) diffMs = 0;
+
+      const minute = 60 * 1000;
+      const hour = 60 * minute;
+      const day = 24 * hour;
+      const month = 30 * day;
+      const year = 365 * day;
+
+      const n = (x) => Math.max(1, Math.floor(x));
+
+      if (diffMs >= year) return `ໂພສເມື່ອ ${n(diffMs / year)} ປີກ່ອນ`;
+      if (diffMs >= month) return `ໂພສເມື່ອ ${n(diffMs / month)} ເດືອນກ່ອນ`;
+      if (diffMs >= day) return `ໂພສເມື່ອ ${n(diffMs / day)} ມື້ກ່ອນ`;
+      if (diffMs >= hour) return `ໂພສເມື່ອ ${n(diffMs / hour)} ຊົ່ວໂມງກ່ອນ`;
+      if (diffMs >= minute) return `ໂພສເມື່ອ ${n(diffMs / minute)} ນາທີກ່ອນ`;
+      return "ໂພສເມື່ອ ບໍ່ດົນມານີ້";
+    },
+
     scrollToTop() {
-      window.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: "smooth"
-      });
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
     },
 
     goBack() {
-      const page =
-        this.$route && this.$route.query ? this.$route.query.page : null;
+      const page = this.$route && this.$route.query ? this.$route.query.page : null;
 
       if (this.$router && page) {
-        this.$router.push({
-          name: "BlogGrid",
-          query: { page }
-        });
+        this.$router.push({ name: "BlogGrid", query: { page } });
         return;
       }
 
-      if (window.history.length > 1 && this.$router) {
-        this.$router.back();
-      } else if (this.$router) {
-        this.$router.push({ name: "BlogGrid" });
-      }
+      if (window.history.length > 1 && this.$router) this.$router.back();
+      else if (this.$router) this.$router.push({ name: "BlogGrid" });
     },
 
-    // Intro animation for header + layout + gallery + latest list
-    animateIntro() {
-      const tl = gsap.timeline({
-        defaults: { ease: "power3.out" }
-      });
+    // ✅ FIX: safe wrappers (no crash => no white screen)
+    animateIntroSafe() {
+      try {
+        this.animateIntro();
+      } catch (e) {
+        // silently ignore gsap timing errors
+        // (prevents white screen)
+      }
+    },
+    animateLatestSafe() {
+      try {
+        this.animateLatest();
+      } catch {}
+    },
 
-      tl.from(".detail-header", {
-        opacity: 0,
-        y: -24,
-        duration: 0.6
-      })
-        .from(
-          this.$refs.detailMain,
-          {
-            opacity: 0,
-            x: -24,
-            duration: 0.55
-          },
-          "-=0.25"
-        )
-        .from(
-          this.$refs.detailSidebar,
-          {
-            opacity: 0,
-            x: 24,
-            duration: 0.55
-          },
-          "-=0.4"
-        )
+    animateIntro() {
+      // ✅ FIX: guard refs
+      if (!this.$refs.detailMain || !this.$refs.detailSidebar) return;
+
+      // ✅ FIX: kill previous timeline
+      if (this.introTl) this.introTl.kill();
+      gsap.killTweensOf(".detail-header");
+
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      this.introTl = tl;
+
+      tl.from(".detail-header", { opacity: 0, y: -24, duration: 0.6 })
+        .from(this.$refs.detailMain, { opacity: 0, x: -24, duration: 0.55 }, "-=0.25")
+        .from(this.$refs.detailSidebar, { opacity: 0, x: 24, duration: 0.55 }, "-=0.4")
         .add(() => {
           this.animateGallery();
           this.animateLatest();
         }, "-=0.2");
     },
 
-    // Animate gallery images
     animateGallery() {
       const grid = this.$refs.imageGrid;
       if (!grid || !this.activePost?.gallery?.length) return;
@@ -454,18 +644,10 @@ export default {
       gsap.fromTo(
         items,
         { opacity: 0, y: 18, scale: 0.96 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.6,
-          ease: "power3.out",
-          stagger: 0.08
-        }
+        { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "power3.out", stagger: 0.08 }
       );
     },
 
-    // Animate latest news items when filter/search changes
     animateLatest() {
       const list = this.$refs.latestList;
       if (!list) return;
@@ -476,35 +658,17 @@ export default {
       gsap.fromTo(
         items,
         { opacity: 0, y: 14 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.45,
-          ease: "power2.out",
-          stagger: 0.05
-        }
+        { opacity: 1, y: 0, duration: 0.45, ease: "power2.out", stagger: 0.05 }
       );
     },
 
-    // ✅ keyboard in lightbox
     onLightboxKeydown(e) {
       if (!this.isLightboxOpen) return;
-
-      if (e.key === "Escape") {
-        this.closeLightbox();
-        return;
-      }
-      if (e.key === "ArrowRight") {
-        this.nextImage();
-        return;
-      }
-      if (e.key === "ArrowLeft") {
-        this.prevImage();
-        return;
-      }
+      if (e.key === "Escape") return this.closeLightbox();
+      if (e.key === "ArrowRight") return this.nextImage();
+      if (e.key === "ArrowLeft") return this.prevImage();
     },
 
-    // ✅ detect vertical image
     detectVertical(imgEl) {
       const naturalW = imgEl?.naturalWidth || 1;
       const naturalH = imgEl?.naturalHeight || 1;
@@ -513,7 +677,6 @@ export default {
       this.isVerticalImage = imgRatio > viewportRatio;
     },
 
-    // ✅ Swipe handlers (ปัดซ้าย/ขวา)
     onSwipeDown(e) {
       if (!this.isLightboxOpen || !this.canNavigate) return;
       if (e.pointerType === "mouse" && e.button !== 0) return;
@@ -533,7 +696,6 @@ export default {
     onSwipeMove(e) {
       if (!this.swipe.active) return;
       if (this.swipe.pointerId != null && e.pointerId !== this.swipe.pointerId) return;
-
       this.swipe.lastX = e.clientX;
       this.swipe.lastY = e.clientY;
     },
@@ -546,8 +708,6 @@ export default {
       const dy = this.swipe.lastY - this.swipe.startY;
 
       this.onSwipeCancel();
-
-      // ถ้ารูปแนวตั้งและกำลังเลื่อนอ่าน ให้ไม่บังคับ swipe เปลี่ยนรูป (กันชน scroll)
       if (this.isVerticalImage) return;
 
       const absX = Math.abs(dx);
@@ -572,7 +732,6 @@ export default {
       this.swipe.pointerId = null;
     },
 
-    // Open lightbox with GSAP animation + vertical image detection
     openLightbox(index) {
       if (!this.activePost?.gallery || !this.activePost.gallery[index]) return;
 
@@ -594,23 +753,12 @@ export default {
           gsap.set(img, { autoAlpha: 0, scale: 0.96, y: 20, x: 0 });
 
           const tl = gsap.timeline();
-          tl.to(overlay, {
-            autoAlpha: 1,
-            duration: 0.2,
-            ease: "power2.out"
-          }).to(
+          tl.to(overlay, { autoAlpha: 1, duration: 0.2, ease: "power2.out" }).to(
             img,
-            {
-              autoAlpha: 1,
-              scale: 1,
-              y: 0,
-              duration: 0.35,
-              ease: "power3.out"
-            },
+            { autoAlpha: 1, scale: 1, y: 0, duration: 0.35, ease: "power3.out" },
             "-=0.05"
           );
 
-          // nav buttons in
           gsap.fromTo(
             ".lb-nav",
             { autoAlpha: 0, y: 6, scale: 0.98 },
@@ -628,7 +776,6 @@ export default {
       });
     },
 
-    // ✅ swap image with GSAP (dir: 1 next, -1 prev)
     swapLightboxImage(newIndex, dir) {
       if (!this.activePost?.gallery?.length) return;
 
@@ -643,13 +790,7 @@ export default {
 
       const tl = gsap.timeline();
 
-      tl.to(img, {
-        autoAlpha: 0,
-        x: outX,
-        scale: 0.985,
-        duration: 0.16,
-        ease: "power2.inOut"
-      }).add(() => {
+      tl.to(img, { autoAlpha: 0, x: outX, scale: 0.985, duration: 0.16, ease: "power2.inOut" }).add(() => {
         this.activeImageIndex = newIndex;
         this.isVerticalImage = false;
       });
@@ -661,22 +802,9 @@ export default {
 
           const runIn = () => {
             this.detectVertical(img2);
-
             gsap.set(img2, { autoAlpha: 0, x: inX, scale: 0.985 });
-            gsap.to(img2, {
-              autoAlpha: 1,
-              x: 0,
-              scale: 1,
-              duration: 0.24,
-              ease: "power3.out"
-            });
-
-            // small counter pulse
-            gsap.fromTo(
-              ".lb-counter-pill",
-              { scale: 0.98 },
-              { scale: 1, duration: 0.2, ease: "power2.out" }
-            );
+            gsap.to(img2, { autoAlpha: 1, x: 0, scale: 1, duration: 0.24, ease: "power3.out" });
+            gsap.fromTo(".lb-counter-pill", { scale: 0.98 }, { scale: 1, duration: 0.2, ease: "power2.out" });
           };
 
           if (img2.complete) runIn();
@@ -686,20 +814,19 @@ export default {
     },
 
     nextImage() {
-      if (!this.canNavigate) return;
+      if (!this.activePost?.gallery?.length || !this.canNavigate) return;
       const len = this.activePost.gallery.length;
       const next = (this.activeImageIndex + 1) % len;
       this.swapLightboxImage(next, 1);
     },
 
     prevImage() {
-      if (!this.canNavigate) return;
+      if (!this.activePost?.gallery?.length || !this.canNavigate) return;
       const len = this.activePost.gallery.length;
       const prev = (this.activeImageIndex - 1 + len) % len;
       this.swapLightboxImage(prev, -1);
     },
 
-    // Close lightbox with reverse animation
     closeLightbox() {
       const overlay = this.$refs.lightboxOverlay;
       const img = this.$refs.lightboxImg;
@@ -723,26 +850,16 @@ export default {
         }
       });
 
-      tl.to(img, {
-        autoAlpha: 0,
-        scale: 0.96,
-        y: 10,
-        x: 0,
-        duration: 0.2,
-        ease: "power2.inOut"
-      }).to(
+      tl.to(img, { autoAlpha: 0, scale: 0.96, y: 10, x: 0, duration: 0.2, ease: "power2.inOut" }).to(
         overlay,
-        {
-          autoAlpha: 0,
-          duration: 0.25,
-          ease: "power2.inOut"
-        },
+        { autoAlpha: 0, duration: 0.25, ease: "power2.inOut" },
         "-=0.1"
       );
     }
   }
 };
 </script>
+
 
 <style scoped>
 /* your original styles, plus lightbox */
@@ -1400,7 +1517,7 @@ export default {
   .filters-card { order: 1; }
   .latest-card { order: 2; }
 
-  /* ✅ mobile lightbox: กันปุ่มบังรูป + ย้าย prev/next ไปด้านล่าง */
+
   .lightbox-overlay {
     padding-bottom: 96px;
   }

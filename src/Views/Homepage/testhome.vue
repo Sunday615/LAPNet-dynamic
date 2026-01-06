@@ -1,29 +1,19 @@
 <template>
   <!-- Desktop links -->
-  <!--
+  
   <popupoverlay
     v-model="show1"
     image-src="/blog/1.jpg"
-    title="Popup #1 (Test)"
-    description="Show popup 1"
+    title="ແຈ້ງການປະມູນລະຫັດ OTP ຜ່ານ SMS"
+    description="ແຈ້ງການປະມູນລະຫັດ OTP ຜ່ານ SMS ເພື່ອເພີ່ມຄວາມປອດໄພໃນການໃຊ້ບໍລິການ LAPNet ທຸລະກໍາໄດ້ເລີ່ມຕົ້ນ ວນນາ 1 ກໍລະນາ 2024."
     primary-text="Next"
     secondary-text="Skip"
     @closed="handleClosed1"
     @primary="handleClosed1"
     @secondary="handleClosed1"
   />
-  <popupoverlay
-    v-model="show2"
-    image-src="/footer/backgroundfooter.png"
-    title="Popup #2 (Test)"
-    description="Show popup 2"
-    primary-text="Done"
-    secondary-text="Close"
-    @closed="handleClosed2"
-    @primary="handleClosed2"
-    @secondary="handleClosed2"
-  />
-  -->
+
+ 
 
   <div class="herosectionhomepage" id="hero">
     <mockupherosectionpage />
@@ -64,7 +54,7 @@
       description="ບໍລິສັດ ລາວເນ ເຊີນນໍ ເພເມັ້ນ ເນັດເວີກ ຈຳກັດ (LAPNet)  ເປັນຜູ້ໃຫ້ບໍລິການລະບົບ ຊໍາລະທຸລະກໍາຍ່ອຍທົ່ວໄປ ຕາມທີ່ໄດ້ກໍານົດໄວ້ໃນກົດໝາຍວ່າດ້ວຍລະບົບການຊໍາລະ. ຊຶ່ງເຮັດໜ້າທີ່ເປັນໂຕກາງໃນການ ເຊື່ອມໂຍງກັບທຸກຂະແໜງການຊຳລະທີ່ເປັນທະນາຄານ, ສະຖາບັນການເງິນ ແລະ ຜູ້ໃຫ້ບໍລິການ ການຊຳລະແຫ່ງດຽວໃນ ສປປ ລາວ;"
       :stat1Value="19"
       stat1Label="Commercial Bank"
-      stat1Suffix="19 ທະນາຄານສະມາຊິກທີ່ເຂົ້າຮ່ວມກັບ Lao National Payment Network CO., LTD"
+      stat1Suffix=""
       :stat2Value="2"
       stat2Label="Fintech"
       stat2Suffix=""
@@ -156,7 +146,8 @@ import { ref, onMounted, onBeforeUnmount, nextTick, watch } from "vue"
 import { gsap } from "gsap"
 
 /** ✅ TEST MODE: 3 Hour per show  */
-const INTERVAL_MS = 3 * 60 * 60 * 1000 // 3 hours
+// const INTERVAL_MS = 3 * 60 * 60 * 1000 // 3 hours
+const INTERVAL_MS = 1 * 60 * 1000 // 3 hours
 
 const KEY_LAST = "home_popups_last_shown_ts_test"
 const KEY_STATE = "home_two_popups_state_test"

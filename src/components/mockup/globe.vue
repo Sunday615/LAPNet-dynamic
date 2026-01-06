@@ -10,6 +10,7 @@ import * as THREE from "three";
 import gsap from "gsap";
 
 type Endpoint = {
+  idmember?: number; // ✅ keep idmember for sorting / debugging
   name?: string;
   logo: string;
   lat?: number;
@@ -24,7 +25,13 @@ type ProductPair = {
   color?: string;
 };
 
-const DEFAULT_NODES: Endpoint[] = Array.from({ length: 21 }).map((_, i) => ({
+// ✅ Force fetch from this API (as you requested)
+const API_BASE = "http://localhost:3000";
+const MEMBERS_API_URL = `${API_BASE}/api/members`;
+
+// ✅ fallback nodes (match 22)
+const DEFAULT_NODES: Endpoint[] = Array.from({ length: 22 }).map((_, i) => ({
+  idmember: i + 1,
   name: `Logo ${i + 1}`,
   logo: `/logos/logo-${String(i + 1).padStart(2, "0")}.png`,
 }));
@@ -69,16 +76,15 @@ const props = withDefaults(
 
     showStars?: boolean;
 
-    /** ✅ NEW: เปิดมาให้ hub (LAPNET) อยู่ด้านหน้าก่อน */
     startWithHubFront?: boolean;
-    /** ✅ NEW: เผื่ออยากกำหนด start lat/lon เอง (จะ override startWithHubFront) */
     startLat?: number;
     startLon?: number;
 
-    /** ✅ NEW: ดัน hubLogo ให้อยู่ด้านหน้า (กันโดนจุด/เส้นบัง) */
     hubFrontLift?: number;
-    /** ✅ NEW: renderOrder ของ hubLogo ให้สูงกว่า element อื่น */
     hubRenderOrder?: number;
+
+    /** ✅ how many member logos to show (set 22 by default) */
+    memberLimit?: number;
   }>(),
   {
     pairs: () => [],
@@ -125,13 +131,16 @@ const props = withDefaults(
 
     hubFrontLift: 0.14,
     hubRenderOrder: 50,
+
+    // ✅ you want all 22 logos
+    memberLimit: 22,
   }
 );
 
 const canvas = ref<HTMLCanvasElement | null>(null);
 const wrap = ref<HTMLDivElement | null>(null);
 
-/** ✅ LOW POWER / MOBILE MODE (กัน crash) */
+/** ✅ LOW POWER / MOBILE MODE */
 const isClient = typeof window !== "undefined";
 const reduceMotion =
   isClient && window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
@@ -151,9 +160,160 @@ const hub = computed(() => ({
   lon: props.hubLon!,
 }));
 
+/** ✅ nodes from members API */
+const membersNodes = ref<Endpoint[] | null>(null);
+
+const toNumber = (v: any) => {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+};
+
+const pickMemberId = (item: any) => {
+  return (
+    toNumber(item?.idmember) ??
+    toNumber(item?.idMember) ??
+    toNumber(item?.memberid) ??
+    toNumber(item?.memberId) ??
+    toNumber(item?.id) ??
+    toNumber(item?._id) ??
+    null
+  );
+};
+
+// ✅ better name mapping for your API (members table)
+const pickMemberName = (item: any, id: number | null) => {
+  const s = String(
+    item?.BanknameLA ??
+      item?.BanknameEN ??
+      item?.bank_name ??
+      item?.name ??
+      item?.title ??
+      item?.label ??
+      ""
+  ).trim();
+  if (s) return s;
+  return id != null ? `Member ${id}` : "Member";
+};
+
+const extractImageString = (img: any): string => {
+  if (!img) return "";
+  if (typeof img === "string") return img;
+
+  // array -> take first
+  if (Array.isArray(img)) {
+    for (const it of img) {
+      const s = extractImageString(it);
+      if (s) return s;
+    }
+    return "";
+  }
+
+  // object -> try common keys
+  const candidates = [
+    img?.url,
+    img?.path,
+    img?.src,
+    img?.image,
+    img?.file,
+    img?.filePath,
+    img?.filename,
+    img?.name,
+    img?.download_url,
+  ];
+  for (const c of candidates) {
+    if (typeof c === "string" && c.trim()) return c;
+  }
+
+  if (img?.data) return extractImageString(img.data);
+
+  return "";
+};
+
+const resolveImage = (img: any) => {
+  const s = extractImageString(img).trim();
+  if (!s) return "";
+  if (/^data:image\//i.test(s)) return s;
+  if (/^https?:\/\//i.test(s)) return s;
+  if (s.startsWith("/")) return `${API_BASE}${s}`;
+  return `${API_BASE}/${s}`;
+};
+
+const fallbackLogoById = (id: number) => {
+  return `/logos/logo-${String(id).padStart(2, "0")}.png`;
+};
+
+// ✅ IMPORTANT: support image_url first (your server returns it)
+const pickMemberImage = (item: any) => {
+  return (
+    item?.image_url ?? // ✅ absolute from API
+    item?.Image_url ??
+    item?.imageUrl ??
+    item?.image ??
+    item?.logo ??
+    item?.logo_img ??
+    item?.member_logo ??
+    item?.img ??
+    item?.photo ??
+    ""
+  );
+};
+
+const normalizeMemberToNode = (item: any) => {
+  const id = pickMemberId(item);
+  if (id == null) return null;
+
+  const name = pickMemberName(item, id);
+
+  const logoResolved = resolveImage(pickMemberImage(item));
+  const logo = logoResolved || fallbackLogoById(id);
+
+  return {
+    idmember: id,
+    name,
+    logo,
+  } satisfies Endpoint;
+};
+
+async function fetchJson(url: string) {
+  const res = await fetch(url, { method: "GET" });
+  if (!res.ok) throw new Error(`API error: ${res.status}`);
+  return res.json();
+}
+
+// ✅ fetch all member logos (22)
+async function loadMembersNodes() {
+  try {
+    const json: any = await fetchJson(MEMBERS_API_URL);
+
+    const list =
+      Array.isArray(json) ? json :
+      Array.isArray(json?.data) ? json.data :
+      Array.isArray(json?.members) ? json.members :
+      Array.isArray(json?.result) ? json.result :
+      [];
+
+    const mapped = (list as any[])
+      .map(normalizeMemberToNode)
+      .filter(Boolean) as Endpoint[];
+
+    // ✅ sort by idmember so id=1 always visible and stable order
+    mapped.sort((a, b) => (a.idmember ?? 0) - (b.idmember ?? 0));
+
+    // ✅ take ALL 22 (or whatever memberLimit is)
+    const limitRaw = props.memberLimit ?? 22;
+    const limit = limitRaw <= 0 ? mapped.length : limitRaw; // allow "0" = no limit
+    membersNodes.value = mapped.slice(0, Math.max(1, limit));
+  } catch (e) {
+    console.error("Load members nodes failed:", e);
+    membersNodes.value = null;
+  }
+}
+
 const nodes = computed<Endpoint[]>(() => {
+  // ✅ if you pass nodes manually, use those
   if (props.nodes && props.nodes.length > 0) return props.nodes;
 
+  // ✅ if pairs are provided, derive nodes from pairs
   const ps = props.pairs ?? [];
   if (ps.length > 0) {
     const map = new Map<string, Endpoint>();
@@ -165,6 +325,10 @@ const nodes = computed<Endpoint[]>(() => {
     return Array.from(map.values()).slice(0, 50);
   }
 
+  // ✅ default: from API members (ALL 22)
+  if (membersNodes.value && membersNodes.value.length > 0) return membersNodes.value;
+
+  // ✅ fallback
   return DEFAULT_NODES;
 });
 
@@ -230,7 +394,6 @@ function fibonacciSphere(n: number, r: number) {
   return pts;
 }
 
-/** ✅ downscale land mask ก่อนอ่าน pixel (กัน crash มือถือ) */
 async function loadLandMaskSampler(url: string) {
   try {
     const img = new Image();
@@ -268,13 +431,11 @@ async function loadLandMaskSampler(url: string) {
   }
 }
 
-/** ✅ ปรับให้เบากว่าบนมือถือ (ลด tries + ลด candidate subset) */
 function pickSpreadPoints(count: number, candidates: THREE.Vector3[], minAngleRad: number) {
   if (candidates.length === 0) return [];
 
   let pool = candidates;
   if (lowPower && pool.length > 800) {
-    // random sample pool ให้เล็กลง ลด O(n^2)
     const tmp: THREE.Vector3[] = [];
     for (let i = 0; i < 800; i++) tmp.push(pool[(Math.random() * pool.length) | 0]!);
     pool = tmp;
@@ -348,12 +509,9 @@ function makeCircleTexture(size = 64) {
 
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
-
-  // ✅ ลด memory บนมือถือ
   tex.generateMipmaps = false;
   tex.minFilter = THREE.LinearFilter;
   tex.magFilter = THREE.LinearFilter;
-
   return tex;
 }
 
@@ -480,7 +638,6 @@ function makeStarfield(count = 1200, radius = 18) {
   return s;
 }
 
-/** ✅ เพิ่ม lift + renderOrder เพื่อให้ hub อยู่หน้า */
 function makeLogoPin(
   worldPos: THREE.Vector3,
   normal: THREE.Vector3,
@@ -720,9 +877,11 @@ function shuffle<T>(arr: T[]) {
 onMounted(async () => {
   if (!canvas.value || !wrap.value) return;
 
+  // ✅ load ALL member logos before build globe
+  await loadMembersNodes();
+
   const reduce = reduceMotion ?? false;
 
-  // ✅ สร้าง renderer แบบกัน crash + ปรับให้เหมาะมือถือ
   try {
     renderer = new THREE.WebGLRenderer({
       canvas: canvas.value,
@@ -755,7 +914,6 @@ onMounted(async () => {
   const globe = new THREE.Group();
   scene.add(globe);
 
-  /** ✅ START ORIENTATION: เปิดมาหัน hub (LAPNET) เข้ากล้องก่อน */
   const startLat = props.startLat ?? (props.startWithHubFront ? props.hubLat! : props.focusLat!);
   const startLon = props.startLon ?? (props.startWithHubFront ? props.hubLon! : props.focusLon!);
 
@@ -783,15 +941,13 @@ onMounted(async () => {
   globe.add(dotField);
 
   const circleTex = makeCircleTexture(64);
-  circleTex.generateMipmaps = false;
-  circleTex.minFilter = THREE.LinearFilter;
-  circleTex.magFilter = THREE.LinearFilter;
   disposers.push(() => circleTex.dispose());
 
   const loader = new THREE.TextureLoader();
   const urls = Array.from(
     new Set([hub.value.logo, ...nodes.value.map((n) => n.logo)].filter(Boolean))
   );
+
   const texMap = new Map<string, THREE.Texture>();
 
   await Promise.all(
@@ -799,13 +955,10 @@ onMounted(async () => {
       try {
         const tex = await loader.loadAsync(url);
         tex.colorSpace = THREE.SRGBColorSpace;
-
-        // ✅ ลด memory บนมือถือ
         tex.generateMipmaps = false;
         tex.minFilter = THREE.LinearFilter;
         tex.magFilter = THREE.LinearFilter;
         tex.anisotropy = 1;
-
         texMap.set(url, tex);
         disposers.push(() => tex.dispose());
       } catch {}
@@ -818,7 +971,6 @@ onMounted(async () => {
   const routesGroup = new THREE.Group();
   globe.add(routesGroup);
 
-  // ✅ hub logo on globe (ยกขึ้น + renderOrder สูง)
   const hubTex = texMap.get(hub.value.logo);
   if (hubTex) {
     routesGroup.add(
@@ -1022,14 +1174,12 @@ onMounted(async () => {
     window.removeEventListener("pointermove", onMove as any);
   });
 
-  // ✅ GSAP intro (เก็บ tween แล้ว kill ตอน unmount)
   if (!reduce && !lowPower) {
     globe.scale.set(0.96, 0.96, 0.96);
     gsapTweens.push(gsap.to(globe.scale, { x: 1, y: 1, z: 1, duration: 1.05, ease: "power3.out" }));
     gsapTweens.push(gsap.fromTo(camera.position, { z: 4.2 }, { z: 3.7, duration: 1.1, ease: "power3.out" }));
   }
 
-  // ✅ handle context lost (มือถือบางรุ่นเจอบ่อย)
   let running = true;
   const stopLoop = () => {
     running = false;
@@ -1041,11 +1191,9 @@ onMounted(async () => {
     e.preventDefault();
     stopLoop();
   };
-
   canvas.value.addEventListener("webglcontextlost", onLost as any, false);
   disposers.push(() => canvas.value?.removeEventListener("webglcontextlost", onLost as any, false));
 
-  // ✅ pause when tab hidden (ช่วย iOS ไม่ reload/crash)
   const onVis = () => {
     if (document.hidden) stopLoop();
     else if (!running) {
@@ -1118,11 +1266,9 @@ onBeforeUnmount(() => {
   ro?.disconnect();
   ro = null;
 
-  // ✅ kill gsap
   gsapTweens.forEach((t) => t.kill());
   gsapTweens = [];
 
-  // ✅ remove listeners + dispose geometries/materials/textures
   disposers.forEach((d) => d());
   disposers.length = 0;
 
@@ -1156,6 +1302,6 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100%;
   display: block;
-  touch-action: none; /* ✅ กัน gesture ทำให้ pointer event หน่วง/เพี้ยนบนมือถือ */
+  touch-action: none;
 }
 </style>

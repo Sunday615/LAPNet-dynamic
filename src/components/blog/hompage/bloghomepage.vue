@@ -1,30 +1,38 @@
 <template>
   <section class="card-section">
     <div class="card-header">
-      <h2 class="card-title">ຂ່າວສານ ແລະ ກິດຈະກຳ</h2>
+      <h2 class="card-title">ຂ່າວສານ ແລະ ກິດຈະກກຳ</h2>
       <div class="titlelapnet">
-        <img src="/logolapnet/logolapnet.PNG" style="width: 30px; height: 30px" alt="" />
+        <img
+          src="/logolapnet/logolapnet.PNG"
+          style="width: 30px; height: 30px"
+          alt=""
+        />
         <p class="card-subtitle">Lao Nationnal Payment Network CO., LTD</p>
       </div>
     </div>
 
+    <!-- ✅ Render Swiper only after data is ready (fix autoplay not starting until drag) -->
     <Swiper
+      v-if="images.length"
+      :key="swiperKey"
       class="card-swiper"
-      :modules="[Autoplay, Navigation, Pagination]"
+      :modules="swiperModules"
       :slides-per-view="3"
       :space-between="20"
-      :loop="true"
+      :loop="images.length > 1"
       :speed="900"
       :autoplay="{
         delay: 2200,
-        disableOnInteraction: false
+        disableOnInteraction: false,
+        pauseOnMouseEnter: false
       }"
       :navigation="{
-        nextEl: '.card-nav-next',
-        prevEl: '.card-nav-prev'
+        nextEl: nextBtn,
+        prevEl: prevBtn
       }"
       :pagination="{
-        el: '.card-pagination',
+        el: paginationEl,
         clickable: true
       }"
       :breakpoints="{
@@ -32,7 +40,11 @@
         640: { slidesPerView: 2 },
         1024: { slidesPerView: 3 }
       }"
-      :centeredSlides="true"
+      :centeredSlides="images.length > 1"
+      :observer="true"
+      :observeParents="true"
+      :observeSlideChildren="true"
+      @swiper="onSwiper"
     >
       <SwiperSlide v-for="item in images" :key="item.id">
         <div class="card" @click="goToBlogDetail(item.id)">
@@ -43,17 +55,9 @@
 
             <div class="card-info">
               <div class="card-info-top">
-                <h3 class="card-item-title">
-                  {{ item.title }}
-                </h3>
-                <span class="card-date-chip">
-                  {{ item.date }}
-                </span>
+                <h3 class="card-item-title">{{ item.title }}</h3>
+                <span class="card-date-chip">{{ item.date }}</span>
               </div>
-
-              <p class="card-description">
-                {{ item.description }}
-              </p>
 
               <button class="card-read-btn" @click.stop="goToBlogDetail(item.id)">
                 <span class="card-read-label">Read more</span>
@@ -67,14 +71,14 @@
 
     <!-- Controls -->
     <div class="card-controls">
-      <button class="card-nav-btn card-nav-prev">
+      <button ref="prevBtn" class="card-nav-btn card-nav-prev">
         <span class="card-nav-icon card-nav-icon-left"></span>
         <span class="card-nav-label">Prev</span>
       </button>
 
-      <div class="card-pagination"></div>
+      <div ref="paginationEl" class="card-pagination"></div>
 
-      <button class="card-nav-btn card-nav-next">
+      <button ref="nextBtn" class="card-nav-btn card-nav-next">
         <span class="card-nav-label">Next</span>
         <span class="card-nav-icon card-nav-icon-right"></span>
       </button>
@@ -83,6 +87,7 @@
 </template>
 
 <script setup>
+import { ref, onMounted, nextTick, watch } from "vue";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
@@ -92,67 +97,187 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 
-const goToBlogDetail = (id) => {
+// ✅ Swiper modules (DON'T inline array in template)
+const swiperModules = [Autoplay, Navigation, Pagination];
+
+// ✅ Swiper instance + controls refs
+const swiperInstance = ref(null);
+const prevBtn = ref(null);
+const nextBtn = ref(null);
+const paginationEl = ref(null);
+
+// ✅ Force re-mount swiper when data loaded (helps autoplay/navigation init)
+const swiperKey = ref(0);
+
+const API_BASE = "http://localhost:3000";
+const NEWS_API_URL = "http://localhost:3000/api/news";
+
+// ✅ data for swiper
+const images = ref([]);
+
+// ✅ click -> send idnews to BlogDetail (route param id)
+const goToBlogDetail = (idnews) => {
   router.push({
     name: "BlogDetail",
-    params: { id }
+    params: { id: idnews }
   });
 };
 
-const images = [
-  {
-    id: 51,
-    src: "/blog/51/2.jpg",
-    alt: "My photo 1",
-    title:
-      "ບໍລິສັດ ລາວເນເຊີນນໍ ເພເມັ້ນ ເນັດເວີກ ຈຳກັດ (LAPNet) ເຂົ້າຮ່ວມງານສຳມະນາ ວ່າດ້ວຍການຊຳລະດ້ວຍລະບົບ QR Code ທີ່ ສສ. ຫວຽດນາມ.",
-    date: "04 ທັນວາ 2025",
-    description: ""
-  },
-  {
-    id: 50,
-    src: "/blog/50/1.jpg",
-    alt: "My photo 2",
-    title:
-      "ເຖິງທະນາຄານຈະປິດ ກໍ່ໂອນເງິນຂ້າມທະນາຄານໄດ້ ພຽງແຕ່ມີ Application ຂອງທະນາຄານທີ່ເຂົ້າຮ່ວມເປັນສະມາຊິກ.",
-    date: "10 ພະຈິກ 2025",
-    description: ""
-  },
-  {
-    id: 49,
-    src: "/blog/49/9.jpg",
-    alt: "My photo 3",
-    title: "ຄະນະສະພາບໍລິຫານຂອງ ບໍລິສັດ ຢູນຽນເພ ສປ.ຈີນ (UPI) ເຂົ້າພົບປະຢ້ຽມຢາມ. ",
-    date: "06 ພະຈິກ 2025",
-    description: ""
-  },
-  {
-    id: 48,
-    src: "/blog/48/8.jpg",
-    alt: "My photo 4",
-    title:
-      "ບໍລິສັດ ລາວເນເຊີນນໍ ເພເມັ້ນ ເນັດເວີກ ຈຳກັດ (LAPNet) ໄດ້ຈັດກອງປະຊຸມສະພາບໍລິຫານ ສະໄໝສາມັນ ປະຈຳໄຕມາດ III ຂອງປີ 2025.",
-    date: "03 ພະຈິກ 2025",
-    description: ""
-  },
-  {
-    id: 47,
-    src: "/blog/47/1.jpg",
-    alt: "My photo 5",
-    title:
-      "ບໍລິສັດ ລາວເນເຊິນນໍ ເພເມັ້ນ ເນັດເວີກ ຈຳກັດ (LAPNet) ໄດ້ຈັດກອງປະຊຸມກະກຽມການເຊື່ອມຕໍ່ລະບົບການຊຳລະຍ່ອຍຂ້າມແດນ ລາວ-ຈີນ. ",
-    date: "16 ຕຸລາ 2025",
-    description: ""
-  },
-  {
-    id: 46,
-    src: "/blog/46/1.jpg",
-    alt: "My photo 6",
-    title: "“ສະແກນຄິວອາດຽວ ຈ່າຍໄດ້ທຸກທະນາຄານ ດ້ວຍ LAO QR",
-    date: "08 ກັນຍາ 2025",
-    description: ""
+// ---------- helpers ----------
+const pad2 = (n) => String(n).padStart(2, "0");
+
+const formatDDMMYY = (input) => {
+  if (input == null) return "";
+  const s = String(input).trim();
+  if (!s) return "";
+
+  const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+  if (m) {
+    const dd = pad2(m[1]);
+    const mm = pad2(m[2]);
+    const yy = String(m[3]).slice(-2);
+    return `${dd}/${mm}/${yy}`;
   }
-];
+
+  const d = new Date(s);
+  if (Number.isNaN(d.getTime())) return s;
+
+  return `${pad2(d.getDate())}/${pad2(d.getMonth() + 1)}/${String(d.getFullYear()).slice(-2)}`;
+};
+
+const resolveImage = (url) => {
+  if (!url) return "";
+  const s = String(url).trim();
+  if (!s) return "";
+  if (/^https?:\/\//i.test(s)) return s;
+  if (s.startsWith("/")) return `${API_BASE}${s}`;
+  return `${API_BASE}/${s}`;
+};
+
+const safeTime = (dt) => {
+  const t = new Date(dt || 0).getTime();
+  return Number.isFinite(t) ? t : 0;
+};
+
+const normalizeNews = (item) => {
+  const id =
+    item?.news_id ??
+    item?.idnews ??
+    item?.id_news ??
+    item?.id ??
+    item?._id ??
+    null;
+
+  if (id == null) return null;
+
+  const title = String(item?.header_news ?? item?.title ?? "-").trim() || "-";
+  const src = resolveImage(item?.hero_img ?? item?.image ?? "");
+  const dateTime =
+    item?.date_time ??
+    item?.datetime ??
+    item?.created_at ??
+    item?.createdAt ??
+    item?.updated_at ??
+    item?.updatedAt ??
+    "";
+  const date = formatDDMMYY(dateTime);
+
+  return {
+    id,
+    src,
+    alt: title,
+    title,
+    date,
+    dateTime
+  };
+};
+
+// ✅ Fix: re-init navigation/pagination + restart autoplay after data is ready
+const reInitSwiper = async () => {
+  await nextTick();
+
+  const swiper = swiperInstance.value;
+  if (!swiper) return;
+
+  // ✅ ensure Swiper knows our navigation/pagination elements
+  if (prevBtn.value && nextBtn.value) {
+    swiper.params.navigation = swiper.params.navigation || {};
+    swiper.params.navigation.prevEl = prevBtn.value;
+    swiper.params.navigation.nextEl = nextBtn.value;
+
+    swiper.navigation?.destroy?.();
+    swiper.navigation?.init?.();
+    swiper.navigation?.update?.();
+  }
+
+  if (paginationEl.value) {
+    swiper.params.pagination = swiper.params.pagination || {};
+    swiper.params.pagination.el = paginationEl.value;
+
+    swiper.pagination?.destroy?.();
+    swiper.pagination?.init?.();
+    swiper.pagination?.render?.();
+    swiper.pagination?.update?.();
+  }
+
+  // ✅ dynamic slides + loop fixes
+  swiper.update();
+
+  if (swiper.params.loop) {
+    swiper.loopDestroy?.();
+    swiper.loopCreate?.();
+    swiper.update();
+  }
+
+  // ✅ START autoplay (this is the main bug fix)
+  swiper.autoplay?.stop?.();
+  swiper.autoplay?.start?.();
+};
+
+const onSwiper = (swiper) => {
+  swiperInstance.value = swiper;
+  reInitSwiper();
+};
+
+const fetchNews = async () => {
+  try {
+    const res = await fetch(NEWS_API_URL);
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+
+    const json = await res.json();
+    const list =
+      Array.isArray(json) ? json :
+      Array.isArray(json?.data) ? json.data :
+      Array.isArray(json?.news) ? json.news :
+      Array.isArray(json?.result) ? json.result :
+      [];
+
+    const mapped = list.map(normalizeNews).filter(Boolean);
+    mapped.sort((a, b) => safeTime(b.dateTime) - safeTime(a.dateTime));
+
+    images.value = mapped.slice(0, 6);
+
+    // ✅ force remount once after data loaded so autoplay starts immediately
+    swiperKey.value += 1;
+
+    // if swiper already exists, re-init
+    await reInitSwiper();
+  } catch (e) {
+    console.error("Fetch news failed:", e);
+    images.value = [];
+  }
+};
+
+onMounted(fetchNews);
+
+// ✅ if images change later, make sure autoplay/nav still works
+watch(
+  () => images.value.length,
+  async () => {
+    if (!images.value.length) return;
+    await reInitSwiper();
+  }
+);
 </script>
 
 <style scoped>
@@ -298,13 +423,6 @@ const images = [
   background: radial-gradient(circle at top, rgba(59, 130, 246, 0.8), rgba(15, 23, 42, 1));
   border: 1px solid rgba(191, 219, 254, 0.9);
   color: #dbeafe;
-}
-
-.card-description {
-  font-size: 0.8rem;
-  color: #c7d2fe;
-  opacity: 0.95;
-  line-height: 1.55;
 }
 
 .card-read-btn {
@@ -473,7 +591,6 @@ const images = [
     align-items: flex-start;
   }
 
-  /* ✅ ทำให้ Prev • Dots • Next อยู่ 1 แถว */
   .card-controls {
     flex-direction: row;
     gap: 0.75rem;
@@ -490,7 +607,6 @@ const images = [
     gap: 0.35rem;
   }
 
-  /* ✅ ถ้าพื้นที่แคบมาก ซ่อนคำ Prev/Next เหลือแต่ไอคอน */
   .card-nav-label {
     display: none;
   }
