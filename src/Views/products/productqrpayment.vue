@@ -99,6 +99,14 @@ const memberLogos = [
      src: "/logoallmember/circle_scale/mb.png",
     alt: "Client Z",
   },
+  {
+     src: "/logoallmember/circle_scale/mmoney.png",
+    alt: "Client Z",
+  },
+  {
+     src: "/logoallmember/circle_scale/umoney.png",
+    alt: "Client Z",
+  },
   // ...continue until you have 16 logos, all with their own paths
 ];
 </script>
