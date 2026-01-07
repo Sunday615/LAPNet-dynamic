@@ -20,70 +20,70 @@ const heroVideo = '/videos/productvdo-background.mp4'
 const memberLogos = [
    {
       src: "/logoallmember/circle_scale/BCEL.png",
-      alt: "Space AI",
+      alt: "BCEL Bank logo",
    },
     {
       src: "/logoallmember/circle_scale/APBB.PNG",
-      alt: "Partner B",
+      alt: "APB Bank logo",
    },
    {
       src: "/logoallmember/circle_scale/LDB.PNG",
-      alt: "Partner A",
+      alt: "LDB Bank logo",
    },
   
     {
       src: "/logoallmember/circle_scale/lvb.PNG",
-      alt: "Client Z",
+      alt: "LVB Bank logo",
    },
    {
       src: "/logoallmember/circle_scale/JDB.png",
-      alt: "Client X",
+      alt: "JDB Bank logo",
    },
   {
       src: "/logoallmember/circle_scale/STB.png",
-      alt: "Client Z",
+      alt: "STB Bank logo",
    },
     {
       src: "/logoallmember/circle_scale/BIC.png",
-      alt: "Client Z",
+      alt: "BIC Bank logo",
    },
  
    {
       src: "/logoallmember/circle_scale/ICBC.png",
-      alt: "Client Z",
+      alt: "ICBC Bank logo",
    },
    {
       src: "/logoallmember/circle_scale/BOC.png",
-      alt: "Client Z",
+      alt: "BOC Bank logo",
    },
    {
       src: "/logoallmember/circle_scale/VTB.png",
-      alt: "Client Z",
+      alt: "VTB Bank logo",
    },
    {
       src: "/logoallmember/circle_scale/IB.png",
-      alt: "Client Z",
+      alt: "IB Bank logo",
    },
    {
       src: "/logoallmember/circle_scale/ACLB.png",
-      alt: "Client Z",
+      alt: "ACLB Bank logo",
    },
     {
       src: "/logoallmember/circle_scale/Maruhan.png",
-      alt: "Client Y",
+      alt: "Maruhan Bank logo",
    },
    {
       src: "/logoallmember/circle_scale/SACOM.PNG",
-      alt: "Client Z",
+      alt: "SACOM Bank logo",
    },
    
    {
       src: "/logoallmember/circle_scale/Kasikorn.png",
-      alt: "Client Z",
+      alt: "Kasikorn Bank logo",
    },
    {
       src: "/logoallmember/circle_scale/PUB.png",
-      alt: "Client Z",
+      alt: "PBB Bank logo",
    },
    // ...continue until you have 16 logos, all with their own paths
 ];

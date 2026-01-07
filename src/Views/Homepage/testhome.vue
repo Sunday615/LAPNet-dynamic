@@ -1,17 +1,10 @@
 <template>
   <!-- Desktop links -->
   
-  <popupoverlay
-    v-model="show1"
-    image-src="/blog/1.jpg"
-    title="ແຈ້ງການປະມູນລະຫັດ OTP ຜ່ານ SMS"
-    description="ແຈ້ງການປະມູນລະຫັດ OTP ຜ່ານ SMS ເພື່ອເພີ່ມຄວາມປອດໄພໃນການໃຊ້ບໍລິການ LAPNet ທຸລະກໍາໄດ້ເລີ່ມຕົ້ນ ວນນາ 1 ກໍລະນາ 2024."
-    primary-text="Next"
-    secondary-text="Skip"
-    @closed="handleClosed1"
-    @primary="handleClosed1"
-    @secondary="handleClosed1"
-  />
+  <!-- <popupoverlay
+  :debugAlwaysShow="true"
+  /> -->
+  <popupoverlay/>
 
  
 

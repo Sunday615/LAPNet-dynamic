@@ -20,29 +20,29 @@ const logoRefs = ref([]);
 const containerRef = ref(null);
 
 const logos = [
-  { src: "/logos/logo1.png", alt: "BCEL Mobile", left: 40 },
-  { src: "/logos/logo3.png", alt: "BigCommerce", left: 260 },
-  { src: "/logos/logo2.png", alt: "Shipstation", left: 140 },
-  { src: "/logos/logo4.png", alt: "TaxJar", left: 360 },
-  { src: "/logos/logo5.png", alt: "Netsuite", left: 480 },
-  { src: "/logos/logo6.png", alt: "Squarespace", left: 500 },
+  { src: "/logos/logo1.png", alt: "BCEL Mobilebanking", left: 40 },
+  { src: "/logos/logo3.png", alt: "APB Mobilebanking", left: 260 },
+  { src: "/logos/logo2.png", alt: "LDB Mobilebanking", left: 140 },
+  { src: "/logos/logo4.png", alt: "JDB Mobilebanking", left: 360 },
+  { src: "/logos/logo5.png", alt: "MARU Mobilebanking", left: 480 },
+  { src: "/logos/logo6.png", alt: "LVB Mobilebanking", left: 500 },
 
-  { src: "/logos/logo7.png", alt: "BCEL Mobile", left: 40 },
-  { src: "/logos/logo8.png", alt: "Shipstation", left: 140 },
-  { src: "/logos/logo9.png", alt: "BigCommerce", left: 260 },
-  { src: "/logos/logo10.png", alt: "TaxJar", left: 360 },
-  { src: "/logos/logo11.png", alt: "Netsuite", left: 480 },
-  { src: "/logos/logo12.png", alt: "Squarespace", left: 500 },
+  { src: "/logos/logo7.png", alt: "ICBC Mobilebanking", left: 40 },
+  { src: "/logos/logo8.png", alt: "BOC Mobilebanking", left: 140 },
+  { src: "/logos/logo9.png", alt: "VTB Mobilebanking", left: 260 },
+  { src: "/logos/logo10.png", alt: "IB Mobilebanking", left: 360 },
+  { src: "/logos/logo11.png", alt: "BIC Mobilebanking", left: 480 },
+  { src: "/logos/logo12.png", alt: "BFL Mobilebanking", left: 500 },
 
-  { src: "/logos/logo13.png", alt: "BCEL Mobile", left: 40 },
-  { src: "/logos/logo14.png", alt: "Shipstation", left: 140 },
-  { src: "/logos/logo15.png", alt: "BigCommerce", left: 260 },
-  { src: "/logos/logo16.png", alt: "Squarespace", left: 360 },
-  { src: "/logos/logo17.png", alt: "TaxJar", left: 480 },
-  { src: "/logos/logo18.png", alt: "Netsuite", left: 500 },
+  { src: "/logos/logo13.png", alt: "SACOM Mobilebanking", left: 40 },
+  { src: "/logos/logo14.png", alt: "PSVB Mobilebanking", left: 140 },
+  { src: "/logos/logo15.png", alt: "MB Mobilebanking", left: 260 },
+  { src: "/logos/logo16.png", alt: "STB Mobilebanking", left: 360 },
+  { src: "/logos/logo17.png", alt: "KBANK Mobilebanking", left: 480 },
+  { src: "/logos/logo18.png", alt: "", left: 500 },
 
-   { src: "/logos/logo19.png", alt: "TaxJar", left: 40 },
-  { src: "/logos/logo20.png", alt: "Netsuite", left: 140 },
+   { src: "/logos/logo19.png", alt: "Mmoney", left: 40 },
+  { src: "/logos/logo20.png", alt: "Umoney", left: 140 },
 ];
 
 onMounted(() => {

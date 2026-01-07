@@ -1,12 +1,12 @@
 <template>
   <teleport to="body">
     <div
-      v-if="modelValue"
+      v-if="isOpen"
       ref="overlayEl"
       class="po-overlay"
       role="dialog"
       aria-modal="true"
-      aria-label="Overlay popup"
+      aria-label="Announcement overlay popup"
       @click.self="close"
     >
       <div ref="cardEl" class="po-card">
@@ -23,9 +23,9 @@
         </div>
 
         <div class="po-content">
-          <!-- ✅ Media container follow image ratio -->
           <div class="po-media" ref="mediaEl" :style="{ aspectRatio: imgAspect }">
             <img
+              v-if="imageSrc"
               ref="imgEl"
               class="po-img"
               :src="imageSrc"
@@ -37,17 +37,21 @@
           </div>
 
           <div class="po-body" ref="bodyEl">
-            <h2 class="po-title">{{ title }}</h2>
-            <p class="po-desc">{{ description }}</p>
+            <h2 class="po-title">{{ titleText }}</h2>
+            <p class="po-desc">{{ descText }}</p>
 
             <div class="po-actions" ref="actionsEl">
-              <button class="po-btn po-primary" type="button" @click="onPrimary">
+              <button v-if="hasLink" class="po-btn po-primary" type="button" @click="onPrimary">
                 {{ primaryText }}
               </button>
-              <button class="po-btn po-ghost" type="button" @click="onSecondary">
-                {{ secondaryText }}
+
+              <button class="po-btn po-ghost" type="button" @click="close">
+                ປິດ
               </button>
             </div>
+
+            <!-- (optional debug) แสดง timeforshow -->
+            <!-- <small style="opacity:.7">timeforshow: {{ current?.timeforshow }} ชั่วโมง</small> -->
           </div>
         </div>
       </div>
@@ -56,21 +60,27 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick, onBeforeUnmount } from "vue"
+import { ref, computed, nextTick, onMounted, onBeforeUnmount } from "vue"
 import { gsap } from "gsap"
 
 const props = defineProps({
-  modelValue: { type: Boolean, default: false }, // v-model
-  imageSrc: { type: String, required: true },
-  imageAlt: { type: String, default: "Popup image" },
-  title: { type: String, default: "Title" },
-  description: { type: String, default: "Description" },
-  primaryText: { type: String, default: "Primary" },
-  secondaryText: { type: String, default: "Secondary" },
+  // ✅ API
+  apiUrl: { type: String, default: "http://localhost:3000/api/announcement" },
+
+  // ✅ fallback
+  fallbackTitle: { type: String, default: "Announcement" },
+  fallbackDescription: { type: String, default: "" },
+  fallbackImageAlt: { type: String, default: "Announcement image" },
+
+  // ✅ auto popup
+  autoShow: { type: Boolean, default: true },
+  //test Func
+    // debugAlwaysShow: { type: Boolean, default: false },
 })
 
-const emit = defineEmits(["update:modelValue", "primary", "secondary", "closed"])
+const emit = defineEmits(["primary", "closed", "loaded", "error"])
 
+// refs (DOM)
 const overlayEl = ref(null)
 const cardEl = ref(null)
 const closeBtnEl = ref(null)
@@ -80,8 +90,65 @@ const bodyEl = ref(null)
 const actionsEl = ref(null)
 const gridEl = ref(null)
 
-
+// state
+const isOpen = ref(false)
+const announcements = ref([]) // rows from API (ทั้งหมด)
+const queue = ref([]) // รายการที่ "ถึงเวลาโชว์" แล้ว
+const queueIndex = ref(0)
+const current = computed(() => queue.value[queueIndex.value] || null)
 const imgAspect = ref("16 / 9")
+
+// timer
+let nextCheckTimer = null
+
+// animations
+let introTl = null
+let outroTl = null
+let floatTween = null
+let gridTween = null
+let isClosing = false
+
+// ==============================
+// ✅ mapping from API table
+// image-src -> image_url (ถ้าไม่มีใช้ image)
+// title -> title
+// description -> description
+// primary button -> linkpath
+// secondary button -> close
+// timeforshow -> ชั่วโมง/1ครั้ง (3 = 3 ชั่วโมง)
+// ==============================
+const imageSrc = computed(() => {
+  const a = current.value
+  return a?.image_url || a?.image || ""
+})
+
+const imageAlt = computed(() => props.fallbackImageAlt)
+
+const titleText = computed(() => {
+  const a = current.value
+  return (a?.title || "").trim() || props.fallbackTitle
+})
+
+const descText = computed(() => {
+  const a = current.value
+  return (a?.description || "").trim() || props.fallbackDescription
+})
+
+const hasLink = computed(() => {
+  const link = String(current.value?.linkpath || "").trim()
+  return !!link
+})
+
+const primaryText = computed(() => {
+  const link = String(current.value?.linkpath || "").trim()
+  if (!link) return ""
+  try {
+    const u = new URL(link)
+    return `ອ່ານເພີ່ມ`
+  } catch {
+    return "ປິດ"
+  }
+})
 
 function onImgLoad(e) {
   const img = e?.target
@@ -90,18 +157,171 @@ function onImgLoad(e) {
   }
 }
 
-let introTl = null
-let outroTl = null
-let floatTween = null
-let gridTween = null
-let isClosing = false
+// ==============================
+// ✅ timeforshow (ชั่วโมง) -> interval ms
+// 3 = 3 ชั่วโมง / 1 ครั้ง
+// 7 = 7 ชั่วโมง / 1 ครั้ง
+// ==============================
+function getIntervalMsFor(row) {
+  // ✅ อ่าน timeforshow จาก API และตีเป็น "ชั่วโมง"
+  const raw = row?.timeforshow
+  const n = Number(raw)
 
+  // ถ้าไม่มี/ไม่ถูกต้อง -> default 3 ชั่วโมง
+  const hours = Number.isFinite(n) && n > 0 ? n : 3
+  return hours * 60 * 60 * 1000
+}
+
+function getStorageKeyFor(row) {
+  const id = row?.idannouncement
+  return `announcement_last_shown_${id ?? "unknown"}`
+}
+
+function getLastShownMsFor(row) {
+  try {
+    const v = Number(localStorage.getItem(getStorageKeyFor(row)))
+    return Number.isFinite(v) ? v : 0
+  } catch {
+    return 0
+  }
+}
+
+function setLastShownMsFor(row, ms) {
+  try {
+    localStorage.setItem(getStorageKeyFor(row), String(ms))
+  } catch {}
+}
+
+function isRowActive(row) {
+  return Number(row?.active) === 1
+}
+//test showfunc
+// function isDueToShow(row) {
+//   if (!row) return false
+//   if (!isRowActive(row)) return false
+
+//   // ✅ โหมดเทส: แสดงทันที ไม่สน timeforshow/localStorage
+//   if (props.debugAlwaysShow) return true
+
+//   const interval = getIntervalMsFor(row)
+//   const last = getLastShownMsFor(row)
+//   const now = Date.now()
+//   return !last || now - last >= interval
+// }
+
+function isDueToShow(row) {
+  if (!row) return false
+  if (!isRowActive(row)) return false
+
+  const interval = getIntervalMsFor(row)
+  const last = getLastShownMsFor(row)
+  const now = Date.now()
+
+  return !last || now - last >= interval
+}
+
+// สร้างคิว: เอาทุก announcement ที่ถึงเวลาแล้ว -> โชว์ทีละอัน (pop1 ปิด -> pop2 ต่อ)
+function buildQueueFromRows(rows) {
+  const arr = Array.isArray(rows) ? rows : []
+  // ✅ เรียงให้แน่นอน (ใหม่ -> เก่า)
+  arr.sort((a, b) => Number(b?.idannouncement ?? 0) - Number(a?.idannouncement ?? 0))
+  return arr.filter(isDueToShow)
+}
+
+// หาเวลาที่จะถึงรอบถัดไป (เพื่อ setTimeout)
+function computeNextRemainingMs(rows) {
+  const now = Date.now()
+  let min = Infinity
+  let hasActive = false
+
+  for (const row of rows || []) {
+    if (!isRowActive(row)) continue
+    hasActive = true
+
+    const interval = getIntervalMsFor(row)
+    const last = getLastShownMsFor(row)
+
+    if (!last) return 0 // ยังไม่เคยโชว์ -> ได้เลย
+
+    const elapsed = now - last
+    const remaining = interval - elapsed
+    if (remaining <= 0) return 0
+    if (remaining < min) min = remaining
+  }
+
+  if (!hasActive) return null
+  return min === Infinity ? null : min
+}
+
+function scheduleNextCheck() {
+  if (!props.autoShow) return
+  clearTimeout(nextCheckTimer)
+
+  const remaining = computeNextRemainingMs(announcements.value)
+  if (remaining === null) return
+
+  // ✅ ไม่ต้องรอขั้นต่ำ 5 วิ ก็ได้ แต่กัน spam ด้วยขั้นต่ำ 1 วิ
+  const wait = Math.max(1_000, remaining)
+
+  nextCheckTimer = setTimeout(() => {
+    fetchAnnouncements()
+  }, wait)
+}
+
+// ==============================
+// ✅ fetch announcements (ทั้งหมด)
+// ==============================
+async function fetchAnnouncements() {
+  try {
+    const res = await fetch(props.apiUrl, { method: "GET" })
+    if (!res.ok) throw new Error(`Fetch failed: ${res.status}`)
+    const json = await res.json()
+
+    const rows = Array.isArray(json?.data) ? json.data : []
+    announcements.value = rows
+    emit("loaded", rows)
+
+    await nextTick()
+    tryAutoOpenQueue()
+  } catch (e) {
+    console.error("ANNOUNCEMENT FETCH ERROR:", e)
+    emit("error", e)
+  }
+}
+
+// ==============================
+// ✅ open queue logic
+// ==============================
+async function tryAutoOpenQueue() {
+  if (!props.autoShow) return
+  if (isOpen.value) return
+
+  const q = buildQueueFromRows(announcements.value)
+  queue.value = q
+  queueIndex.value = 0
+
+  if (!queue.value.length) {
+    scheduleNextCheck()
+    return
+  }
+
+  // ✅ mark shown ให้ "ทุกตัวที่อยู่ในคิวรอบนี้" เพื่อให้ 1 รอบ/ตามชั่วโมง
+  // ป้องกัน close แล้วย้อนกลับมาเปิดซ้ำทันทีตัวเดิมในรอบเดียว
+  const now = Date.now()
+  for (const row of queue.value) setLastShownMsFor(row, now)
+
+  open()
+}
+
+// ==============================
+// ✅ animations open/close/next
+// ==============================
 function onKeydown(e) {
-  if (!props.modelValue) return
+  if (!isOpen.value) return
   if (e.key === "Escape") close()
 }
 
-async function playIntro() {
+async function playIntroFull() {
   await nextTick()
 
   introTl?.kill()
@@ -113,8 +333,7 @@ async function playIntro() {
   gsap.set(cardEl.value, { opacity: 0, y: 46, scale: 0.985, rotateX: 6, transformPerspective: 900 })
   gsap.set([mediaEl.value, bodyEl.value, actionsEl.value], { opacity: 0, y: 14 })
 
-  // ✅ image zoom (container จะ “ตามสัดส่วน” ส่วนรูปจะ scale)
-  gsap.set(imgEl.value, { scale: 1.12, transformOrigin: "50% 50%" })
+  if (imgEl.value) gsap.set(imgEl.value, { scale: 1.12, transformOrigin: "50% 50%" })
 
   introTl = gsap.timeline({ defaults: { ease: "power3.out" } })
   introTl
@@ -123,33 +342,63 @@ async function playIntro() {
     .to(mediaEl.value, { opacity: 1, y: 0, duration: 0.33 }, "-=0.25")
     .to(bodyEl.value, { opacity: 1, y: 0, duration: 0.33 }, "-=0.28")
     .to(actionsEl.value, { opacity: 1, y: 0, duration: 0.26 }, "-=0.22")
-    .to(imgEl.value, { scale: 1, duration: 0.65, ease: "power2.out" }, "-=0.55")
 
-  // “เลื้อยๆ” เบาๆ
-  floatTween = gsap.to(cardEl.value, {
-    y: "+=8",
-    duration: 3.2,
-    ease: "sine.inOut",
-    yoyo: true,
-    repeat: -1,
-  })
+  if (imgEl.value) introTl.to(imgEl.value, { scale: 1, duration: 0.65, ease: "power2.out" }, "-=0.55")
 
-  gridTween = gsap.to(gridEl.value, {
-    x: "-=40",
-    y: "+=30",
-    duration: 8,
-    ease: "sine.inOut",
-    yoyo: true,
-    repeat: -1,
-  })
+  floatTween = gsap.to(cardEl.value, { y: "+=8", duration: 3.2, ease: "sine.inOut", yoyo: true, repeat: -1 })
+  gridTween = gsap.to(gridEl.value, { x: "-=40", y: "+=30", duration: 8, ease: "sine.inOut", yoyo: true, repeat: -1 })
 
   closeBtnEl.value?.focus?.()
 }
 
-function close() {
-  if (!props.modelValue || isClosing) return
-  isClosing = true
+async function playSwapToNext() {
+  introTl?.kill()
+  floatTween?.kill()
+  gridTween?.kill()
 
+  const tl = gsap.timeline({ defaults: { ease: "power2.inOut" } })
+  tl.to([actionsEl.value, bodyEl.value, mediaEl.value], { opacity: 0, y: 10, duration: 0.16, stagger: 0.03 })
+  await new Promise((resolve) => tl.eventCallback("onComplete", resolve))
+
+  queueIndex.value += 1
+  imgAspect.value = "16 / 9"
+  await nextTick()
+
+  gsap.set([mediaEl.value, bodyEl.value, actionsEl.value], { opacity: 0, y: 14 })
+  if (imgEl.value) gsap.set(imgEl.value, { scale: 1.12, transformOrigin: "50% 50%" })
+
+  const tlIn = gsap.timeline({ defaults: { ease: "power3.out" } })
+  tlIn
+    .to(mediaEl.value, { opacity: 1, y: 0, duration: 0.28 })
+    .to(bodyEl.value, { opacity: 1, y: 0, duration: 0.28 }, "-=0.22")
+    .to(actionsEl.value, { opacity: 1, y: 0, duration: 0.22 }, "-=0.20")
+
+  if (imgEl.value) tlIn.to(imgEl.value, { scale: 1, duration: 0.55, ease: "power2.out" }, "-=0.45")
+
+  floatTween = gsap.to(cardEl.value, { y: "+=8", duration: 3.2, ease: "sine.inOut", yoyo: true, repeat: -1 })
+  gridTween = gsap.to(gridEl.value, { x: "-=40", y: "+=30", duration: 8, ease: "sine.inOut", yoyo: true, repeat: -1 })
+
+  closeBtnEl.value?.focus?.()
+}
+
+function open() {
+  if (isOpen.value) return
+  isOpen.value = true
+  window.addEventListener("keydown", onKeydown)
+  playIntroFull()
+}
+
+function close() {
+  if (!isOpen.value || isClosing) return
+
+  const hasNext = queueIndex.value + 1 < queue.value.length
+  if (hasNext) {
+    // ✅ ปิด popup 1 -> โชว์ popup 2 ต่อทันที (ไม่มี delay เพิ่มจาก timeforshow)
+    playSwapToNext()
+    return
+  }
+
+  isClosing = true
   introTl?.kill()
   floatTween?.kill()
   gridTween?.kill()
@@ -158,9 +407,16 @@ function close() {
   outroTl = gsap.timeline({
     defaults: { ease: "power2.inOut" },
     onComplete: () => {
-      emit("update:modelValue", false)
+      isOpen.value = false
       emit("closed")
       isClosing = false
+      window.removeEventListener("keydown", onKeydown)
+
+      queue.value = []
+      queueIndex.value = 0
+
+      // ✅ หลังปิดทั้งหมดแล้ว ค่อยตั้งเวลาเช็คตาม timeforshow (หน่วยชั่วโมง)
+      scheduleNextCheck()
     },
   })
 
@@ -171,29 +427,21 @@ function close() {
 }
 
 function onPrimary() {
-  emit("primary")
-  close()
-}
-function onSecondary() {
-  emit("secondary")
+  const link = String(current.value?.linkpath || "").trim()
+  if (!link) return
+
+  emit("primary", link)
+  window.open(link, "_blank", "noopener,noreferrer")
   close()
 }
 
-watch(
-  () => props.modelValue,
-  (v) => {
-    if (v) {
-      window.addEventListener("keydown", onKeydown)
-      playIntro()
-    } else {
-      window.removeEventListener("keydown", onKeydown)
-    }
-  },
-  { immediate: true }
-)
+onMounted(() => {
+  fetchAnnouncements()
+})
 
 onBeforeUnmount(() => {
   window.removeEventListener("keydown", onKeydown)
+  clearTimeout(nextCheckTimer)
   introTl?.kill()
   outroTl?.kill()
   floatTween?.kill()
@@ -208,8 +456,6 @@ onBeforeUnmount(() => {
   background: rgba(1, 6, 18, 0.86);
   backdrop-filter: blur(14px);
 }
-
-/* ✅ เปลี่ยนจาก fixed height เป็น auto + max-height */
 .po-card{
   position:relative;
   width:min(1100px, 92vw);
@@ -247,27 +493,21 @@ onBeforeUnmount(() => {
   grid-template-columns: 1.1fr 0.9fr;
   align-items: stretch;
 }
-
-/* ✅ container “ตามสัดส่วนรูป” ด้วย aspect-ratio */
 .po-media{
   padding:14px;
   width:100%;
   min-height: 260px;
-  /* aspect-ratio ถูกส่งจาก :style (imgAspect) */
 }
-
 .po-img{
   width:100%;
   height:100%;
   border-radius:18px;
-  object-fit: cover;          /* ✅ ตามที่ต้องการ */
-  object-position: center;    /* ✅ */
+  object-fit: cover;
+  object-position: center;
   border:1px solid rgba(96,165,250,0.18);
   box-shadow: 0 22px 70px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06);
   transform: translateZ(0);
 }
-
-/* ✅ ถ้า content เยอะ ให้ body scroll แทนไม่ล้นจอ */
 .po-body{
   padding:28px 26px 24px;
   display:flex;
@@ -276,7 +516,6 @@ onBeforeUnmount(() => {
   overflow:auto;
   max-height: 90vh;
 }
-
 .po-title{
   margin:0 0 12px;
   font-size:clamp(22px, 3vw, 44px);
@@ -290,7 +529,6 @@ onBeforeUnmount(() => {
   max-width:48ch;
   font-size:15px;
 }
-
 .po-actions{display:flex; gap:12px; flex-wrap:wrap;}
 .po-btn{
   border-radius:14px;
