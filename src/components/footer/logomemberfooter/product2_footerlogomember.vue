@@ -20,7 +20,6 @@
           </li>
         </ul>
 
-     
       </div>
 
       <!-- RIGHT: Logo grid -->
@@ -126,7 +125,7 @@ onMounted(async () => {
 <style scoped>
 /* (styles unchanged) */
 .section {
-  min-height: 100%;
+  min-height: 100vh;
   padding: 40px 20px;
   display: flex;
   align-items: center;
@@ -185,7 +184,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: 10px;
- font-size: var(--fs-base);
+   font-size: var(--fs-base);
   font-weight: bold;
   color: #374151;
 }

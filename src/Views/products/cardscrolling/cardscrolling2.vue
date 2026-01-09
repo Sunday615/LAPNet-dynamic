@@ -14,8 +14,6 @@
             <i class="fa-solid fa-circle-exclamation"></i> {{ item }}
           </li>
         </ul>
-
-    
       </section>
 
       <!-- RIGHT PANEL -->
@@ -24,7 +22,8 @@
           <span class="badge">{{ badgeLabel }}</span>
 
           <p>
-            {{ badgeDescription }}
+            <!-- ✅ นับจำนวนจากข้อมูลที่ get มาจาก API -->
+            {{ computedBadgeDescription }}
           </p>
         </div>
 
@@ -39,11 +38,7 @@
               <div class="card-top">
                 <!-- CHIP WITH LOGO -->
                 <span class="chip">
-                  <img
-                    :src="card.logo"
-                    :alt="card.holder + ' logo'"
-                    class="chip-logo"
-                  />
+                  <img :src="card.logo" :alt="card.holder + ' logo'" class="chip-logo" />
                 </span>
 
                 <span class="network">{{ card.network }}</span>
@@ -74,17 +69,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed, defineProps } from "vue";
+import { ref, onMounted, onBeforeUnmount, computed, defineProps, nextTick } from "vue";
 import gsap from "gsap";
 
 /**
  * ✅ Props for dynamic content
- * - title
- * - subtitle
- * - features (array of strings)
- * - primaryButtonLabel
- * - badgeLabel
- * - badgeDescription
  */
 const props = defineProps({
   title: {
@@ -94,7 +83,7 @@ const props = defineProps({
   subtitle: {
     type: String,
     default:
-      "ລູກຄ້າທີ່ມີບັດ ATM ຂອງທະນາຄານທີ່ເປັນສະມາຊິກຂອງ LAPNet ສາມາດຖອນເງິນສົດຂ້າມທະນາຄານຜ່ານຕູ້ ATM ຂອງທະນາຄານສະມາຊິກ ໂດຍສາມາດສັງເກດໄດ້ຈາກສັນຍາລັກ LAPNet ວົງມົນສີຟ້າທີ່ຕິດຢູ່ໜ້າຕູ້ ATM.",
+      "ລູກຄ້າທີ່ມີບັດ ATM ຂອງທະນາຄານທີເປັນສະມາຊິກຂອງ LAPNet ສາມາດຖອນເງິນສົດຂ້າມທະນາຄານຜ່ານຕູ້ ATM ຂອງທະນາຄານສະມາຊິກ ໂດຍສາມາດສັງເກດໄດ້ຈາກສັນຍາລັກ LAPNet ວົງມົນສີຟ້າທີ່ຕິດຢູ່ໜ້າຕູ້ ATM.",
   },
   features: {
     type: Array,
@@ -112,167 +101,144 @@ const props = defineProps({
   },
   badgeDescription: {
     type: String,
-    default:
-      "ເຊິ່ງການຖອນເງິນສົດຂ້າມຕູ້ເອທີເອັມນີ້ແມ່ນຈະຕ້ອງໄດ້ເສຍຄ່າທຳນຽມ 2,000 ກີບ ຕໍ່ ຄັ້ງ.",
+    default: "ທະນາຄານສະມາຊິກທັງຫມົດທີເຂົ້າຮ່ວມ : 15 ທະນາຄານ",
   },
 });
 
-// 16 cards
-const cards = [
-  {
-    id: 1,
-    holder: "xxxxxxxx ****xxxxx",
-    number: "**** **** **** 1024",
-    expiry: "08/27",
-    network: "BCEL ",
-    logo: "/logoallmember/circle_scale/BCEL.png",
-  },
-    {
-    id: 2,
-    holder: "xxxxxx ****xxxx",
-    number: "**** **** **** 5532",
-    expiry: "04/28",
-    network: "APB",
-    logo: "/logoallmember/circle_scale/APBB.PNG",
-  },
-  {
-    id: 3,
-    holder: "xxx xxxxx****xxxxx",
-    number: "**** **** **** 9834",
-    expiry: "11/26",
-    network: "LDB",
-    logo: "/logoallmember/circle_scale/LDB.PNG",
-  },
+/** =========================
+ * ✅ Load logos from API
+ * API: http://localhost:3000/api/members
+ * Condition: atmtransfer = 1
+ * ========================= */
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+const MEMBERS_API_URL = `${API_BASE_URL}/api/members`;
 
-  {
-    id: 4,
-    holder: "xxxxxxxxx ****xxxxx",
-    number: "**** **** **** 7789",
-    expiry: "09/27",
-    network: "JDB",
-    logo: "/logoallmember/circle_scale/JDB.png",
-  },
-  {
-    id: 5,
-    holder: "xxxxxxx ****xxxxxx",
-    number: "**** **** **** 1492",
-    expiry: "02/29",
-    network: "MJBL",
-    logo: "/logoallmember/circle_scale/Maruhan.png",
-  },
-  {
-    id: 6,
-    holder: "xxxxxxxxx ****xxxxx",
-    number: "**** **** **** 6321",
-    expiry: "06/27",
-    network: "LVB",
-    logo: "/logoallmember/circle_scale/lvb.PNG",
-  },
-  {
-    id: 7,
-    holder: "xxxxxxxx ****xxxxx",
-    number: "**** **** **** 8420",
-    expiry: "12/26",
-    network: "ICBC",
-    logo: "/logoallmember/circle_scale/ICBC.png",
-  },
- 
-  {
-    id: 10,
-    holder: "xxxxxxxxx ****xxxx",
-    number: "**** **** **** 7654",
-    expiry: "10/26",
-    network: "IB",
-    logo: "/logoallmember/circle_scale/IB.png",
-  },
-  {
-    id: 11,
-    holder: "Xxxxxxxxx ****xxxxx",
-    number: "**** **** **** 2156",
-    expiry: "05/28",
-    network: "ACLEDA",
-    logo: "/logoallmember/circle_scale/ACLB.png",
-  },
-  {
-    id: 12,
-    holder: "xxxxxxxxx ****xxxxx",
-    number: "**** **** **** 9999",
-    expiry: "01/29",
-    network: "BIC",
-    logo: "/logoallmember/circle_scale/BIC.png",
-  },
-  {
-    id: 13,
-    holder: "xxxxxxx ****xxxx",
-    number: "**** **** **** 3201",
-    expiry: "09/28",
-    network: "SACOM",
-    logo: "/logoallmember/circle_scale/SACOM.PNG",
-  },
-  {
-    id: 14,
-    holder: "xxxxxxx ****Xxxxx",
-    number: "**** **** **** 8044",
-    expiry: "02/27",
-    network: "STB",
-    logo: "/logoallmember/circle_scale/STB.png",
-  },
-  {
-    id: 15,
-    holder: "xxxxxxx ****xxxxx",
-    number: "**** **** **** 5678",
-    expiry: "08/26",
-    network: "KBANK",
-    logo: "/logoallmember/circle_scale/Kasikorn.png",
-  },
-  {
-    id: 16,
-    holder: "xxxxxxxx ****xxxxxx",
-    number: "**** **** **** 1111",
-    expiry: "11/27",
-    network: "PBB ",
-    logo: "/logoallmember/circle_scale/PUB.png",
-  },
-];
+const normalizeUrl = (p) => {
+  if (!p || typeof p !== "string") return "";
+  if (
+    p.startsWith("http://") ||
+    p.startsWith("https://") ||
+    p.startsWith("data:") ||
+    p.startsWith("blob:")
+  ) {
+    return p;
+  }
+  if (p.startsWith("/")) return `${API_BASE_URL}${p}`;
+  return `${API_BASE_URL}/${p}`;
+};
+
+const getMemberId = (m) => Number(m?.idmember ?? m?.id ?? m?.member_id ?? 0);
+
+const cards = ref([]); // ✅ now dynamic from API
+
+const fetchMemberCards = async () => {
+  try {
+    const res = await fetch(MEMBERS_API_URL, {
+      headers: { Accept: "application/json" },
+    });
+    if (!res.ok) throw new Error(`Fetch failed: ${res.status} ${res.statusText}`);
+
+    const json = await res.json();
+    const list = Array.isArray(json) ? json : json?.data || json?.members || [];
+    const arr = Array.isArray(list) ? list : [];
+
+    const filteredSorted = arr
+      // ✅ where atmtransfer = 1
+      .filter((m) => String(m?.atmtransfer) === "1" || m?.atmtransfer === true)
+      // ✅ stable order by idmember asc
+      .sort((a, b) => getMemberId(a) - getMemberId(b));
+
+    // ✅ build cards (id = No 1..N)
+    cards.value = filteredSorted
+      .map((m, index) => {
+        const rawLogo =
+          m?.image ?? m?.logo ?? m?.img ?? m?.photo ?? m?.path ?? m?.src ?? "";
+
+        const network =
+          m?.network ??
+          m?.shortname ??
+          m?.code ??
+          m?.name ??
+          m?.bank_name ??
+          m?.title ??
+          `Commercial Bank`.trim();
+
+        const no = index + 1;
+
+        return {
+          id: no, // ✅ สำคัญ: ให้ key ไม่ซ้ำ
+          no,
+          holder: "xxxxxxxx ****xxxxx",
+          number: `**** **** **** ${String(no).padStart(4, "0")}`,
+          expiry: "08/27",
+          network,
+          logo: normalizeUrl(rawLogo),
+          memberId: getMemberId(m),
+        };
+      })
+      .filter((c) => !!c.logo);
+  } catch (err) {
+    console.error("Error loading members for cards:", err);
+    cards.value = [];
+  }
+};
+
+/** ✅ นับจำนวนธนาคารจากข้อมูลที่ได้จริง */
+const computedBadgeDescription = computed(() => {
+  const count = cards.value.length;
+  // ถ้ายังไม่โหลด (0) ให้โชว์ค่าเดิมจาก props กันกระพริบ
+  if (!count) return props.badgeDescription;
+  return `ທະນາຄານສະມາຊິກທັງຫມົດທີເຂົ້າຮ່ວມ : ${count} ທະນາຄານ`;
+});
 
 // duplicate to create seamless looping
 const loopCards = computed(() => [
-  ...cards.map((c) => ({ ...c, loopKey: "a" })),
-  ...cards.map((c) => ({ ...c, loopKey: "b" })),
+  ...cards.value.map((c) => ({ ...c, loopKey: "a" })),
+  ...cards.value.map((c) => ({ ...c, loopKey: "b" })),
 ]);
 
+/** GSAP */
 const cardsColumn = ref(null);
 let tween = null;
+let floatTween = null;
 
 const initAutoScroll = () => {
   const col = cardsColumn.value;
   if (!col) return;
 
   const halfHeight = col.scrollHeight / 2;
+  if (!halfHeight || halfHeight <= 0) return;
 
   tween = gsap.to(col, {
     y: -halfHeight,
-    duration: 40, // slow & smooth
+    duration: 40,
     ease: "none",
     repeat: -1,
   });
 };
 
-const destroyAutoScroll = () => {
+const destroyAnimations = () => {
   if (tween) {
     tween.kill();
     tween = null;
+  }
+  if (floatTween) {
+    floatTween.kill();
+    floatTween = null;
   }
   if (cardsColumn.value) {
     gsap.set(cardsColumn.value, { y: 0 });
   }
 };
 
-onMounted(() => {
-  initAutoScroll(); // auto-scroll on all screen sizes
+onMounted(async () => {
+  await fetchMemberCards();
+  await nextTick();
 
-  // soft floating animation on all cards
-  gsap.to(".atm-card", {
+  destroyAnimations();
+  initAutoScroll();
+
+  floatTween = gsap.to(".atm-card", {
     y: -8,
     duration: 2.5,
     ease: "sine.inOut",
@@ -283,11 +249,12 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  destroyAutoScroll();
+  destroyAnimations();
 });
 </script>
 
 <style scoped>
+/* CSS เดิมของคุณทั้งหมด */
 .atm-page {
   width: 100%;
   height: 80vh;
@@ -351,26 +318,6 @@ onBeforeUnmount(() => {
   color: rgba(240, 248, 255, 0.9);
 }
 
-.primary-btn {
-  align-self: flex-start;
-  padding: 0.75rem 1.6rem;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.95rem;
-  background: linear-gradient(135deg, #2563eb, #60a5ff);
-  color: #ffffff;
-  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.7);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
-}
-
-.primary-btn:hover {
-  transform: translateY(-1px) scale(1.02);
-  box-shadow: 0 18px 40px rgba(37, 99, 235, 0.85);
-  filter: brightness(1.08);
-}
-
 /* RIGHT */
 .right-panel {
   flex: 1;
@@ -420,12 +367,7 @@ onBeforeUnmount(() => {
   position: relative;
   border-radius: 1.4rem;
   padding: 0.5rem;
-  background: radial-gradient(
-    circle at 0 0,
-    #3b82f6 0,
-    #0f265f 55%,
-    #020617 100%
-  );
+  background: radial-gradient(circle at 0 0, #3b82f6 0, #0f265f 55%, #020617 100%);
 }
 
 /* Column that will be animated by GSAP */
@@ -460,11 +402,7 @@ onBeforeUnmount(() => {
   content: "";
   position: absolute;
   inset: -40%;
-  background: radial-gradient(
-    circle at 0% 0%,
-    rgba(255, 255, 255, 0.28),
-    transparent 60%
-  );
+  background: radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.28), transparent 60%);
   opacity: 0.9;
   pointer-events: none;
 }
@@ -499,9 +437,7 @@ onBeforeUnmount(() => {
   width: 60px;
   height: 60px;
   border-radius: 0.9rem;
-  box-shadow:
-    0 0 0 1px rgba(15, 46, 94, 0.25),
-    0 8px 16px rgba(15, 23, 42, 0.35);
+  box-shadow: 0 0 0 1px rgba(15, 46, 94, 0.25), 0 8px 16px rgba(15, 23, 42, 0.35);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -572,17 +508,10 @@ onBeforeUnmount(() => {
     min-height: 80vh;
   }
 
-  /* show about 4 cards height, rest hidden but auto-scrolling */
   .cards-window {
-    max-height: calc(4 * 200px + 3 * 1rem + 1.4rem); /* 4 cards + gaps + padding */
+    max-height: calc(4 * 200px + 3 * 1rem + 1.4rem);
     overflow: hidden;
     padding-right: 0.4rem;
-    background: radial-gradient(
-      circle at 0 0,
-      #3b82f6 0,
-      #0f265f 55%,
-      #020617 100%
-    );
   }
 }
 

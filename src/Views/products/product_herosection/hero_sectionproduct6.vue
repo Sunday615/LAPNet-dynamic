@@ -77,12 +77,15 @@
             </div>
         </div>
     </section>
+   
+    
 </template>
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { gsap } from "gsap";
 import tagproduct from "../../../components/tagproduct/tagproduct.vue";
+
 
 const props = defineProps({
     // 🔁 put your own image URL here

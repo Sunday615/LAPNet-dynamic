@@ -11,11 +11,9 @@
 
         <ul class="feature-list">
           <li v-for="(item, index) in features" :key="index">
-           <i class="fa-solid fa-circle-exclamation"></i> {{ item }}
+            <i class="fa-solid fa-circle-exclamation"></i> {{ item }}
           </li>
         </ul>
-
-  
       </section>
 
       <!-- RIGHT PANEL -->
@@ -24,7 +22,8 @@
           <span class="badge">{{ badgeLabel }}</span>
 
           <p>
-            {{ badgeDescription }}
+            <!-- ✅ เปลี่ยนจาก badgeDescription เดิม เป็นข้อความที่นับจาก API -->
+            {{ computedBadgeDescription }}
           </p>
         </div>
 
@@ -74,17 +73,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed, defineProps } from "vue";
+import { ref, onMounted, onBeforeUnmount, computed, defineProps, nextTick } from "vue";
 import gsap from "gsap";
 
 /**
  * ✅ Props for dynamic content
- * - title
- * - subtitle
- * - features (array of strings)
- * - primaryButtonLabel
- * - badgeLabel
- * - badgeDescription
  */
 const props = defineProps({
   title: {
@@ -110,184 +103,146 @@ const props = defineProps({
     type: String,
     default: "Member Cards",
   },
+  // ✅ เก็บไว้เผื่อ parent ส่งมา แต่เราจะไม่ใช้ใน UI แล้ว
   badgeDescription: {
     type: String,
-    default:
-      "ເຊິ່ງການຖອນເງິນສົດຂ້າມຕູ້ເອທີເອັມນີ້ແມ່ນຈະຕ້ອງໄດ້ເສຍຄ່າທຳນຽມ 2,000 ກີບ ຕໍ່ ຄັ້ງ.",
+    default: "",
   },
 });
 
-// 16 cards
-const cards = [
-  {
-    id: 1,
+/** =========================
+ *  ✅ Load card logos from API
+ *  - API: http://localhost:3000/api/members
+ *  - where atmcashwithdraw = 1
+ *  - idmember = 1 show on top
+ * ========================= */
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+const MEMBERS_API_URL = `${API_BASE_URL}/api/members`;
+
+const normalizeUrl = (p) => {
+  if (!p || typeof p !== "string") return "";
+  if (
+    p.startsWith("http://") ||
+    p.startsWith("https://") ||
+    p.startsWith("data:") ||
+    p.startsWith("blob:")
+  ) {
+    return p;
+  }
+  if (p.startsWith("/")) return `${API_BASE_URL}${p}`;
+  return `${API_BASE_URL}/${p}`;
+};
+
+const getMemberId = (m) => Number(m?.idmember ?? m?.id ?? m?.member_id ?? 0);
+
+const cards = ref([]);
+
+/** map member -> card object used by UI */
+const mapMemberToCard = (m) => {
+  const id = getMemberId(m);
+
+  const rawLogo =
+    m?.image ?? m?.logo ?? m?.img ?? m?.photo ?? m?.path ?? m?.src ?? "";
+
+  const network =
+    m?.network ??
+    m?.shortname ??
+    m?.code ??
+    m?.name ??
+    m?.bank_name ??
+    m?.title ??
+    `Commercial Bank`.trim();
+
+  return {
+    id: 0, // จะถูก override เป็น No ตอน map ด้านล่าง
     holder: "xxxxxxx xxxxxxx",
-    number: "**** **** **** 1024",
+    number: `**** **** **** ${String((id || 0) % 10000).padStart(4, "0")}`,
     expiry: "08/27",
-    network: "BCEL",
-    logo: "/logoallmember/circle_scale/BCEL.png",
-  },
-    {
-    id: 2,
-    holder: "xxxxx xxxxxxx",
-    number: "**** **** **** 5532",
-    expiry: "04/28",
-    network: "APB",
-    logo: "/logoallmember/circle_scale/APBB.PNG",
-  },
-  {
-    id: 3,
-    holder: "xxxxx xxxxxxxxx",
-    number: "**** **** **** 9834",
-    expiry: "11/26",
-    network: "LDB",
-    logo: "/logoallmember/circle_scale/LDB.PNG",
-  },
+    network,
+    logo: normalizeUrl(rawLogo),
+  };
+};
 
-  {
-    id: 4,
-    holder: "xxxxx xxxxxxxx",
-    number: "**** **** **** 7789",
-    expiry: "09/27",
-    network: "JDB",
-    logo: "/logoallmember/circle_scale/JDB.png",
-  },
-  {
-    id: 5,
-    holder: "xxxxx xxxxxxxxx",
-    number: "**** **** **** 1492",
-    expiry: "02/29",
-    network: "MJBL",
-    logo: "/logoallmember/circle_scale/Maruhan.png",
-  },
-  {
-    id: 6,
-    holder: "xxxxx xxxxxxxxx",
-    number: "**** **** **** 6321",
-    expiry: "06/27",
-    network: "LVB",
-    logo: "/logoallmember/circle_scale/lvb.PNG",
-  },
-  {
-    id: 7,
-    holder: "xxxxx xxxxxx",
-    number: "**** **** **** 8420",
-    expiry: "12/26",
-    network: "ICBC",
-    logo: "/logoallmember/circle_scale/ICBC.png",
-  },
-  {
-    id: 8,
-    holder: "xxxxxxxx xxxxxx",
-    number: "**** **** **** 3901",
-    expiry: "07/28",
-    network: "BOC",
-    logo: "/logoallmember/circle_scale/BOC.png",
-  },
-  {
-    id: 9,
-    holder: "xxxxx xxxxxxxxxx",
-    number: "**** **** **** 4217",
-    expiry: "03/27",
-    network: "VTB",
-    logo: "/logoallmember/circle_scale/VTB.png",
-  },
-  {
-    id: 10,
-    holder: "xxxxxxx xxxxxxxxx",
-    number: "**** **** **** 7654",
-    expiry: "10/26",
-    network: "IB",
-    logo: "/logoallmember/circle_scale/IB.png",
-  },
-  {
-    id: 11,
-    holder: "xxxxx xxxxxx",
-    number: "**** **** **** 2156",
-    expiry: "05/28",
-    network: "ACLEDA",
-    logo: "/logoallmember/circle_scale/ACLB.png",
-  },
-  {
-    id: 12,
-    holder: "xxxxxx xxxxxxx",
-    number: "**** **** **** 9999",
-    expiry: "01/29",
-    network: "BIC",
-    logo: "/logoallmember/circle_scale/BIC.png",
-  },
-  {
-    id: 13,
-    holder: "xxxxxxx xxxxx",
-    number: "**** **** **** 3201",
-    expiry: "09/28",
-    network: "SACOM",
-    logo: "/logoallmember/circle_scale/SACOM.PNG",
-  },
-  {
-    id: 14,
-    holder: "xxxxxxx xxxxxxxx",
-    number: "**** **** **** 8044",
-    expiry: "02/27",
-    network: "STB",
-    logo: "/logoallmember/circle_scale/STB.png",
-  },
-  {
-    id: 15,
-    holder: "xxxxxxx xxxxxxxx",
-    number: "**** **** **** 5678",
-    expiry: "08/26",
-    network: "KBANK",
-    logo: "/logoallmember/circle_scale/Kasikorn.png",
-  },
-  {
-    id: 16,
-    holder: "xxxxxx ****xxxxxx",
-    number: "**** **** **** 1111",
-    expiry: "11/27",
-    network: "PBB",
-    logo: "/logoallmember/circle_scale/PUB.png",
-  },
-];
+const fetchMemberCards = async () => {
+  try {
+    const res = await fetch(MEMBERS_API_URL, {
+      headers: { Accept: "application/json" },
+    });
+    if (!res.ok) throw new Error(`Fetch failed: ${res.status} ${res.statusText}`);
 
-// duplicate to create seamless looping
+    const json = await res.json();
+    const list = Array.isArray(json) ? json : json?.data || json?.members || [];
+    const arr = Array.isArray(list) ? list : [];
+
+    cards.value = arr
+      .filter((m) => String(m?.atmcashwithdraw) === "1" || m?.atmcashwithdraw === true)
+      .sort((a, b) => {
+        const ida = getMemberId(a);
+        const idb = getMemberId(b);
+
+        if (ida === 1 && idb !== 1) return -1;
+        if (idb === 1 && ida !== 1) return 1;
+
+        return ida - idb;
+      })
+      .map((m, index) => {
+        const card = mapMemberToCard(m);
+        return {
+          ...card,
+          id: index + 1, // ✅ No: 1..N
+          no: index + 1,
+          memberId: getMemberId(m),
+        };
+      })
+      .filter((c) => !!c.logo);
+  } catch (err) {
+    console.error("Error loading members for cards:", err);
+    cards.value = [];
+  }
+};
+
+/** ✅ นับจำนวนธนาคารจากข้อมูล API (หลัง filter แล้ว) */
+const memberCount = computed(() => cards.value.length);
+
+/** ✅ สร้างข้อความ badgeDescription แบบ dynamic */
+const computedBadgeDescription = computed(() => {
+  const count = memberCount.value || 0;
+  return `ທະນາຄານສະມາຊິກທັງຫມົດທີເຂົ້າຮ່ວມ : ${count} ທະນາຄານ`;
+});
+
+/** duplicate to create seamless looping */
 const loopCards = computed(() => [
-  ...cards.map((c) => ({ ...c, loopKey: "a" })),
-  ...cards.map((c) => ({ ...c, loopKey: "b" })),
+  ...cards.value.map((c) => ({ ...c, loopKey: "a" })),
+  ...cards.value.map((c) => ({ ...c, loopKey: "b" })),
 ]);
 
+/** GSAP auto scroll */
 const cardsColumn = ref(null);
 let tween = null;
+let floatTween = null;
 
 const initAutoScroll = () => {
   const col = cardsColumn.value;
   if (!col) return;
 
   const halfHeight = col.scrollHeight / 2;
+  if (!halfHeight || halfHeight <= 0) return;
 
   tween = gsap.to(col, {
     y: -halfHeight,
-    duration: 40, // slow & smooth
+    duration: 40,
     ease: "none",
     repeat: -1,
   });
 };
 
-const destroyAutoScroll = () => {
-  if (tween) {
-    tween.kill();
-    tween = null;
+const initFloating = () => {
+  if (floatTween) {
+    floatTween.kill();
+    floatTween = null;
   }
-  if (cardsColumn.value) {
-    gsap.set(cardsColumn.value, { y: 0 });
-  }
-};
 
-onMounted(() => {
-  initAutoScroll(); // auto-scroll on all screen sizes
-
-  // soft floating animation on all cards
-  gsap.to(".atm-card", {
+  floatTween = gsap.to(".atm-card", {
     y: -8,
     duration: 2.5,
     ease: "sine.inOut",
@@ -295,14 +250,38 @@ onMounted(() => {
     repeat: -1,
     stagger: 0.1,
   });
+};
+
+const destroyAnimations = () => {
+  if (tween) {
+    tween.kill();
+    tween = null;
+  }
+  if (floatTween) {
+    floatTween.kill();
+    floatTween = null;
+  }
+  if (cardsColumn.value) {
+    gsap.set(cardsColumn.value, { y: 0 });
+  }
+};
+
+onMounted(async () => {
+  await fetchMemberCards();
+  await nextTick();
+
+  destroyAnimations();
+  initAutoScroll();
+  initFloating();
 });
 
 onBeforeUnmount(() => {
-  destroyAutoScroll();
+  destroyAnimations();
 });
 </script>
 
 <style scoped>
+/* (CSS เดิมทั้งหมดเหมือนของคุณ) */
 .atm-page {
   width: 100%;
   height: 80vh;
@@ -324,7 +303,6 @@ onBeforeUnmount(() => {
   gap: 2rem;
 }
 
-/* LEFT */
 .left-panel {
   flex: 1.1;
   display: flex;
@@ -366,27 +344,6 @@ onBeforeUnmount(() => {
   color: rgba(240, 248, 255, 0.9);
 }
 
-.primary-btn {
-  align-self: flex-start;
-  padding: 0.75rem 1.6rem;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.95rem;
-  background: linear-gradient(135deg, #2563eb, #60a5ff);
-  color: #ffffff;
-  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.7);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
-}
-
-.primary-btn:hover {
-  transform: translateY(-1px) scale(1.02);
-  box-shadow: 0 18px 40px rgba(37, 99, 235, 0.85);
-  filter: brightness(1.08);
-}
-
-/* RIGHT */
 .right-panel {
   flex: 1;
   display: flex;
@@ -400,13 +357,6 @@ onBeforeUnmount(() => {
 
 .slider-header {
   margin-bottom: 1.2rem;
-}
-
-.slider-header h2 {
-  margin: 0.25rem 0 0.15rem;
-  font-size: 1.2rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
 
 .slider-header p {
@@ -428,7 +378,6 @@ onBeforeUnmount(() => {
   box-shadow: 0 8px 20px rgba(37, 99, 235, 0.75);
 }
 
-/* Window for vertical slider */
 .cards-window {
   flex: 1;
   overflow: hidden;
@@ -443,7 +392,6 @@ onBeforeUnmount(() => {
   );
 }
 
-/* Column that will be animated by GSAP */
 .cards-column {
   display: flex;
   flex-direction: column;
@@ -451,11 +399,10 @@ onBeforeUnmount(() => {
   padding: 0.5rem 0.2rem 0.5rem;
 }
 
-/* Single ATM card – bigger, more modern */
 .atm-card {
   position: relative;
   width: 100%;
-  min-height: 200px; /* bigger */
+  min-height: 200px;
   border-radius: 1.4rem;
   padding: 1.2rem 1.4rem;
   box-sizing: border-box;
@@ -470,7 +417,6 @@ onBeforeUnmount(() => {
   backdrop-filter: blur(16px);
 }
 
-/* subtle glass highlight */
 .atm-card::before {
   content: "";
   position: absolute;
@@ -484,7 +430,6 @@ onBeforeUnmount(() => {
   pointer-events: none;
 }
 
-/* decorative gradient loop line */
 .card-accent {
   position: absolute;
   inset: 12% -30%;
@@ -500,7 +445,6 @@ onBeforeUnmount(() => {
   pointer-events: none;
 }
 
-/* Top row: chip + network */
 .card-top {
   position: relative;
   display: flex;
@@ -509,13 +453,11 @@ onBeforeUnmount(() => {
   z-index: 1;
 }
 
-/* BIGGER CHIP WITH LOGO */
 .chip {
   width: 60px;
   height: 60px;
   border-radius: 0.9rem;
-  box-shadow:
-    0 0 0 1px rgba(15, 46, 94, 0.25),
+  box-shadow: 0 0 0 1px rgba(15, 46, 94, 0.25),
     0 8px 16px rgba(15, 23, 42, 0.35);
   display: flex;
   justify-content: center;
@@ -539,7 +481,6 @@ onBeforeUnmount(() => {
   letter-spacing: 0.14em;
 }
 
-/* Card number */
 .card-number {
   position: relative;
   z-index: 1;
@@ -548,7 +489,6 @@ onBeforeUnmount(() => {
   margin: 1rem 0 0.7rem;
 }
 
-/* Bottom row: holder + expiry */
 .card-bottom {
   position: relative;
   z-index: 1;
@@ -571,7 +511,6 @@ onBeforeUnmount(() => {
   margin-top: 0.1rem;
 }
 
-/* TABLET & MOBILE (1 column) */
 @media (max-width: 960px) {
   .content {
     flex-direction: column;
@@ -587,9 +526,8 @@ onBeforeUnmount(() => {
     min-height: 80vh;
   }
 
-  /* show about 4 cards height, rest hidden but auto-scrolling */
   .cards-window {
-    max-height: calc(4 * 200px + 3 * 1rem + 1.4rem); /* 4 cards + gaps + padding */
+    max-height: calc(4 * 200px + 3 * 1rem + 1.4rem);
     overflow: hidden;
     padding-right: 0.4rem;
     background: radial-gradient(
